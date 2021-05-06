@@ -47,4 +47,11 @@ libc_src = [
   'string/strtok.c'
 ]
 
-both_libraries('c', libc_src, install: true, include_directories: libc_inc)
+if get_option('shared')
+  libc_targ = 'both_libraries'
+else
+  libc_targ = 'static_library'
+endif
+
+build_target('c', libc_src, install: true, include_directories: libc_inc,
+	     target_type: libc_targ, link_args: '-nostartfiles')
