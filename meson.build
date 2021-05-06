@@ -54,6 +54,7 @@ libc_src = [
   'string/string.c',
   'string/strtok.c',
   'syscall/fcntl.S',
+  'syscall/fork.S',
   'syscall/return.S'
 ]
 
