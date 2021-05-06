@@ -27,13 +27,13 @@ void *calloc (size_t size, size_t block);
 void *realloc (void *ptr, size_t size);
 void free (void *ptr);
 
-int atexit (void (*func) (void));
-
 char *getenv (const char *name);
 int setenv (const char *name, const char *value, int overwrite);
 int putenv (char *str);
 int unsetenv (const char *name);
 
+int atexit (void (*func) (void));
+void exit (int code) __attribute__ ((noreturn));
 void abort (void) __attribute__ ((noreturn));
 
 int atoi (const char *str);

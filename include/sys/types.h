@@ -36,7 +36,7 @@ typedef uint32_t mode_t;
 typedef uint32_t nlink_t;
 typedef int32_t off_t;
 typedef int64_t loff_t;
-typedef uint16_t pid_t;
+typedef int16_t pid_t;
 typedef int32_t time_t; /* Year 2038 problem */
 typedef int32_t timer_t;
 typedef uint16_t uid_t;
