@@ -53,7 +53,8 @@ libc_src = [
   'string/strerror.c',
   'string/string.c',
   'string/strtok.c',
-  'syscall/fcntl.S'
+  'syscall/fcntl.S',
+  'syscall/return.S'
 ]
 
 if get_option('shared')

@@ -1,4 +1,4 @@
-/* fcntl.S -- This file is part of OS/0 libc.
+/* return.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,19 +14,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <syscall.h>
+	.global syscall_ret
+	.hidden syscall_ret
+syscall_ret:
+	test	%eax, %eax
+	js	1f
+	ret
 
-	.section .text
-	.global fcntl
-	.type fcntl, @function
-fcntl:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_fcntl, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+1:
+	/* Set errno and return -1 */
+	call	__x86.get_pc_thunk.dx
+	add	$_GLOBAL_OFFSET_TABLE_, %edx
+	neg	%eax
+	mov	%eax, errno@GOTOFF(%edx)
+	mov	$-1, %eax
+	ret
 
-	.size fcntl, . - fcntl
+	.size syscall_ret, . - syscall_ret
