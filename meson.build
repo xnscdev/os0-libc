@@ -33,6 +33,7 @@ libc_src = [
   'stdlib/bitsearch.c',
   'string/memcmp.c',
   'string/memset.c',
+  'string/strcat.c',
   'string/strcmp.c',
   'string/strcpy.c',
   'string/strerror.c',
@@ -40,4 +41,4 @@ libc_src = [
   'string/strtok.c'
 ]
 
-static_library('c', libc_src, install: true, include_directories: libc_inc)
+both_libraries('c', libc_src, install: true, include_directories: libc_inc)
