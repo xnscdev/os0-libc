@@ -13,3 +13,5 @@ install_headers(
   'unistd.h')
 
 subdir('sys')
+
+libc_inc = include_directories('.')
