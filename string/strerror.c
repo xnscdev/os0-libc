@@ -1,0 +1,151 @@
+/* strerror.c -- This file is part of OS/0 libc.
+   Copyright (C) 2021 XNSC
+
+   OS/0 libc is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   OS/0 libc is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
+
+#include <string.h>
+
+static const char *errno_names[] = {
+  NULL,
+  "Operation not permitted",
+  "No such file or directory",
+  "No such process",
+  "Interrupted system call",
+  "Input/output error",
+  "No such device or address",
+  "Argument list too long",
+  "Exec format error",
+  "Bad file descriptor",
+  "No child processes",
+  "Resource temporarily unavailable",
+  "Cannot allocate memory",
+  "Permission denied",
+  "Bad address",
+  "Block device required",
+  "Device or resource busy",
+  "File exists",
+  "Invalid cross-device link",
+  "No such device",
+  "Not a directory",
+  "Is a directory",
+  "Invalid argument",
+  "Too many open files",
+  "Too many open files in system",
+  "Inappropriate ioctl for device",
+  "Text file busy",
+  "File too large",
+  "No space left on device",
+  "Illegal seek",
+  "Read-only file system",
+  "Too many links",
+  "Broken pipe",
+  "Numerical argument out of domain",
+  "Numerical result out of range",
+  "Resource deadlock avoided",
+  "File name too long",
+  "No locks available",
+  "Function not implemented",
+  "Directory not empty",
+  "Too many levels of symbolic links",
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  "Device not a stream",
+  "No data available",
+  "Timer expired",
+  "Out of streams resources",
+  "Machine is not on the network",
+  "Package not installed",
+  "Remote I/O error",
+  "Link has been severed",
+  "Advertise error",
+  "Srmount error",
+  "Communication error on send",
+  "Protocol error",
+  "Multihop attempted",
+  NULL,
+  NULL,
+  "Value too large for defined data type",
+  "Name not unique on the network",
+  "File descriptor in bad state",
+  "Remote address changed",
+  "Can not access a needed shared library" /* sic */
+  "Accessing a corrupt shared library",
+  NULL,
+  "Attempting to link in too many shared libraries",
+  "Cannot exec a shared library directly",
+  "Invalid or incomplete multibyte or wide character",
+  "Interrupted system call should be restarted",
+  "Streams pipe error",
+  "Too many users",
+  "Socket operation on non-socket",
+  "Destination address required",
+  "Message too long",
+  "Protocol wrong type for socket",
+  "Protocol not available",
+  "Protocol not supported",
+  "Socket type not supported",
+  "Operation not supported",
+  "Protocol family not supported",
+  "Address family not supported by protocol",
+  "Address already in use",
+  "Cannot assign requested address",
+  "Network is down",
+  "Network is unreachable",
+  "Network dropped connection on reset",
+  "Software caused connection abort",
+  "Connection reset by peer",
+  "No buffer space available",
+  "Transport endpoint is already connected",
+  "Transport endpoint is not connected",
+  "Cannot send after transport endpoint shutdown",
+  "Too many references: cannot splice",
+  "Connection timed out",
+  "Connection refused",
+  "Host is down",
+  "No route to host",
+  "Operation already in progress",
+  "Operation now in progress",
+  "Stale file handle",
+  "Structure needs cleaning",
+  NULL,
+  NULL,
+  NULL,
+  "Remote I/O error",
+  "Disk quota exceeded"
+};
+
+const char *
+strerror (int errno)
+{
+  if (errno >= 0 || errno < -(sizeof (errno_names) / sizeof (errno_names[0])))
+    return NULL;
+  return errno_names[-errno];
+}

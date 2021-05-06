@@ -26,8 +26,18 @@ endif
 
 subdir('include')
 
+libc_inc = include_directories('include', 'private-include')
+
 libc_src = [
-  'stdlib/assert.c'
+  'stdlib/assert.c',
+  'stdlib/bitsearch.c',
+  'string/memcmp.c',
+  'string/memset.c',
+  'string/strcmp.c',
+  'string/strcpy.c',
+  'string/strerror.c',
+  'string/string.c',
+  'string/strtok.c'
 ]
 
 static_library('c', libc_src, install: true, include_directories: libc_inc)
