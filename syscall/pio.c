@@ -1,4 +1,4 @@
-/* types.h -- This file is part of OS/0 libc.
+/* pio.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,32 +14,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SYS_TYPES_H
-#define _SYS_TYPES_H
+#include <unistd.h>
 
-#include <stdint.h>
+ssize_t
+pread (int fd, void *buffer, size_t len, off_t offset)
+{
+  if (lseek (fd, offset, SEEK_SET) == -1)
+    return -1;
+  return read (fd, buffer, len);
+}
 
-/* POSIX types */
-
-typedef int32_t blkcnt_t;
-typedef int32_t blksize_t;
-typedef int32_t clock_t;
-typedef int32_t clockid_t;
-typedef uint16_t dev_t;
-typedef uint32_t fsblkcnt_t;
-typedef uint32_t fsfilcnt_t;
-typedef uint16_t gid_t;
-typedef uint16_t id_t;
-typedef uint32_t ino_t;
-typedef int32_t key_t;
-typedef uint32_t mode_t;
-typedef uint32_t nlink_t;
-typedef int32_t off_t;
-typedef int64_t loff_t;
-typedef int16_t pid_t;
-typedef int32_t time_t; /* Year 2038 problem */
-typedef int32_t timer_t;
-typedef uint16_t uid_t;
-typedef int32_t ssize_t;
-
-#endif
+ssize_t
+pwrite (int fd, const void *buffer, size_t len, off_t offset)
+{
+  if (lseek (fd, offset, SEEK_SET) == -1)
+    return -1;
+  return write (fd, buffer, len);
+}

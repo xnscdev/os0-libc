@@ -19,6 +19,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
+#include <stddef.h>
 
 #define SEEK_SET 0
 #define SEEK_CUR 1
@@ -30,7 +31,7 @@
 
 __BEGIN_DECLS
 
-pid_t fork (void);
+int fork (void);
 pid_t getpid (void);
 int execv (const char *path, char *const *argv);
 int execvp (const char *file, char *const *argv);

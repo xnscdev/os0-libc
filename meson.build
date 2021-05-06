@@ -57,6 +57,9 @@ libc_src = [
   'syscall/exit.S',
   'syscall/fcntl.S',
   'syscall/fork.S',
+  'syscall/io.S',
+  'syscall/lseek.S',
+  'syscall/pio.c',
   'syscall/return.S'
 ]
 
