@@ -22,6 +22,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#define BUFSIZ 512
+
 struct __FILE
 {
   int _flags;

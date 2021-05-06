@@ -17,6 +17,8 @@
 #ifndef _ERRNO_H
 #define _ERRNO_H
 
+#include <sys/cdefs.h>
+
 #define EPERM           1
 #define ENOENT          2
 #define ESRCH           3
@@ -117,5 +119,11 @@
 #define EUCLEAN         117
 #define EREMOTEIO       121
 #define EDQUOT          122
+
+__BEGIN_DECLS
+
+extern int errno;
+
+__END_DECLS
 
 #endif

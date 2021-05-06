@@ -29,8 +29,14 @@ subdir('include')
 libc_inc = include_directories('include', 'private-include')
 
 libc_src = [
+  'stdio/fprintf.c',
+  'stdio/stream.c',
+  'stdio/vfprintf.c',
+  'stdlib/abort.c',
   'stdlib/assert.c',
   'stdlib/bitsearch.c',
+  'stdlib/errno.c',
+  'stdlib/malloc.c',
   'string/memcmp.c',
   'string/memset.c',
   'string/strcat.c',
