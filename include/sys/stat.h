@@ -17,6 +17,7 @@
 #ifndef _SYS_STAT_H
 #define _SYS_STAT_H
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 #define S_IFMT   0170000
@@ -68,5 +69,15 @@ struct stat
   blksize_t st_blksize;
   blkcnt_t st_blocks;
 };
+
+__BEGIN_DECLS
+
+int fstat (int fd, struct stat *st);
+int lstat (const char *__restrict path, struct stat *__restrict st);
+int stat (const char *__restrict path, struct stat *__restrict st);
+int fstatat (int fd, const char *__restrict path, struct stat *__restrict st,
+	     int flags);
+
+__END_DECLS
 
 #endif

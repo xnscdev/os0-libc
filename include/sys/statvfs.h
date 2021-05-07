@@ -17,6 +17,7 @@
 #ifndef _SYS_STATVFS_H
 #define _SYS_STATVFS_H
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 typedef struct
@@ -37,5 +38,12 @@ struct statvfs
   long f_namelen;
   long f_flags;
 };
+
+__BEGIN_DECLS
+
+int fstatvfs (int fd, struct statvfs *st);
+int statvfs (const char *__restrict path, struct statvfs *__restrict st);
+
+__END_DECLS
 
 #endif
