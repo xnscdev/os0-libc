@@ -53,6 +53,7 @@ libc_src = [
   'string/strerror.c',
   'string/string.c',
   'string/strtok.c',
+  'syscall/brk.S',
   'syscall/execve.S',
   'syscall/exit.S',
   'syscall/fcntl.S',

@@ -38,6 +38,9 @@ int execvp (const char *file, char *const *argv);
 int execve (const char *path, char *const *argv, char *const *envp);
 void _exit (int code) __attribute__ ((noreturn));
 
+int brk (void *ptr);
+void *sbrk (int inc);
+
 ssize_t pread (int fd, void *buffer, size_t len, off_t offset);
 ssize_t read (int fd, void *buffer, size_t len);
 
