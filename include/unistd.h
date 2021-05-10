@@ -38,6 +38,9 @@ int execvp (const char *file, char *const *argv);
 int execve (const char *path, char *const *argv, char *const *envp);
 void _exit (int code) __attribute__ ((noreturn));
 
+int chdir (const char *path);
+int fchdir (int fd);
+
 int brk (void *ptr);
 void *sbrk (int inc);
 

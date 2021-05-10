@@ -43,6 +43,7 @@ libc_src = [
   'stdlib/abort.c',
   'stdlib/assert.c',
   'stdlib/bitsearch.c',
+  'stdlib/ctype.c',
   'stdlib/errno.c',
   'stdlib/malloc.c',
   'string/memcmp.c',
