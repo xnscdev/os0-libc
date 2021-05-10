@@ -54,12 +54,15 @@ libc_src = [
   'string/string.c',
   'string/strtok.c',
   'syscall/brk.S',
+  'syscall/chdir.S',
   'syscall/execve.S',
   'syscall/exit.S',
   'syscall/fcntl.S',
   'syscall/fork.S',
   'syscall/io.S',
   'syscall/lseek.S',
+  'syscall/open.c',
+  'syscall/open.S',
   'syscall/pio.c',
   'syscall/return.S'
 ]
