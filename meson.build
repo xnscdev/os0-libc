@@ -56,6 +56,7 @@ libc_src = [
   'string/strtok.c',
   'syscall/brk.S',
   'syscall/chdir.S',
+  'syscall/close.S',
   'syscall/execve.S',
   'syscall/exit.S',
   'syscall/fcntl.S',
