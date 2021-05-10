@@ -20,6 +20,8 @@
 #include <sys/cdefs.h>
 #include <stddef.h>
 
+#define __atexit_LIMIT 32
+
 __BEGIN_DECLS
 
 void *malloc (size_t size);

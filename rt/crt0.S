@@ -1,4 +1,4 @@
-/* exit.S -- This file is part of OS/0 libc.
+/* crt0.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,14 +14,36 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <syscall.h>
-
 	.section .text
-	.global _exit
-	.type _exit, @function
-_exit:
-	mov	$SYS_exit, %eax
-	mov	4(%esp), %ebx
-	int	$0x80
+	.global _start
+	.type _start, @function
+_start:
+	/* Kernel places argv in ESI and envp in EDI */
+	push	%edi
+	push	%esi
 
-	.size _exit, . - _exit
+	/* Calculate argc */
+	xor	%eax, %eax
+1:
+	mov	(%esi,%eax,4), %edx
+	test	%edx, %edx
+	jz	2f
+	inc	%eax
+	jmp	1b
+
+2:
+	/* Setup argc on stack */
+	push	%eax
+
+	call	_init
+	pushl	$_fini
+	call	atexit
+	add	$4, %esp
+
+	/* Call C entry point and exit */
+	call	main
+	add	$12, %esp
+	push	%eax
+	call	exit
+
+	.size _start, . - _start

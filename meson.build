@@ -45,6 +45,7 @@ libc_src = [
   'stdlib/bitsearch.c',
   'stdlib/ctype.c',
   'stdlib/errno.c',
+  'stdlib/exit.c',
   'stdlib/malloc.c',
   'string/memcmp.c',
   'string/memset.c',
@@ -77,3 +78,5 @@ endif
 
 build_target('c', libc_src, install: true, include_directories: libc_inc,
 	     target_type: libc_targ, link_args: '-nostartfiles')
+
+subdir('rt')

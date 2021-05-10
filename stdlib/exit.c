@@ -1,4 +1,4 @@
-/* exit.S -- This file is part of OS/0 libc.
+/* exit.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,14 +14,30 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <syscall.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-	.section .text
-	.global _exit
-	.type _exit, @function
-_exit:
-	mov	$SYS_exit, %eax
-	mov	4(%esp), %ebx
-	int	$0x80
+static void (*__atexit_funcs[__atexit_LIMIT]) (void);
+static int __atexit_ptr;
 
-	.size _exit, . - _exit
+int
+atexit (void (*func) (void))
+{
+  if (__atexit_ptr >= __atexit_LIMIT)
+    {
+      errno = ENOMEM;
+      return -1;
+    }
+  __atexit_funcs[__atexit_ptr++] = func;
+  return 0;
+}
+
+void
+exit (int code)
+{
+  int i;
+  for (i = 0; i < __atexit_ptr; i++)
+    __atexit_funcs[i] ();
+  _exit (code);
+}
