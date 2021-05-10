@@ -23,7 +23,7 @@ syscall_ret:
 
 1:
 	/* Set errno and return -1 */
-	call	__x86.get_pc_thunk.dx
+	call	__get_pc
 	add	$_GLOBAL_OFFSET_TABLE_, %edx
 	neg	%eax
 	mov	%eax, errno@GOTOFF(%edx)
@@ -31,3 +31,9 @@ syscall_ret:
 	ret
 
 	.size syscall_ret, . - syscall_ret
+
+__get_pc:
+	mov	(%esp), %edx
+	ret
+
+	.size __get_pc, . - __get_pc
