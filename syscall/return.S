@@ -23,17 +23,9 @@ syscall_ret:
 
 1:
 	/* Set errno and return -1 */
-	call	__get_pc
-	add	$_GLOBAL_OFFSET_TABLE_, %edx
 	neg	%eax
-	mov	%eax, errno@GOTOFF(%edx)
+	mov	%eax, errno
 	mov	$-1, %eax
 	ret
 
 	.size syscall_ret, . - syscall_ret
-
-__get_pc:
-	mov	(%esp), %edx
-	ret
-
-	.size __get_pc, . - __get_pc

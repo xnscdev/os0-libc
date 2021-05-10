@@ -34,9 +34,7 @@ brk:
 
 1:
 	dec	%eax
-	call	__x86.get_pc_thunk.dx
-	add	$_GLOBAL_OFFSET_TABLE_, %edx
-	movl	$ENOMEM, errno@GOTOFF(%edx)
+	movl	$ENOMEM, errno
 	ret
 
 	.size brk, . - brk
@@ -56,9 +54,7 @@ sbrk:
 	jns	2f
 
 1:
-	call	__x86.get_pc_thunk.dx
-	add	$_GLOBAL_OFFSET_TABLE_, %edx
-	movl	$ENOMEM, errno@GOTOFF(%edx)
+	movl	$ENOMEM, errno
 	mov	$-1, %eax
 	pop	%ebx
 	ret
