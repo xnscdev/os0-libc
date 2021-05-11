@@ -66,8 +66,8 @@ libc_src = [
   'syscall/io.S',
   'syscall/link.S',
   'syscall/lseek.S',
-  'syscall/open.c',
   'syscall/open.S',
+  'syscall/openat.S',
   'syscall/pio.c',
   'syscall/return.S'
 ]
