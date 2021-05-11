@@ -1,4 +1,4 @@
-/* exit.S -- This file is part of OS/0 libc.
+/* gettimeofday.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,11 +17,15 @@
 #include <sys/syscall.h>
 
 	.section .text
-	.global _exit
-	.type _exit, @function
-_exit:
-	mov	$SYS_exit, %eax
-	mov	4(%esp), %ebx
+	.global gettimeofday
+	.type gettimeofday, @function
+gettimeofday:
+	push	%ebx
+	mov	8(%esp), %ebx
+	mov	12(%esp), %ecx
+	mov	$SYS_gettimeofday, %eax
 	int	$0x80
+	pop	%ebx
+	jmp	syscall_ret
 
-	.size _exit, . - _exit
+	.size gettimeofday, . - gettimeofday

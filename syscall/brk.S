@@ -15,7 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/errno.h>
-#include <syscall.h>
+#include <sys/syscall.h>
 
 	.section .text
 	.global brk

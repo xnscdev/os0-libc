@@ -14,7 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <syscall.h>
+#include <sys/syscall.h>
 
 	.section .text
 	.global open
@@ -27,14 +27,6 @@ open:
 	mov	$SYS_open, %eax
 	int	$0x80
 	pop	%ebx
-
-	test	%eax, %eax
-	jns	1f
-
-	neg	%eax
-	mov	%eax, errno
-	mov	$-1, %eax
-1:
-	ret
+	jmp	syscall_ret
 
 	.size open, . - open

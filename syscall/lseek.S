@@ -14,7 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <syscall.h>
+#include <sys/syscall.h>
 
 	.section .text
 	.global lseek

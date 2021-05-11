@@ -19,5 +19,13 @@
 
 #include <bits/types/tm.h>
 #include <bits/time.h>
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
+
+int gettimeofday (struct timeval *__restrict tv,
+		  struct timezone *__restrict tz);
+
+__END_DECLS
 
 #endif
