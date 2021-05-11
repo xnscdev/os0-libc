@@ -11,4 +11,5 @@ install_headers('assert.h',
 		'time.h',
 		'unistd.h')
 
+subdir('bits/types')
 subdir('sys')

@@ -24,19 +24,8 @@
 
 #define BUFSIZ 512
 
-struct __FILE
-{
-  int _flags;
-  char *_buffer;
-  char *_ptr;
-  int _buf_len;
-  int _read_len;
-  int _write_len;
-};
-
-typedef struct __FILE FILE;
-
-typedef off_t fpos_t;
+#include <bits/types/file.h>
+#include <bits/types/fpos.h>
 
 __BEGIN_DECLS
 
