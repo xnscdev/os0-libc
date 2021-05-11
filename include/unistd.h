@@ -19,15 +19,8 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
+#include <sys/unistd.h>
 #include <stddef.h>
-
-#define SEEK_SET 0
-#define SEEK_CUR 1
-#define SEEK_END 2
-
-#define STDIN_FILENO  0
-#define STDOUT_FILENO 1
-#define STDERR_FILENO 2
 
 __BEGIN_DECLS
 
