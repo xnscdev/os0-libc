@@ -17,27 +17,8 @@
 #ifndef _SYS_STATVFS_H
 #define _SYS_STATVFS_H
 
+#include <bits/statvfs.h>
 #include <sys/cdefs.h>
-#include <sys/types.h>
-
-typedef struct
-{
-  int f_val[2];
-} fsid_t;
-
-struct statvfs
-{
-  long f_type;
-  blksize_t f_bsize;
-  fsblkcnt_t f_blocks;
-  fsblkcnt_t f_bfree;
-  fsblkcnt_t f_bavail;
-  fsfilcnt_t f_files;
-  fsfilcnt_t f_ffree;
-  fsid_t f_fsid;
-  long f_namelen;
-  long f_flags;
-};
 
 __BEGIN_DECLS
 

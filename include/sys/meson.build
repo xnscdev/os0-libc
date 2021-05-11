@@ -1,9 +1,3 @@
-install_headers(
-  'cdefs.h',
-  'errno.h',
-  'io.h',
-  'stat.h',
-  'statvfs.h',
-  'sysmacros.h',
-  'time.h',
-  'types.h', subdir: 'sys')
+install_headers('stat.h',
+		'statvfs.h',
+		'time.h', subdir: 'sys')

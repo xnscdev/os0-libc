@@ -27,6 +27,14 @@ open:
 	mov	$SYS_open, %eax
 	int	$0x80
 	pop	%ebx
-	jmp	syscall_ret
+
+	test	%eax, %eax
+	jns	1f
+
+	neg	%eax
+	mov	%eax, errno
+	mov	$-1, %eax
+1:
+	ret
 
 	.size open, . - open
