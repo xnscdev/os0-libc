@@ -64,6 +64,7 @@ libc_src = [
   'syscall/fork.S',
   'syscall/gettimeofday.S',
   'syscall/io.S',
+  'syscall/link.S',
   'syscall/lseek.S',
   'syscall/open.c',
   'syscall/open.S',

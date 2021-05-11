@@ -21,12 +21,16 @@
 int
 openat (int fd, const char *path, int flags, ...)
 {
-  int cwd = open (".", O_RDONLY);
-  int result;
-  if (cwd == -1)
-    return -1;
-  if (fchdir (fd) == -1)
-    return -1;
+  int cwd = -1;
+  int ret;
+  if (fd != AT_FDCWD)
+    {
+      cwd = open (".", O_RDONLY);
+      if (cwd == -1)
+	return -1;
+      if (fchdir (fd) == -1)
+	return -1;
+    }
   if (flags & O_CREAT)
     {
       va_list args;
@@ -34,13 +38,17 @@ openat (int fd, const char *path, int flags, ...)
       va_start (args, flags);
       mode = va_arg (args, mode_t);
       va_end (args);
-      result = open (path, flags, mode);
+      ret = open (path, flags, mode);
     }
   else
-    result = open (path, flags);
-  if (fchdir (cwd) == -1)
-    return -1;
-  return result;
+    ret = open (path, flags);
+  if (cwd != -1)
+    {
+      if (fchdir (cwd) == -1)
+	return -1;
+      close (cwd);
+    }
+  return ret;
 }
 
 int
