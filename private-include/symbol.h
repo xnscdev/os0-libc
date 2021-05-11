@@ -1,4 +1,4 @@
-/* malloc.c -- This file is part of OS/0 libc.
+/* symbol.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,46 +14,10 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <branch.h>
-#include <stdlib.h>
-#include <string.h>
-#include <symbol.h>
+#ifndef _SYMBOL_H
+#define _SYMBOL_H
 
-/* Temporary stub implementations */
+#define weak_alias(old, new)						\
+  extern __typeof__ (old) new __attribute__ ((weak, alias (#old)))
 
-void *
-__malloc (size_t size)
-{
-  abort ();
-}
-
-weak_alias (__malloc, malloc);
-
-void *
-__calloc (size_t size, size_t block)
-{
-  void *ptr = malloc (size * block);
-  if (unlikely (ptr == NULL))
-    return ptr;
-  memset (ptr, 0, size * block);
-  return ptr;
-}
-
-weak_alias (__calloc, calloc);
-
-void *
-__realloc (void *ptr, size_t size)
-{
-  if (ptr == NULL)
-    return malloc (size);
-  abort ();
-}
-
-weak_alias (__realloc, realloc);
-
-void
-__free (void *ptr)
-{
-}
-
-weak_alias (__free, free);
+#endif
