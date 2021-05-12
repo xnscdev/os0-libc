@@ -78,6 +78,7 @@ libc_src = [
   'syscall/rename.S',
   'syscall/return.S',
   'syscall/symlink.S',
+  'syscall/truncate.S',
   'syscall/unlink.S'
 ]
 
