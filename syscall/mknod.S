@@ -1,4 +1,4 @@
-/* link.S -- This file is part of OS/0 libc.
+/* mknod.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,35 +17,33 @@
 #include <sys/syscall.h>
 
 	.section .text
-	.global link
-	.type link, @function
-link:
+	.global mknod
+	.type mknod, @function
+mknod:
 	push	%ebx
 	mov	8(%esp), %ebx
 	mov	12(%esp), %ecx
-	mov	$SYS_link, %eax
+	mov	16(%esp), %edx
+	mov	$SYS_mknod, %eax
 	int	$0x80
 	pop	%ebx
 	jmp	syscall_ret
 
-	.size link, . - link
+	.size mknod, . - mknod
 
-	.global linkat
-	.type linkat, @function
-linkat:
+	.global mknodat
+	.type mknodat, @function
+mknodat:
 	push	%ebx
 	push	%esi
-	push	%edi
 	mov	8(%esp), %ebx
 	mov	12(%esp), %ecx
 	mov	16(%esp), %edx
 	mov	20(%esp), %esi
-	mov	24(%esp), %edi
-	mov	$SYS_linkat, %eax
+	mov	$SYS_mknodat, %eax
 	int	$0x80
-	pop	%edi
 	pop	%esi
 	pop	%ebx
 	jmp	syscall_ret
 
-	.size linkat, . - linkat
+	.size mknodat, . - mknodat

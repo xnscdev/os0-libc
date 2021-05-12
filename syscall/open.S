@@ -30,3 +30,20 @@ open:
 	jmp	syscall_ret
 
 	.size open, . - open
+
+	.global openat
+	.type openat, @function
+openat:
+	push	%ebx
+	push	%esi
+	mov	8(%esp), %ebx
+	mov	12(%esp), %ecx
+	mov	16(%esp), %edx
+	mov	20(%esp), %esi
+	mov	$SYS_openat, %eax
+	int	$0x80
+	pop	%esi
+	pop	%ebx
+	jmp	syscall_ret
+
+	.size openat, . - openat

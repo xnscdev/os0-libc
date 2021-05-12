@@ -1,4 +1,4 @@
-/* link.S -- This file is part of OS/0 libc.
+/* creat.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,38 +14,11 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <sys/syscall.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-	.section .text
-	.global link
-	.type link, @function
-link:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_link, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size link, . - link
-
-	.global linkat
-	.type linkat, @function
-linkat:
-	push	%ebx
-	push	%esi
-	push	%edi
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	mov	24(%esp), %edi
-	mov	$SYS_linkat, %eax
-	int	$0x80
-	pop	%edi
-	pop	%esi
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size linkat, . - linkat
+int
+creat (const char *path, mode_t mode)
+{
+  return open (path, O_CREAT | O_TRUNC | O_WRONLY, mode);
+}

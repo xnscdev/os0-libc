@@ -1,4 +1,4 @@
-/* link.S -- This file is part of OS/0 libc.
+/* mkdir.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,35 +17,41 @@
 #include <sys/syscall.h>
 
 	.section .text
-	.global link
-	.type link, @function
-link:
+	.global mkdir
+	.type mkdir, @function
+mkdir:
 	push	%ebx
 	mov	8(%esp), %ebx
 	mov	12(%esp), %ecx
-	mov	$SYS_link, %eax
+	mov	$SYS_mkdir, %eax
 	int	$0x80
 	pop	%ebx
 	jmp	syscall_ret
 
-	.size link, . - link
+	.size mkdir, . - mkdir
 
-	.global linkat
-	.type linkat, @function
-linkat:
+	.global mkdirat
+	.type mkdirat, @function
+mkdirat:
 	push	%ebx
-	push	%esi
-	push	%edi
 	mov	8(%esp), %ebx
 	mov	12(%esp), %ecx
 	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	mov	24(%esp), %edi
-	mov	$SYS_linkat, %eax
+	mov	$SYS_mkdirat, %eax
 	int	$0x80
-	pop	%edi
-	pop	%esi
 	pop	%ebx
 	jmp	syscall_ret
 
-	.size linkat, . - linkat
+	.size mkdirat, . - mkdirat
+
+	.global rmdir
+	.type rmdir, @function
+rmdir:
+	push	%ebx
+	mov	8(%esp), %ebx
+	mov	$SYS_rmdir, %eax
+	int	$0x80
+	pop	%ebx
+	jmp	syscall_ret
+
+	.size rmdir, . - rmdir

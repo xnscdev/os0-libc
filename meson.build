@@ -55,9 +55,13 @@ libc_src = [
   'string/strerror.c',
   'string/string.c',
   'string/strtok.c',
+  'syscall/access.S',
   'syscall/brk.S',
   'syscall/chdir.S',
+  'syscall/chmod.S',
+  'syscall/chown.S',
   'syscall/close.S',
+  'syscall/creat.c',
   'syscall/execve.S',
   'syscall/exit.S',
   'syscall/fcntl.S',
@@ -66,10 +70,15 @@ libc_src = [
   'syscall/io.S',
   'syscall/link.S',
   'syscall/lseek.S',
+  'syscall/mkdir.S',
+  'syscall/mknod.S',
   'syscall/open.S',
-  'syscall/openat.S',
   'syscall/pio.c',
-  'syscall/return.S'
+  'syscall/readlink.S',
+  'syscall/rename.S',
+  'syscall/return.S',
+  'syscall/symlink.S',
+  'syscall/unlink.S'
 ]
 
 if get_option('shared')

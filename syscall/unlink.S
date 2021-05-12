@@ -1,4 +1,4 @@
-/* openat.S -- This file is part of OS/0 libc.
+/* unlink.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,19 +17,28 @@
 #include <sys/syscall.h>
 
 	.section .text
-	.global openat
-	.type openat, @function
-openat:
+	.global unlink
+	.type unlink, @function
+unlink:
 	push	%ebx
-	push	%esi
 	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	mov	$SYS_openat, %eax
+	mov	$SYS_unlink, %eax
 	int	$0x80
-	pop	%esi
 	pop	%ebx
 	jmp	syscall_ret
 
-	.size openat, . - openat
+	.size unlink, . - unlink
+
+	.global unlinkat
+	.type unlinkat, @function
+unlinkat:
+	push	%ebx
+	mov	8(%esp), %ebx
+	mov	12(%esp), %ecx
+	mov	16(%esp), %edx
+	mov	$SYS_unlinkat, %eax
+	int	$0x80
+	pop	%ebx
+	jmp	syscall_ret
+
+	.size unlinkat, . - unlinkat

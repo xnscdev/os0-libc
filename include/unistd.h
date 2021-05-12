@@ -50,6 +50,9 @@ int openat (int fd, const char *path, int flags, ...);
 int creat (const char *path, mode_t mode);
 int close (int fd);
 
+int access (const char *path, int mode);
+int faccessat (int fd, const char *path, int mode, int flags);
+
 int link (const char *old, const char *new);
 int linkat (int oldfd, const char *old, int newfd, const char *new, int flags);
 
