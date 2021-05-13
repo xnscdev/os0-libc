@@ -68,6 +68,7 @@ libc_src = [
   'syscall/fork.S',
   'syscall/gettimeofday.S',
   'syscall/io.S',
+  'syscall/kill.S',
   'syscall/link.S',
   'syscall/lseek.S',
   'syscall/mkdir.S',
@@ -77,6 +78,7 @@ libc_src = [
   'syscall/readlink.S',
   'syscall/rename.S',
   'syscall/return.S',
+  'syscall/sigaction.S',
   'syscall/symlink.S',
   'syscall/truncate.S',
   'syscall/unlink.S'
