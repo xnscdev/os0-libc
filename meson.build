@@ -47,6 +47,7 @@ libc_src = [
   'stdlib/errno.c',
   'stdlib/exit.c',
   'stdlib/malloc.c',
+  'stdlib/signal.c',
   'string/memcmp.c',
   'string/memset.c',
   'string/strcat.c',

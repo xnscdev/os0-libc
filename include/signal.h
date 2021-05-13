@@ -24,7 +24,10 @@ __BEGIN_DECLS
 
 int sigaction (int sig, const struct sigaction *__restrict act,
 	       struct sigaction *__restrict old);
+sighandler_t signal (int sig, sighandler_t func);
+
 int kill (pid_t pid, int sig);
+int raise (int sig);
 
 __END_DECLS
 
