@@ -92,6 +92,7 @@ else
 endif
 
 build_target('c', libc_src, install: true, include_directories: libc_inc,
-	     target_type: libc_targ, link_args: ['-nostartfiles', '-nostdlib'])
+	     target_type: libc_targ, link_args: ['-nostartfiles', '-nostdlib'],
+	     version: '1.0.0')
 
 subdir('rt')
