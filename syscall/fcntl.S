@@ -21,12 +21,12 @@
 	.type fcntl, @function
 fcntl:
 	push	%ebx
+	mov	$SYS_fcntl, %eax
 	mov	8(%esp), %ebx
 	mov	12(%esp), %ecx
 	mov	16(%esp), %edx
-	mov	$SYS_fcntl, %eax
 	int	$0x80
 	pop	%ebx
-	jmp	syscall_ret
+	jmp	syscall_asm_ret
 
 	.size fcntl, . - fcntl

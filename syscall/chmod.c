@@ -1,4 +1,4 @@
-/* link.S -- This file is part of OS/0 libc.
+/* chmod.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,37 +15,22 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global link
-	.type link, @function
-link:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_link, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+chmod (const char *path, mode_t mode)
+{
+  return syscall (SYS_chmod, path, mode);
+}
 
-	.size link, . - link
+int
+fchmod (int fd, mode_t mode)
+{
+  return syscall (SYS_fchmod, fd, mode);
+}
 
-	.global linkat
-	.type linkat, @function
-linkat:
-	push	%ebx
-	push	%esi
-	push	%edi
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	mov	24(%esp), %edi
-	mov	$SYS_linkat, %eax
-	int	$0x80
-	pop	%edi
-	pop	%esi
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size linkat, . - linkat
+int
+fchmodat (int fd, const char *path, mode_t mode, int flags)
+{
+  return syscall (SYS_fchmodat, fd, path, mode, flags);
+}

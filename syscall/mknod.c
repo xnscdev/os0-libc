@@ -1,4 +1,4 @@
-/* mknod.S -- This file is part of OS/0 libc.
+/* mknod.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,35 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global mknod
-	.type mknod, @function
-mknod:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_mknod, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+mknod (const char *path, mode_t mode, dev_t dev)
+{
+  return syscall (SYS_mknod, path, mode, dev);
+}
 
-	.size mknod, . - mknod
-
-	.global mknodat
-	.type mknodat, @function
-mknodat:
-	push	%ebx
-	push	%esi
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	mov	$SYS_mknodat, %eax
-	int	$0x80
-	pop	%esi
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size mknodat, . - mknodat
+int
+mknodat (int fd, const char *path, mode_t mode, dev_t dev)
+{
+  return syscall (SYS_mknodat, fd, path, mode, dev);
+}

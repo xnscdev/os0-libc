@@ -1,4 +1,4 @@
-/* fork.S -- This file is part of OS/0 libc.
+/* rename.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,22 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global fork
-	.type fork, @function
-fork:
-	mov	$SYS_fork, %eax
-	int	$0x80
-	jmp	syscall_ret
+int
+rename (const char *old, const char *new)
+{
+  return syscall (SYS_rename, old, new);
+}
 
-	.size fork, . - fork
-
-	.global getpid
-	.type getpid, @function
-getpid:
-	mov	$SYS_getpid, %eax
-	int	$0x80
-	jmp	syscall_ret
-
-	.size getpid, . - getpid
+int
+renameat (int oldfd, const char *old, int newfd, const char *new)
+{
+  return syscall (SYS_renameat, oldfd, old, newfd, new);
+}

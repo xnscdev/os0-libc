@@ -1,4 +1,4 @@
-/* ioctl.S -- This file is part of OS/0 libc.
+/* gettimeofday.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,18 +15,11 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-	.section .text
-	.global ioctl
-	.type ioctl, @function
-ioctl:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_ioctl, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_asm_ret
-
-	.size ioctl, . - ioctl
+int
+gettimeofday (struct timeval *__restrict tv, struct timezone *__restrict tz)
+{
+  return syscall (SYS_gettimeofday, tv, tz);
+}

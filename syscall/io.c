@@ -1,4 +1,4 @@
-/* io.S -- This file is part of OS/0 libc.
+/* io.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,32 +15,32 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global read
-	.type read, @function
-read:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_read, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+ssize_t
+pread (int fd, void *buffer, size_t len, off_t offset)
+{
+  if (lseek (fd, offset, SEEK_SET) == -1)
+    return -1;
+  return read (fd, buffer, len);
+}
 
-	.size read, . - read
+ssize_t
+read (int fd, void *buffer, size_t len)
+{
+  return syscall (SYS_read, fd, buffer, len);
+}
 
-	.global write
-	.type write, @function
-write:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_write, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+ssize_t
+pwrite (int fd, const void *buffer, size_t len, off_t offset)
+{
+  if (lseek (fd, offset, SEEK_SET) == -1)
+    return -1;
+  return write (fd, buffer, len);
+}
 
-	.size write, . - write
+ssize_t
+write (int fd, const void *buffer, size_t len)
+{
+  return syscall (SYS_write, fd, buffer, len);
+}

@@ -1,4 +1,4 @@
-/* gettimeofday.S -- This file is part of OS/0 libc.
+/* link.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,17 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global gettimeofday
-	.type gettimeofday, @function
-gettimeofday:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_gettimeofday, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+link (const char *old, const char *new)
+{
+  return syscall (SYS_link, old, new);
+}
 
-	.size gettimeofday, . - gettimeofday
+int
+linkat (int oldfd, const char *old, int newfd, const char *new, int flags)
+{
+  return syscall (SYS_linkat, oldfd, old, newfd, new, flags);
+}

@@ -1,4 +1,4 @@
-/* lseek.S -- This file is part of OS/0 libc.
+/* fork.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,18 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global lseek
-	.type lseek, @function
-lseek:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_lseek, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+fork (void)
+{
+  return syscall (SYS_fork);
+}
 
-	.size lseek, . - lseek
+pid_t
+getpid (void)
+{
+  return syscall (SYS_getpid);
+}

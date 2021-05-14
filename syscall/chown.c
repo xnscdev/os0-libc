@@ -1,4 +1,4 @@
-/* sigaction.S -- This file is part of OS/0 libc.
+/* chown.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,18 +15,29 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global sigaction
-	.type sigaction, @function
-sigaction:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_sigaction, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+chown (const char *path, uid_t uid, gid_t gid)
+{
+  return syscall (SYS_chown, path, uid, gid);
+}
 
-	.size sigaction, . - sigaction
+int
+fchown (int fd, uid_t uid, gid_t gid)
+{
+  return syscall (SYS_fchown, fd, uid, gid);
+}
+
+int
+lchown (const char *path, uid_t uid, gid_t gid)
+{
+  /* TODO Implement lchown(2) */
+  return chown (path, uid, gid);
+}
+
+int
+fchownat (int fd, const char *path, uid_t uid, gid_t gid, int flags)
+{
+  return syscall (SYS_fchownat, fd, path, uid, gid, flags);
+}

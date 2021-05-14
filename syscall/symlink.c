@@ -1,4 +1,4 @@
-/* unlink.S -- This file is part of OS/0 libc.
+/* symlink.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,30 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global unlink
-	.type unlink, @function
-unlink:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	$SYS_unlink, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+symlink (const char *old, const char *new)
+{
+  return syscall (SYS_symlink, old, new);
+}
 
-	.size unlink, . - unlink
-
-	.global unlinkat
-	.type unlinkat, @function
-unlinkat:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_unlinkat, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size unlinkat, . - unlinkat
+int
+symlinkat (const char *old, int fd, const char *new)
+{
+  return syscall (SYS_symlinkat, old, fd, new);
+}

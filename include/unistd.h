@@ -91,6 +91,8 @@ ssize_t readlinkat (int fd, const char *__restrict path,
 int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
 
+long syscall (long num, ...);
+
 __END_DECLS
 
 #endif

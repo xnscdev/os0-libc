@@ -1,4 +1,4 @@
-/* return.S -- This file is part of OS/0 libc.
+/* chdir.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,18 +14,17 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-	.global syscall_ret
-	.hidden syscall_ret
-syscall_ret:
-	test	%eax, %eax
-	js	1f
-	ret
+#include <sys/syscall.h>
+#include <unistd.h>
 
-1:
-	/* Set errno and return -1 */
-	neg	%eax
-	mov	%eax, errno
-	mov	$-1, %eax
-	ret
+int
+chdir (const char *path)
+{
+  return syscall (SYS_chdir, path);
+}
 
-	.size syscall_ret, . - syscall_ret
+int
+fchdir (int fd)
+{
+  return syscall (SYS_fchdir, fd);
+}

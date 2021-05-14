@@ -1,4 +1,4 @@
-/* truncate.S -- This file is part of OS/0 libc.
+/* syscall.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,31 +14,47 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <sys/syscall.h>
-
 	.section .text
-	.global truncate
-	.type truncate, @function
-truncate:
+	.global syscall
+	.type syscall, @function
+syscall:
+	/* Save registers */
 	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_truncate, %eax
+	push	%esi
+	push	%edi
+	push	%ebp
+
+	/* Setup syscall arguments and interrupt */
+	mov	20(%esp), %eax
+	mov	24(%esp), %ebx
+	mov	28(%esp), %ecx
+	mov	32(%esp), %edx
+	mov	36(%esp), %esi
+	mov	40(%esp), %edi
+	mov	44(%esp), %ebp
 	int	$0x80
+
+	/* Restore registers */
+	pop	%ebp
+	pop	%edi
+	pop	%esi
 	pop	%ebx
-	jmp	syscall_ret
+	jmp	syscall_asm_ret
 
-	.size truncate, . - truncate
+	.size syscall, . - syscall
 
-	.global ftruncate
-	.type ftruncate, @function
-ftruncate:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_ftruncate, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+	.global syscall_asm_ret
+	.hidden syscall_asm_ret
+syscall_asm_ret:
+	test	%eax, %eax
+	js	1f
+	ret
 
-	.size ftruncate, . - ftruncate
+1:
+	/* Set errno and return -1 */
+	neg	%eax
+	mov	%eax, errno
+	mov	$-1, %eax
+	ret
+
+	.size syscall_asm_ret, . - syscall_asm_ret

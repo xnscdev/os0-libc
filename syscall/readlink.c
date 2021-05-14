@@ -1,4 +1,4 @@
-/* chmod.S -- This file is part of OS/0 libc.
+/* readlink.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,47 +15,17 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global chmod
-	.type chmod, @function
-chmod:
-	push	%ebx
-	mov	$SYS_chmod, %eax
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+ssize_t
+readlink (const char *__restrict path, char *__restrict buffer, size_t len)
+{
+  return syscall (SYS_readlink, path, buffer, len);
+}
 
-	.size chmod, . - chmod
-
-	.global fchmod
-	.type fchmod, @function
-fchmod:
-	push	%ebx
-	mov	$SYS_fchmod, %eax
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size fchmod, . - fchmod
-
-	.global fchmodat
-	.type fchmodat, @function
-fchmodat:
-	push	%ebx
-	push	%esi
-	mov	$SYS_fchmodat, %eax
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	int	$0x80
-	pop	%esi
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size fchmodat, . - fchmodat
+ssize_t
+readlinkat (int fd, const char *__restrict path, char *__restrict buffer,
+	    size_t len)
+{
+  return syscall (SYS_readlinkat, fd, path, buffer, len);
+}

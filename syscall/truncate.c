@@ -1,4 +1,4 @@
-/* chdir.S -- This file is part of OS/0 libc.
+/* truncate.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,28 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global chdir
-	.type chdir, @function
-chdir:
-	push	%ebx
-	mov	$SYS_chdir, %eax
-	mov	8(%esp), %ebx
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+truncate (const char *path, off_t len)
+{
+  return syscall (SYS_truncate, path, len);
+}
 
-	.size chdir, . - chdir
-
-	.global fchdir
-	.type fchdir, @function
-fchdir:
-	push	%ebx
-	mov	$SYS_fchdir, %eax
-	mov	8(%esp), %ebx
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size fchdir, . - fchdir
+int
+ftruncate (int fd, off_t len)
+{
+  return syscall (SYS_ftruncate, fd, len);
+}

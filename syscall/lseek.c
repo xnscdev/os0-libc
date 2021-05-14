@@ -1,4 +1,4 @@
-/* symlink.S -- This file is part of OS/0 libc.
+/* lseek.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,31 +15,10 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global symlink
-	.type symlink, @function
-symlink:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_symlink, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size symlink, . - symlink
-
-	.global symlinkat
-	.type symlinkat, @function
-symlinkat:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_symlinkat, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size symlinkat, . - symlinkat
+off_t
+lseek (int fd, off_t offset, int whence)
+{
+  return syscall (SYS_lseek, fd, offset, whence);
+}

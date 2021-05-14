@@ -1,4 +1,4 @@
-/* pio.c -- This file is part of OS/0 libc.
+/* sigaction.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,20 +14,13 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/syscall.h>
+#include <signal.h>
 #include <unistd.h>
 
-ssize_t
-pread (int fd, void *buffer, size_t len, off_t offset)
+int
+sigaction (int sig, const struct sigaction *__restrict act,
+	   struct sigaction *__restrict old)
 {
-  if (lseek (fd, offset, SEEK_SET) == -1)
-    return -1;
-  return read (fd, buffer, len);
-}
-
-ssize_t
-pwrite (int fd, const void *buffer, size_t len, off_t offset)
-{
-  if (lseek (fd, offset, SEEK_SET) == -1)
-    return -1;
-  return write (fd, buffer, len);
+  return syscall (SYS_sigaction, sig, act, old);
 }

@@ -1,4 +1,4 @@
-/* readlink.S -- This file is part of OS/0 libc.
+/* exit.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,35 +15,11 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global readlink
-	.type readlink, @function
-readlink:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_readlink, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size readlink, . - readlink
-
-	.global readlinkat
-	.type readlinkat, @function
-readlinkat:
-	push	%ebx
-	push	%esi
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	20(%esp), %esi
-	mov	$SYS_readlinkat, %eax
-	int	$0x80
-	pop	%esi
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size readlinkat, . - readlinkat
+void
+_exit (int code)
+{
+  syscall (SYS_exit, code);
+  __builtin_unreachable ();
+}

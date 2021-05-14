@@ -1,4 +1,4 @@
-/* kill.S -- This file is part of OS/0 libc.
+/* mkdir.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,17 +15,22 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global kill
-	.type kill, @function
-kill:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_kill, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
+int
+mkdir (const char *path, mode_t mode)
+{
+  return syscall (SYS_mkdir, path, mode);
+}
 
-	.size kill, . - kill
+int
+mkdirat (int fd, const char *path, mode_t mode)
+{
+  return syscall (SYS_mkdirat, fd, path, mode);
+}
+
+int
+rmdir (const char *path)
+{
+  return syscall (SYS_rmdir, path);
+}

@@ -1,4 +1,4 @@
-/* exit.S -- This file is part of OS/0 libc.
+/* access.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,13 +15,16 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global _exit
-	.type _exit, @function
-_exit:
-	mov	$SYS_exit, %eax
-	mov	4(%esp), %ebx
-	int	$0x80
+int
+access (const char *path, int mode)
+{
+  return syscall (SYS_access, path, mode);
+}
 
-	.size _exit, . - _exit
+int
+faccessat (int fd, const char *path, int mode, int flags)
+{
+  return syscall (SYS_faccessat, fd, path, mode, flags);
+}

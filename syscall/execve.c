@@ -1,4 +1,4 @@
-/* mkdir.S -- This file is part of OS/0 libc.
+/* execve.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,43 +15,10 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <unistd.h>
 
-	.section .text
-	.global mkdir
-	.type mkdir, @function
-mkdir:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	$SYS_mkdir, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size mkdir, . - mkdir
-
-	.global mkdirat
-	.type mkdirat, @function
-mkdirat:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	12(%esp), %ecx
-	mov	16(%esp), %edx
-	mov	$SYS_mkdirat, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size mkdirat, . - mkdirat
-
-	.global rmdir
-	.type rmdir, @function
-rmdir:
-	push	%ebx
-	mov	8(%esp), %ebx
-	mov	$SYS_rmdir, %eax
-	int	$0x80
-	pop	%ebx
-	jmp	syscall_ret
-
-	.size rmdir, . - rmdir
+int
+execve (const char *path, char *const *argv, char *const *envp)
+{
+  return syscall (SYS_execve, path, argv, envp);
+}
