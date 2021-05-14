@@ -46,6 +46,7 @@ libc_src = [
   'stdlib/ctype.c',
   'stdlib/errno.c',
   'stdlib/exit.c',
+  'stdlib/isatty.c',
   'stdlib/malloc.c',
   'stdlib/signal.c',
   'stdlib/termios.c',
