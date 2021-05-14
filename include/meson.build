@@ -9,6 +9,7 @@ install_headers('assert.h',
 		'stdio.h',
 		'stdlib.h',
 		'string.h',
+		'termios.h',
 		'time.h',
 		'unistd.h')
 
