@@ -19,12 +19,15 @@
 #include <string.h>
 #include <symbol.h>
 
-/* Temporary stub implementations */
+void *dlmalloc (size_t size);
+void *dlcalloc (size_t size, size_t block);
+void *dlrealloc (void *ptr, size_t size);
+void *dlfree (void *ptr);
 
 void *
 __malloc (size_t size)
 {
-  abort ();
+  return dlmalloc (size);
 }
 
 weak_alias (__malloc, malloc);
@@ -32,11 +35,7 @@ weak_alias (__malloc, malloc);
 void *
 __calloc (size_t size, size_t block)
 {
-  void *ptr = malloc (size * block);
-  if (unlikely (ptr == NULL))
-    return ptr;
-  memset (ptr, 0, size * block);
-  return ptr;
+  return dlcalloc (size, block);
 }
 
 weak_alias (__calloc, calloc);
@@ -44,9 +43,7 @@ weak_alias (__calloc, calloc);
 void *
 __realloc (void *ptr, size_t size)
 {
-  if (ptr == NULL)
-    return malloc (size);
-  abort ();
+  return dlrealloc (ptr, size);
 }
 
 weak_alias (__realloc, realloc);
@@ -54,6 +51,7 @@ weak_alias (__realloc, realloc);
 void
 __free (void *ptr)
 {
+  dlfree (ptr);
 }
 
 weak_alias (__free, free);

@@ -44,6 +44,7 @@ libc_src = [
   'stdlib/assert.c',
   'stdlib/bitsearch.c',
   'stdlib/ctype.c',
+  'stdlib/dlmalloc.c',
   'stdlib/errno.c',
   'stdlib/exit.c',
   'stdlib/isatty.c',
