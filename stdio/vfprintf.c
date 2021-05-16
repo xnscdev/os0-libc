@@ -18,7 +18,6 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stream.h>
 #include <string.h>
 
 static char *__cvtdgl =
@@ -32,7 +31,7 @@ __cvtnums (intmax_t value, int base, const char *digits)
 {
   char *ptr = __cvtbuf;
   char *rev = __cvtbuf;
-  int temp;
+  intmax_t temp;
   char c;
 
   do
@@ -59,7 +58,7 @@ __cvtnumu (uintmax_t value, int base, const char *digits)
 {
   char *ptr = __cvtbuf;
   char *rev = __cvtbuf;
-  int temp;
+  uintmax_t temp;
   char c;
 
   do
@@ -192,6 +191,58 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	      count++;
 	    }
 	  fmt++;
+	}
+      else if (strncmp (fmt, "ld", 2) == 0 || strncmp (fmt, "li", 2) == 0)
+	{
+	  long value = va_arg (args, long);
+	  const char *str;
+	  __cvtnums (value, 10, __cvtdgl);
+	  for (str = __cvtbuf; *str != '\0'; str++)
+	    {
+	      if (fputc (*str, stream) == EOF)
+		return EOF;
+	      count++;
+	    }
+	  fmt += 2;
+	}
+      else if (strncmp (fmt, "lo", 2) == 0)
+	{
+	  unsigned long value = va_arg (args, long);
+	  const char *str;
+	  __cvtnumu (value, 8, __cvtdgl);
+	  for (str = __cvtbuf; *str != '\0'; str++)
+	    {
+	      if (fputc (*str, stream) == EOF)
+		return EOF;
+	      count++;
+	    }
+	  fmt += 2;
+	}
+      else if (strncmp (fmt, "lu", 2) == 0)
+	{
+	  unsigned long value = va_arg (args, long);
+	  const char *str;
+	  __cvtnumu (value, 10, __cvtdgl);
+	  for (str = __cvtbuf; *str != '\0'; str++)
+	    {
+	      if (fputc (*str, stream) == EOF)
+		return EOF;
+	      count++;
+	    }
+	  fmt += 2;
+	}
+      else if (strncmp (fmt, "lx", 2) == 0 || strncmp (fmt, "lX", 2) == 0)
+	{
+	  unsigned long value = va_arg (args, long);
+	  const char *str;
+	  __cvtnumu (value, 16, fmt[1] == 'x' ? __cvtdgl : __cvtdgu);
+	  for (str = __cvtbuf; *str != '\0'; str++)
+	    {
+	      if (fputc (*str, stream) == EOF)
+		return EOF;
+	      count++;
+	    }
+	  fmt += 2;
 	}
       else
 	{
