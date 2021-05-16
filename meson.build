@@ -42,6 +42,7 @@ libc_src = [
   'stdio/fio.c',
   'stdio/fprintf.c',
   'stdio/fputc.c',
+  'stdio/fputs.c',
   'stdio/setvbuf.c',
   'stdio/stdstr.c',
   'stdio/vfprintf.c',
@@ -102,7 +103,7 @@ else
 endif
 
 build_target('c', libc_src, install: true, include_directories: libc_inc,
-	     target_type: libc_targ, link_args: ['-nostartfiles', '-nostdlib'],
-	     version: '1.0.0')
+	     target_type: libc_targ, version: '1.0.0',
+	     link_args: ['-nostartfiles', '-nostdlib', '-lgcc'])
 
 subdir('rt')

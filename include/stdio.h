@@ -60,6 +60,9 @@ int fputc (int c, FILE *stream);
 #define putc(c, stream) fputc (c, stream) 
 int putchar (int c);
 
+int fputs (const char *__restrict str, FILE *__restrict stream);
+int puts (const char *str);
+
 FILE *fopen (const char *__restrict path, const char *__restrict mode);
 FILE *fdopen (int fd, const char *mode);
 FILE *freopen (const char *__restrict path, const char *__restrict mode,
