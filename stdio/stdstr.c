@@ -20,34 +20,29 @@
 #include <stream.h>
 #include <unistd.h>
 
-FILE *stdin;
-FILE *stdout;
-FILE *stderr;
+static FILE __stdin;
+static FILE __stdout;
+static FILE __stderr;
+
+static char __stdout_buf[BUFSIZ];
+
+FILE *stdin = &__stdin;
+FILE *stdout = &__stdout;
+FILE *stderr = &__stderr;
 
 void
 __libc_setup_stdstr (void)
 {
-  stdin = calloc (1, sizeof (FILE));
-  if (stdin == NULL)
-    raise (SIGSEGV);
   stdin->_flags = _IONBF;
   stdin->_fd = STDIN_FILENO;
 
-  stdout = malloc (sizeof (FILE));
-  if (stdout == NULL)
-    raise (SIGSEGV);
-  stdout->_flags = _IOLBF | __IO_buf_alloc;
+  stdout->_flags = _IOLBF;
   stdout->_fd = STDOUT_FILENO;
-  stdout->_buffer = malloc (BUFSIZ);
-  if (stdout->_buffer == NULL)
-    raise (SIGSEGV);
+  stdout->_buffer = __stdout_buf;
   stdout->_ptr = stdout->_buffer;
   stdout->_buf_len = BUFSIZ;
   stdout->_ptr_len = 0;
 
-  stderr = calloc (1, sizeof (FILE));
-  if (stderr == NULL)
-    raise (SIGSEGV);
   stderr->_flags = _IONBF;
   stderr->_fd = STDERR_FILENO;
 }

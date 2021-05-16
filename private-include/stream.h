@@ -24,6 +24,7 @@
 #define __IO_buf_alloc 0x04
 #define __IO_eof       0x08
 #define __IO_err       0x10
+#define __IO_stt_alloc 0x20
 
 __BEGIN_DECLS
 
