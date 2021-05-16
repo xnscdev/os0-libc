@@ -138,6 +138,11 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	    }
 	  fmt++;
 	}
+      else if (*fmt == 'n')
+	{
+	  *va_arg (args, int *) = count;
+	  fmt++;
+	}
       else if (*fmt == 'o')
 	{
 	  unsigned int value = va_arg (args, unsigned int);
