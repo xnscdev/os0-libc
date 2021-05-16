@@ -1,4 +1,4 @@
-/* stream.c -- This file is part of OS/0 libc.
+/* init.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,29 +14,10 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <branch.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <stream.h>
 
-FILE *stdin;
-FILE *stdout;
-FILE *stderr;
-
-FILE *
-create_stream (int bufsize)
+__hidden void
+__libc_init (void)
 {
-  FILE *stream = malloc (sizeof (FILE));
-  stream->_flags = 0;
-  stream->_buffer = calloc (bufsize, 1);
-  if (unlikely (stream->_buffer == NULL))
-    {
-      free (stream);
-      return NULL;
-    }
-  stream->_ptr = stream->_buffer;
-  stream->_buf_len = bufsize;
-  stream->_read_len = 0;
-  stream->_write_len = 0;
-  return stream;
+  __libc_setup_stdstr ();
 }

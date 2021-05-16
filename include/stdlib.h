@@ -20,6 +20,9 @@
 #include <sys/cdefs.h>
 #include <stddef.h>
 
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
+
 #define __atexit_LIMIT 32
 
 __BEGIN_DECLS

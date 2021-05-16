@@ -1,4 +1,4 @@
-/* crt0.S -- This file is part of OS/0 libc.
+/* fflush.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,38 +14,28 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-	.section .text
-	.global _start
-	.type _start, @function
-_start:
-	/* Kernel places argv in ESI and envp in EDI */
-	push	%edi
-	push	%esi
+#include <stdio.h>
+#include <stream.h>
+#include <unistd.h>
 
-	/* Calculate argc */
-	xor	%eax, %eax
-1:
-	mov	(%esi,%eax,4), %edx
-	test	%edx, %edx
-	jz	2f
-	inc	%eax
-	jmp	1b
+int
+fflush (FILE *stream)
+{
+  if ((stream->_flags & __IO_buf_mask) == _IONBF)
+    return 0;
+  if (write (stream->_fd, stream->_buffer, stream->_ptr_len) == -1)
+    return -1;
+  stream->_ptr = stream->_buffer;
+  stream->_ptr_len = 0;
+  return 0;
+}
 
-2:
-	/* Setup argc on stack */
-	push	%eax
-
-	/* Initialize C library */
-	call	_init
-	pushl	$_fini
-	call	atexit
-	add	$4, %esp
-	call	__libc_init
-
-	/* Call C entry point and exit */
-	call	main
-	add	$12, %esp
-	push	%eax
-	call	exit
-
-	.size _start, . - _start
+int
+fpurge (FILE *stream)
+{
+  if ((stream->_flags & __IO_buf_mask) == _IONBF)
+    return 0;
+  stream->_ptr = stream->_buffer;
+  stream->_ptr_len = 0;
+  return 0;
+}

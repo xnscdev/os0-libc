@@ -1,4 +1,4 @@
-/* crt0.S -- This file is part of OS/0 libc.
+/* fio.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,38 +14,38 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-	.section .text
-	.global _start
-	.type _start, @function
-_start:
-	/* Kernel places argv in ESI and envp in EDI */
-	push	%edi
-	push	%esi
+#include <stdio.h>
+#include <stream.h>
+#include <unistd.h>
 
-	/* Calculate argc */
-	xor	%eax, %eax
-1:
-	mov	(%esi,%eax,4), %edx
-	test	%edx, %edx
-	jz	2f
-	inc	%eax
-	jmp	1b
+size_t
+fread (void *__restrict buffer, size_t size, size_t len,
+       FILE *__restrict stream)
+{
+  size_t i;
+  for (i = 0; i < len; i++)
+    {
+      if (read (stream->_fd, buffer + i * size, size) == -1)
+	{
+	  stream->_flags |= __IO_err;
+	  return i;
+	}
+    }
+  return i;
+}
 
-2:
-	/* Setup argc on stack */
-	push	%eax
-
-	/* Initialize C library */
-	call	_init
-	pushl	$_fini
-	call	atexit
-	add	$4, %esp
-	call	__libc_init
-
-	/* Call C entry point and exit */
-	call	main
-	add	$12, %esp
-	push	%eax
-	call	exit
-
-	.size _start, . - _start
+size_t
+fwrite (const void *__restrict buffer, size_t size, size_t len,
+	FILE *__restrict stream)
+{
+  size_t i;
+  for (i = 0; i < len; i++)
+    {
+      if (write (stream->_fd, buffer + i * size, size) == -1)
+	{
+	  stream->_flags |= __IO_err;
+	  return i;
+	}
+    }
+  return i;
+}

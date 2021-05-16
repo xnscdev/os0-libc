@@ -37,8 +37,13 @@ subdir('include')
 libc_inc = include_directories('include', 'private-include')
 
 libc_src = [
+  'stdio/ferror.c',
+  'stdio/fflush.c',
+  'stdio/fio.c',
   'stdio/fprintf.c',
-  'stdio/stream.c',
+  'stdio/fputc.c',
+  'stdio/setvbuf.c',
+  'stdio/stdstr.c',
   'stdio/vfprintf.c',
   'stdlib/abort.c',
   'stdlib/assert.c',
@@ -47,6 +52,7 @@ libc_src = [
   'stdlib/dlmalloc.c',
   'stdlib/errno.c',
   'stdlib/exit.c',
+  'stdlib/init.c',
   'stdlib/isatty.c',
   'stdlib/malloc.c',
   'stdlib/signal.c',

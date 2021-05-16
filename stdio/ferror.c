@@ -1,4 +1,4 @@
-/* crt0.S -- This file is part of OS/0 libc.
+/* ferror.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,38 +14,29 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-	.section .text
-	.global _start
-	.type _start, @function
-_start:
-	/* Kernel places argv in ESI and envp in EDI */
-	push	%edi
-	push	%esi
+#include <stdio.h>
+#include <stream.h>
 
-	/* Calculate argc */
-	xor	%eax, %eax
-1:
-	mov	(%esi,%eax,4), %edx
-	test	%edx, %edx
-	jz	2f
-	inc	%eax
-	jmp	1b
+void
+clearerr (FILE *stream)
+{
+  stream->_flags &= ~(__IO_err | __IO_eof);
+}
 
-2:
-	/* Setup argc on stack */
-	push	%eax
+int
+feof (FILE *stream)
+{
+  return stream->_flags & __IO_eof ? 1 : 0;
+}
 
-	/* Initialize C library */
-	call	_init
-	pushl	$_fini
-	call	atexit
-	add	$4, %esp
-	call	__libc_init
+int
+ferror (FILE *stream)
+{
+  return stream->_flags & __IO_err ? 1 : 0;
+}
 
-	/* Call C entry point and exit */
-	call	main
-	add	$12, %esp
-	push	%eax
-	call	exit
-
-	.size _start, . - _start
+int
+fileno (FILE *stream)
+{
+  return stream->_fd;
+}

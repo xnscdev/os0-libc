@@ -15,7 +15,9 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
+#include <stream.h>
 
 int
 vprintf (const char *__restrict fmt, va_list args)
@@ -27,6 +29,6 @@ int
 vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 {
   /* TODO Implement */
-  errno = ENOTSUP;
+  errno = ENOSYS;
   return -1;
 }

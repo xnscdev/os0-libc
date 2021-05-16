@@ -20,11 +20,11 @@
 struct __FILE
 {
   int _flags;
+  int _fd;
   char *_buffer;
   char *_ptr;
   int _buf_len;
-  int _read_len;
-  int _write_len;
+  int _ptr_len;
 };
 
 typedef struct __FILE FILE;

@@ -17,6 +17,18 @@
 #ifndef _STREAM_H
 #define _STREAM_H
 
-FILE *create_stream (int bufsize) __attribute__ ((visibility ("hidden")));
+#include <sys/cdefs.h>
+#include <stdarg.h>
+
+#define __IO_buf_mask  0x03
+#define __IO_buf_alloc 0x04
+#define __IO_eof       0x08
+#define __IO_err       0x10
+
+__BEGIN_DECLS
+
+void __libc_setup_stdstr (void) __hidden;
+
+__END_DECLS
 
 #endif

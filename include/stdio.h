@@ -22,7 +22,13 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#define EOF (-1)
+
 #define BUFSIZ 512
+
+#define _IONBF 0
+#define _IOLBF 1
+#define _IOFBF 2
 
 #include <bits/types/file.h>
 #include <bits/types/fpos.h>
@@ -50,6 +56,10 @@ int vsprintf (char *__restrict str, const char *__restrict fmt, va_list args);
 int vsnprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 	       va_list args);
 
+int fputc (int c, FILE *stream);
+#define putc(c, stream) fputc (c, stream) 
+int putchar (int c);
+
 FILE *fopen (const char *__restrict path, const char *__restrict mode);
 FILE *fdopen (int fd, const char *mode);
 FILE *freopen (const char *__restrict path, const char *__restrict mode,
@@ -57,19 +67,30 @@ FILE *freopen (const char *__restrict path, const char *__restrict mode,
 FILE *fmemopen (void *__restrict *buffer, size_t size,
 		const char *__restrict mode);
 int fclose (FILE *stream);
+
 size_t fread (void *__restrict buffer, size_t size, size_t len,
 	      FILE *__restrict stream);
 size_t fwrite (const void *__restrict buffer, size_t size, size_t len,
 	       FILE *__restrict stream);
+
+void clearerr (FILE *stream);
+int feof (FILE *stream);
+int ferror (FILE *stream);
+int fileno (FILE *stream);
+
 int fgetpos (FILE *__restrict stream, fpos_t *__restrict pos);
 int fsetpos (FILE *__restrict stream, const fpos_t *__restrict pos);
 int fseek (FILE *stream, long offset, int whence);
 int fseeko (FILE *stream, off_t offset, int whence);
 long ftell (FILE *stream);
 off_t ftello (FILE *stream);
+
 int fflush (FILE *stream);
+int fpurge (FILE *stream);
 
 void setbuf (FILE *__restrict stream, char *__restrict buffer);
+void setbuffer (FILE *__restrict stream, char *__restrict buffer, size_t size);
+void setlinebuf (FILE *stream);
 int setvbuf (FILE *__restrict stream, char *__restrict buffer, int mode,
 	     size_t size);
 
