@@ -14,11 +14,19 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#define __fmt_THSEP   0x01 /* Print integers with thousands grouping chars */
+#define __fmt_LJUST   0x02 /* Left-justify conversion */
+#define __fmt_FRCSGN  0x04 /* Force printing number sign */
+#define __fmt_PSPACE  0x08 /* Print space if sign not printed */
+#define __fmt_ALTCONV 0x10 /* Alternate form conversion */
+#define __fmt_PADZERO 0x20 /* Pad with zeroes instead of spaces */
 
 static char *__cvtdgl =
   "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz";
@@ -78,6 +86,107 @@ __cvtnumu (uintmax_t value, int base, const char *digits)
     }
 }
 
+static int
+__fprintf_convspec (FILE *stream, const char *fmt, va_list args, int count,
+		    int flags)
+{
+  int len = 0;
+  if (*fmt == 'c')
+    {
+      unsigned char c = (unsigned char) va_arg (args, int);
+      if (fputc (c, stream) == EOF)
+	return EOF;
+    }
+  else if (*fmt == 's')
+    {
+      const char *str = va_arg (args, const char *);
+      for (; *str != '\0'; str++, len++)
+	{
+	  if (fputc (*str, stream) == EOF)
+	    return EOF;
+	}
+    }
+  else if (*fmt == 'd' || *fmt == 'i')
+    {
+      int value = va_arg (args, int);
+      const char *str;
+      if (value > 0 && (flags & __fmt_FRCSGN))
+	{
+	  if (fputc ('+', stream) == EOF)
+	    return EOF;
+	  len++;
+	}
+      __cvtnums (value, 10, __cvtdgl);
+      for (str = __cvtbuf; *str != '\0'; str++, len++)
+	{
+	  if (fputc (*str, stream) == EOF)
+	    return EOF;
+	}
+    }
+  else if (*fmt == 'n')
+    *va_arg (args, int *) = count + len;
+  else if (*fmt == 'o')
+    {
+      unsigned int value = va_arg (args, unsigned int);
+      const char *str;
+      __cvtnumu (value, 8, __cvtdgl);
+      for (str = __cvtbuf; *str != '\0'; str++, len++)
+	{
+	  if (fputc (*str, stream) == EOF)
+	    return EOF;
+	}
+    }
+  else if (*fmt == 'p')
+    {
+      void *ptr = va_arg (args, void *);
+      const char *str;
+      __cvtnumu ((uintptr_t) ptr, 16, __cvtdgl);
+      if (fputs ("0x", stream) == EOF)
+	return EOF;
+      for (str = __cvtbuf; *str != '\0'; str++, len++)
+	{
+	  if (fputc (*str, stream) == EOF)
+	    return EOF;
+	}
+    }
+  else if (*fmt == 'u')
+    {
+      unsigned int value = va_arg (args, unsigned int);
+      const char *str;
+      __cvtnumu (value, 10, __cvtdgl);
+      for (str = __cvtbuf; *str != '\0'; str++, len++)
+	{
+	  if (fputc (*str, stream) == EOF)
+	    return EOF;
+	}
+    }
+  else if (*fmt == 'x' || *fmt == 'X')
+    {
+      unsigned int value = va_arg (args, unsigned int);
+      const char *str;
+      if (flags & __fmt_ALTCONV)
+	{
+	  if (fputs (*fmt == 'x' ? "0x" : "0X", stream) == EOF)
+	    return EOF;
+	  len += 2;
+	}
+      __cvtnumu (value, 16, *fmt == 'x' ? __cvtdgl : __cvtdgu);
+      for (str = __cvtbuf; *str != '\0'; str++, len++)
+	{
+	  if (fputc (*str, stream) == EOF)
+	    return EOF;
+	}
+    }
+  else
+    {
+      /* Also handles '%%' conversion specifier */
+      if (fputc (*fmt, stream) == EOF)
+	return EOF;
+      return 1;
+    }
+  return len;
+}
+
 int
 vprintf (const char *__restrict fmt, va_list args)
 {
@@ -90,174 +199,55 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
   int count = 0;
   while (*fmt != '\0')
     {
-      const char *fmt_begin;
-      if (fmt[0] != '%' || fmt[1] == '%')
+      if (*fmt == '%')
 	{
-	  /* Copy characters directly */
-	  size_t len = 1;
-	  if (*fmt == '%')
-	    len++;
-	  while (fmt[len] != '\0' && fmt[len] != '%')
-	    len++;
-	  if (fwrite (fmt, 1, len, stream) < len)
-	    return EOF;
-	  fmt += len;
-	  count += len;
-	  continue;
-	}
+	  int len;
+	  int flags = 0;
+	  fmt++;
 
-      fmt_begin = fmt++;
-      if (*fmt == 'c')
-	{
-	  char c = (char) va_arg (args, int);
-	  if (fputc (c, stream) == EOF)
+	  /* Check for flag characters */
+	  while (1)
+	    {
+	      switch (*fmt)
+		{
+		case '\'':
+		  flags |= __fmt_THSEP;
+		  break;
+		case '-':
+		  flags |= __fmt_LJUST;
+		  break;
+		case '+':
+		  flags |= __fmt_FRCSGN;
+		  break;
+		case ' ':
+		  flags |= __fmt_PSPACE;
+		  break;
+		case '#':
+		  flags |= __fmt_ALTCONV;
+		  break;
+		case '0':
+		  flags |= __fmt_PADZERO;
+		  break;
+		case '\0':
+		  return count;
+		default:
+		  goto conv;
+		}
+	      fmt++;
+	    }
+
+	conv:
+	  len = __fprintf_convspec (stream, fmt, args, count, flags);
+	  if (len == EOF)
 	    return EOF;
+	  count += len;
 	  fmt++;
-	}
-      else if (*fmt == 's')
-	{
-	  const char *str = va_arg (args, const char *);
-	  for (; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt++;
-	}
-      else if (*fmt == 'd' || *fmt == 'i')
-	{
-	  int value = va_arg (args, int);
-	  const char *str;
-	  __cvtnums (value, 10, __cvtdgl);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt++;
-	}
-      else if (*fmt == 'n')
-	{
-	  *va_arg (args, int *) = count;
-	  fmt++;
-	}
-      else if (*fmt == 'o')
-	{
-	  unsigned int value = va_arg (args, unsigned int);
-	  const char *str;
-	  __cvtnumu (value, 8, __cvtdgl);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt++;
-	}
-      else if (*fmt == 'p')
-	{
-	  void *ptr = va_arg (args, void *);
-	  const char *str;
-	  __cvtnumu ((uintptr_t) ptr, 16, __cvtdgl);
-	  if (fputs ("0x", stream) == EOF)
-	    return EOF;
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt++;
-	}
-      else if (*fmt == 'u')
-	{
-	  unsigned int value = va_arg (args, unsigned int);
-	  const char *str;
-	  __cvtnumu (value, 10, __cvtdgl);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt++;
-	}
-      else if (*fmt == 'x' || *fmt == 'X')
-	{
-	  unsigned int value = va_arg (args, unsigned int);
-	  const char *str;
-	  __cvtnumu (value, 16, *fmt == 'x' ? __cvtdgl : __cvtdgu);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt++;
-	}
-      else if (strncmp (fmt, "ld", 2) == 0 || strncmp (fmt, "li", 2) == 0)
-	{
-	  long value = va_arg (args, long);
-	  const char *str;
-	  __cvtnums (value, 10, __cvtdgl);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt += 2;
-	}
-      else if (strncmp (fmt, "lo", 2) == 0)
-	{
-	  unsigned long value = va_arg (args, long);
-	  const char *str;
-	  __cvtnumu (value, 8, __cvtdgl);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt += 2;
-	}
-      else if (strncmp (fmt, "lu", 2) == 0)
-	{
-	  unsigned long value = va_arg (args, long);
-	  const char *str;
-	  __cvtnumu (value, 10, __cvtdgl);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt += 2;
-	}
-      else if (strncmp (fmt, "lx", 2) == 0 || strncmp (fmt, "lX", 2) == 0)
-	{
-	  unsigned long value = va_arg (args, long);
-	  const char *str;
-	  __cvtnumu (value, 16, fmt[1] == 'x' ? __cvtdgl : __cvtdgu);
-	  for (str = __cvtbuf; *str != '\0'; str++)
-	    {
-	      if (fputc (*str, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
-	  fmt += 2;
 	}
       else
 	{
-	  /* TODO Check for padding characters */
-	  for (fmt = fmt_begin; *fmt != '\0'; fmt++)
-	    {
-	      if (fputc (*fmt, stream) == EOF)
-		return EOF;
-	      count++;
-	    }
+	  if (fputc (*fmt, stream) == EOF)
+	    return EOF;
+	  count++;
 	}
     }
   return count;
