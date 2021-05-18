@@ -187,11 +187,18 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 
 	conv:
 	  /* Check for field width */
-	  /* TODO Field width specified in variadic args */
-	  while (isdigit (*fmt))
+	  if (*fmt == '*')
 	    {
-	      width *= 10;
-	      width += *fmt++ - '0';
+	      width = va_arg (args, int);
+	      fmt++;
+	    }
+	  else
+	    {
+	      while (isdigit (*fmt))
+		{
+		  width *= 10;
+		  width += *fmt++ - '0';
+		}
 	    }
 
 	  if (*fmt == 'c')
