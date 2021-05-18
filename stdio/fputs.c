@@ -24,7 +24,7 @@ fputs (const char *__restrict str, FILE *__restrict stream)
       if (fputc (*str, stream) == EOF)
 	return EOF;
     }
-  return 0;
+  return fputc ('\n', stream);
 }
 
 int

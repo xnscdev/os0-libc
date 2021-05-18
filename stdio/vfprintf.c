@@ -86,107 +86,6 @@ __cvtnumu (uintmax_t value, int base, const char *digits)
     }
 }
 
-static int
-__fprintf_convspec (FILE *stream, const char *fmt, va_list args, int count,
-		    int flags)
-{
-  int len = 0;
-  if (*fmt == 'c')
-    {
-      unsigned char c = (unsigned char) va_arg (args, int);
-      if (fputc (c, stream) == EOF)
-	return EOF;
-    }
-  else if (*fmt == 's')
-    {
-      const char *str = va_arg (args, const char *);
-      for (; *str != '\0'; str++, len++)
-	{
-	  if (fputc (*str, stream) == EOF)
-	    return EOF;
-	}
-    }
-  else if (*fmt == 'd' || *fmt == 'i')
-    {
-      int value = va_arg (args, int);
-      const char *str;
-      if (value > 0 && (flags & __fmt_FRCSGN))
-	{
-	  if (fputc ('+', stream) == EOF)
-	    return EOF;
-	  len++;
-	}
-      __cvtnums (value, 10, __cvtdgl);
-      for (str = __cvtbuf; *str != '\0'; str++, len++)
-	{
-	  if (fputc (*str, stream) == EOF)
-	    return EOF;
-	}
-    }
-  else if (*fmt == 'n')
-    *va_arg (args, int *) = count + len;
-  else if (*fmt == 'o')
-    {
-      unsigned int value = va_arg (args, unsigned int);
-      const char *str;
-      __cvtnumu (value, 8, __cvtdgl);
-      for (str = __cvtbuf; *str != '\0'; str++, len++)
-	{
-	  if (fputc (*str, stream) == EOF)
-	    return EOF;
-	}
-    }
-  else if (*fmt == 'p')
-    {
-      void *ptr = va_arg (args, void *);
-      const char *str;
-      __cvtnumu ((uintptr_t) ptr, 16, __cvtdgl);
-      if (fputs ("0x", stream) == EOF)
-	return EOF;
-      for (str = __cvtbuf; *str != '\0'; str++, len++)
-	{
-	  if (fputc (*str, stream) == EOF)
-	    return EOF;
-	}
-    }
-  else if (*fmt == 'u')
-    {
-      unsigned int value = va_arg (args, unsigned int);
-      const char *str;
-      __cvtnumu (value, 10, __cvtdgl);
-      for (str = __cvtbuf; *str != '\0'; str++, len++)
-	{
-	  if (fputc (*str, stream) == EOF)
-	    return EOF;
-	}
-    }
-  else if (*fmt == 'x' || *fmt == 'X')
-    {
-      unsigned int value = va_arg (args, unsigned int);
-      const char *str;
-      if (flags & __fmt_ALTCONV)
-	{
-	  if (fputs (*fmt == 'x' ? "0x" : "0X", stream) == EOF)
-	    return EOF;
-	  len += 2;
-	}
-      __cvtnumu (value, 16, *fmt == 'x' ? __cvtdgl : __cvtdgu);
-      for (str = __cvtbuf; *str != '\0'; str++, len++)
-	{
-	  if (fputc (*str, stream) == EOF)
-	    return EOF;
-	}
-    }
-  else
-    {
-      /* Also handles '%%' conversion specifier */
-      if (fputc (*fmt, stream) == EOF)
-	return EOF;
-      return 1;
-    }
-  return len;
-}
-
 int
 vprintf (const char *__restrict fmt, va_list args)
 {
@@ -201,7 +100,6 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
     {
       if (*fmt == '%')
 	{
-	  int len;
 	  int flags = 0;
 	  fmt++;
 
@@ -237,15 +135,105 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	    }
 
 	conv:
-	  len = __fprintf_convspec (stream, fmt, args, count, flags);
-	  if (len == EOF)
-	    return EOF;
-	  count += len;
+	  if (*fmt == 'c')
+	    {
+	      unsigned char c = va_arg (args, int);
+	      if (fputc (c, stream) == EOF)
+		return EOF;
+	    }
+	  else if (*fmt == 's')
+	    {
+	      const char *str = va_arg (args, const char *);
+	      for (; *str != '\0'; str++, count++)
+		{
+		  if (fputc (*str, stream) == EOF)
+		    return EOF;
+		}
+	    }
+	  else if (*fmt == 'd' || *fmt == 'i')
+	    {
+	      int value = va_arg (args, int);
+	      const char *str;
+	      if (value > 0 && (flags & __fmt_FRCSGN))
+		{
+		  if (fputc ('+', stream) == EOF)
+		    return EOF;
+		  count++;
+		}
+	      __cvtnums (value, 10, __cvtdgl);
+	      for (str = __cvtbuf; *str != '\0'; str++, count++)
+		{
+		  if (fputc (*str, stream) == EOF)
+		    return EOF;
+		}
+	    }
+	  else if (*fmt == 'n')
+	    *va_arg (args, int *) = count + count;
+	  else if (*fmt == 'o')
+	    {
+	      unsigned int value = va_arg (args, unsigned int);
+	      const char *str;
+	      __cvtnumu (value, 8, __cvtdgl);
+	      for (str = __cvtbuf; *str != '\0'; str++, count++)
+		{
+		  if (fputc (*str, stream) == EOF)
+		    return EOF;
+		}
+	    }
+	  else if (*fmt == 'p')
+	    {
+	      void *ptr = va_arg (args, void *);
+	      const char *str;
+	      __cvtnumu ((uintptr_t) ptr, 16, __cvtdgl);
+	      if (fwrite ("0x", 1, 2, stream) < 2)
+		return EOF;
+	      for (str = __cvtbuf; *str != '\0'; str++, count++)
+		{
+		  if (fputc (*str, stream) == EOF)
+		    return EOF;
+		}
+	    }
+	  else if (*fmt == 'u')
+	    {
+	      unsigned int value = va_arg (args, unsigned int);
+	      const char *str;
+	      __cvtnumu (value, 10, __cvtdgl);
+	      for (str = __cvtbuf; *str != '\0'; str++, count++)
+		{
+		  if (fputc (*str, stream) == EOF)
+		    return EOF;
+		}
+	    }
+	  else if (*fmt == 'x' || *fmt == 'X')
+	    {
+	      unsigned int value = va_arg (args, unsigned int);
+	      const char *str;
+	      if (flags & __fmt_ALTCONV)
+		{
+		  /* Alternate conversion of %x or %X prints hex prefix */
+		  if (fwrite (*fmt == 'x' ? "0x" : "0X", 1, 2, stream) < 2)
+		    return EOF;
+		  count += 2;
+		}
+	      __cvtnumu (value, 16, *fmt == 'x' ? __cvtdgl : __cvtdgu);
+	      for (str = __cvtbuf; *str != '\0'; str++, count++)
+		{
+		  if (fputc (*str, stream) == EOF)
+		    return EOF;
+		}
+	    }
+	  else
+	    {
+	      /* Also handles '%%' conversion specifier */
+	      if (fputc (*fmt, stream) == EOF)
+		return EOF;
+	      count++;
+	    }
 	  fmt++;
 	}
       else
 	{
-	  if (fputc (*fmt, stream) == EOF)
+	  if (fputc (*fmt++, stream) == EOF)
 	    return EOF;
 	  count++;
 	}

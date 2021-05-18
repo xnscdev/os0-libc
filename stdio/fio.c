@@ -41,10 +41,15 @@ fwrite (const void *__restrict buffer, size_t size, size_t len,
   size_t i;
   for (i = 0; i < len; i++)
     {
-      if (write (stream->_fd, buffer + i * size, size) == -1)
+      size_t j;
+      for (j = 0; j < size; j++)
 	{
-	  stream->_flags |= __IO_err;
-	  return i;
+	  unsigned char c = ((unsigned char *) buffer)[i * size + j];
+	  if (fputc (c, stream) == EOF)
+	    {
+	      stream->_flags |= __IO_err;
+	      return i;
+	    }
 	}
     }
   return i;
