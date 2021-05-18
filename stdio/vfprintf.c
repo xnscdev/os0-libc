@@ -35,7 +35,7 @@ static char *__cvtdgu =
 static char __cvtbuf[64];
 
 static void
-__cvtnums (intmax_t value, int base, const char *digits)
+__cvtnums (intmax_t value, int base, const char *digits, int flags)
 {
   char *ptr = __cvtbuf;
   char *rev = __cvtbuf;
@@ -52,6 +52,10 @@ __cvtnums (intmax_t value, int base, const char *digits)
 
   if (temp < 0)
     *ptr++ = '-';
+  else if (flags & __fmt_FRCSGN)
+    *ptr++ = '+';
+  else if (flags & __fmt_PSPACE)
+    *ptr++ = ' ';
   *ptr-- = '\0';
   while (rev < ptr)
     {
@@ -86,6 +90,52 @@ __cvtnumu (uintmax_t value, int base, const char *digits)
     }
 }
 
+static int
+__printf_write (FILE *__restrict stream, const char *__restrict str)
+{
+  int count;
+  for (; *str != '\0'; str++, count++)
+    {
+      if (fputc (*str, stream) == EOF)
+	return EOF;
+    }
+  return count;
+}
+
+static int
+__printf_fillchars (FILE *stream, size_t len, char c)
+{
+  size_t i;
+  for (i = 0; i < len; i++)
+    {
+      if (fputc (c, stream) == EOF)
+	return EOF;
+    }
+  return 0;
+}
+
+static int
+__printf_padwrite (FILE *__restrict stream, const char *__restrict str,
+		   size_t width, int flags)
+{
+  size_t len = strlen (str);
+  size_t pad = width > len ? width - len : 0;
+  char c = flags & __fmt_PADZERO ? '0' : ' ';
+  if (!(flags & __fmt_LJUST))
+    {
+      if (__printf_fillchars (stream, pad, c) == EOF)
+	return EOF;
+    }
+  if (__printf_write (stream, str) == EOF)
+    return EOF;
+  if (flags & __fmt_LJUST)
+    {
+      if (__printf_fillchars (stream, pad, c) == EOF)
+	return EOF;
+    }
+  return len + pad;
+}
+
 int
 vprintf (const char *__restrict fmt, va_list args)
 {
@@ -101,6 +151,7 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
       if (*fmt == '%')
 	{
 	  int flags = 0;
+	  size_t width = 0;
 	  fmt++;
 
 	  /* Check for flag characters */
@@ -135,6 +186,14 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	    }
 
 	conv:
+	  /* Check for field width */
+	  /* TODO Field width specified in variadic args */
+	  while (isdigit (*fmt))
+	    {
+	      width *= 10;
+	      width += *fmt++ - '0';
+	    }
+
 	  if (*fmt == 'c')
 	    {
 	      unsigned char c = va_arg (args, int);
@@ -144,83 +203,75 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	  else if (*fmt == 's')
 	    {
 	      const char *str = va_arg (args, const char *);
-	      for (; *str != '\0'; str++, count++)
-		{
-		  if (fputc (*str, stream) == EOF)
-		    return EOF;
-		}
+	      int len;
+	      if (str == NULL)
+		len = __printf_write (stream, "(null)");
+	      else
+	        len = __printf_padwrite (stream, str, width, flags);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
 	    }
 	  else if (*fmt == 'd' || *fmt == 'i')
 	    {
 	      int value = va_arg (args, int);
-	      const char *str;
-	      if (value > 0 && (flags & __fmt_FRCSGN))
-		{
-		  if (fputc ('+', stream) == EOF)
-		    return EOF;
-		  count++;
-		}
-	      __cvtnums (value, 10, __cvtdgl);
-	      for (str = __cvtbuf; *str != '\0'; str++, count++)
-		{
-		  if (fputc (*str, stream) == EOF)
-		    return EOF;
-		}
+	      int len;
+	      __cvtnums (value, 10, __cvtdgl, flags);
+	      len = __printf_padwrite (stream, __cvtbuf, width, flags);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
 	    }
 	  else if (*fmt == 'n')
 	    *va_arg (args, int *) = count + count;
 	  else if (*fmt == 'o')
 	    {
 	      unsigned int value = va_arg (args, unsigned int);
-	      const char *str;
+	      int len;
 	      __cvtnumu (value, 8, __cvtdgl);
-	      for (str = __cvtbuf; *str != '\0'; str++, count++)
-		{
-		  if (fputc (*str, stream) == EOF)
-		    return EOF;
-		}
+	      len = __printf_padwrite (stream, __cvtbuf, width, flags);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
 	    }
 	  else if (*fmt == 'p')
 	    {
 	      void *ptr = va_arg (args, void *);
-	      const char *str;
+	      int len;
 	      __cvtnumu ((uintptr_t) ptr, 16, __cvtdgl);
-	      if (fwrite ("0x", 1, 2, stream) < 2)
+	      if (__printf_write (stream, "0x") == EOF)
 		return EOF;
-	      for (str = __cvtbuf; *str != '\0'; str++, count++)
-		{
-		  if (fputc (*str, stream) == EOF)
-		    return EOF;
-		}
+	      len = __printf_padwrite (stream, __cvtbuf, width, flags);
+	      if (len == EOF)
+		return EOF;
+	      count += len + 2;
 	    }
 	  else if (*fmt == 'u')
 	    {
 	      unsigned int value = va_arg (args, unsigned int);
-	      const char *str;
+	      int len;
 	      __cvtnumu (value, 10, __cvtdgl);
-	      for (str = __cvtbuf; *str != '\0'; str++, count++)
-		{
-		  if (fputc (*str, stream) == EOF)
-		    return EOF;
-		}
+	      len = __printf_padwrite (stream, __cvtbuf, width, flags);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
 	    }
 	  else if (*fmt == 'x' || *fmt == 'X')
 	    {
 	      unsigned int value = va_arg (args, unsigned int);
-	      const char *str;
+	      int len;
 	      if (flags & __fmt_ALTCONV)
 		{
 		  /* Alternate conversion of %x or %X prints hex prefix */
-		  if (fwrite (*fmt == 'x' ? "0x" : "0X", 1, 2, stream) < 2)
+		  if (__printf_write (stream, *fmt == 'x' ? "0x" : "0X") == EOF)
 		    return EOF;
 		  count += 2;
 		}
 	      __cvtnumu (value, 16, *fmt == 'x' ? __cvtdgl : __cvtdgu);
-	      for (str = __cvtbuf; *str != '\0'; str++, count++)
-		{
-		  if (fputc (*str, stream) == EOF)
-		    return EOF;
-		}
+	      len = __printf_padwrite (stream, __cvtbuf, width, flags);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
 	    }
 	  else
 	    {
