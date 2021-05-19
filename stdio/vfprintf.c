@@ -30,12 +30,83 @@
 #define __fmt_ALTCONV 0x10 /* Alternate form conversion */
 #define __fmt_PADZERO 0x20 /* Pad with zeroes instead of spaces */
 
+/* Length modifiers */
+
+#define __len_CHAR    0x01
+#define __len_SHORT   0x02
+#define __len_LONG    0x03
+#define __len_LLONG   0x04
+#define __len_INTMAX  0x05
+#define __len_SIZE    0x06
+#define __len_PTRDIFF 0x07
+#define __len_LDOUBLE 0x08
+
 /* How to interpret `prec' parameter in __printf_padwrite() */
 
 #define __prec_MINWRITE 0x01 /* Write a minimum amount of digits */
 #define __prec_MAXWRITE 0x02 /* Write a maximum amount of bytes */
 #define __prec_RDXPREC  0x03 /* Write a minimum amount of digits after radix */
 #define __prec_SIGDGTS  0x04 /* Write a minimum amount of significant digits */
+
+/* Wrapper macro to properly get and convert variadic argument based on
+   length modifier specified
+   Should not be used outside of vfprintf(), uses local variables */
+
+#define __printf_cvtnum(func)						\
+  do									\
+    {									\
+      switch (lenmod)							\
+	{								\
+	case __len_CHAR:						\
+	  {								\
+	    char value = va_arg (args, int);				\
+	    func;							\
+	    break;							\
+	  }								\
+	case __len_SHORT:						\
+	  {								\
+	    short value = va_arg (args, int);				\
+	    func;							\
+	    break;							\
+	  }								\
+	case __len_LONG:						\
+	  {								\
+	    long value = va_arg (args, long);				\
+	    func;							\
+	    break;							\
+	  }								\
+	case __len_LLONG:						\
+	  {								\
+	    long long value = va_arg (args, long long);			\
+	    func;							\
+	    break;							\
+	  }								\
+	case __len_INTMAX:						\
+	  {								\
+	    intmax_t value = va_arg (args, intmax_t);			\
+	    func;							\
+	    break;							\
+	  }								\
+	case __len_SIZE:						\
+	  {								\
+	    ssize_t value = va_arg (args, ssize_t);			\
+	    func;							\
+	    break;							\
+	  }								\
+	case __len_PTRDIFF:						\
+	  {								\
+	    ptrdiff_t value = va_arg (args, ptrdiff_t);			\
+	    func;							\
+	    break;							\
+	  }								\
+	default:							\
+	  {								\
+	    int value = va_arg (args, int);				\
+	    func;							\
+	  }								\
+	}								\
+    }									\
+  while (0)
 
 static char *__cvtdgl =
   "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz";
@@ -203,6 +274,7 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	  int flags = 0;
 	  int width = 0;
 	  int prec = 0;
+	  int lenmod = 0;
 	  fmt++;
 
 	  /* Check for flag characters */
@@ -278,42 +350,55 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 		}
 	    }
 
+	spec:
 	  if (*fmt == 'c')
 	    {
+	      /* TODO Wide character printing */
 	      unsigned char c = va_arg (args, int);
 	      if (fputc (c, stream) == EOF)
 		return EOF;
 	    }
-	  else if (*fmt == 's')
-	    {
-	      const char *str = va_arg (args, const char *);
-	      int len;
-	      if (str == NULL)
-	        str = "(null)";
-	      len = __printf_padwrite (stream, str, width, prec, flags,
-				       __prec_MAXWRITE);
-	      if (len == EOF)
-		return EOF;
-	      count += len;
-	    }
 	  else if (*fmt == 'd' || *fmt == 'i')
 	    {
-	      int value = va_arg (args, int);
 	      int len;
-	      __cvtnums (value, 10, __cvtdgl, flags);
+	      __printf_cvtnum (__cvtnums (value, 10, __cvtdgl, flags));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
 				       __prec_MINWRITE);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
 	    }
+	  else if (*fmt == 'h')
+	    {
+	      if (lenmod == 0)
+		lenmod = __len_SHORT;
+	      else if (lenmod == __len_SHORT)
+		lenmod = __len_CHAR;
+	      fmt++;
+	      goto spec;
+	    }
+	  else if (*fmt == 'j')
+	    {
+	      if (lenmod == 0)
+		lenmod = __len_INTMAX;
+	      fmt++;
+	      goto spec;
+	    }
+	  else if (*fmt == 'l')
+	    {
+	      if (lenmod == 0)
+		lenmod = __len_LONG;
+	      else if (lenmod == __len_LONG)
+		lenmod = __len_LLONG;
+	      fmt++;
+	      goto spec;
+	    }
 	  else if (*fmt == 'n')
 	    *va_arg (args, int *) = count + count;
 	  else if (*fmt == 'o')
 	    {
-	      unsigned int value = va_arg (args, unsigned int);
 	      int len;
-	      __cvtnumu (value, 8, __cvtdgl);
+	      __printf_cvtnum (__cvtnumu (value, 8, __cvtdgl));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
 				       __prec_MINWRITE);
 	      if (len == EOF)
@@ -332,11 +417,29 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 		return EOF;
 	      count += len + 2;
 	    }
+	  else if (*fmt == 's')
+	    {
+	      const char *str = va_arg (args, const char *);
+	      int len;
+	      if (str == NULL)
+	        str = "(null)";
+	      len = __printf_padwrite (stream, str, width, prec, flags,
+				       __prec_MAXWRITE);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
+	    }
+	  else if (*fmt == 't')
+	    {
+	      if (lenmod == 0)
+		lenmod = __len_PTRDIFF;
+	      fmt++;
+	      goto spec;
+	    }
 	  else if (*fmt == 'u')
 	    {
-	      unsigned int value = va_arg (args, unsigned int);
 	      int len;
-	      __cvtnumu (value, 10, __cvtdgl);
+	      __printf_cvtnum (__cvtnumu (value, 10, __cvtdgl));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
 				       __prec_MINWRITE);
 	      if (len == EOF)
@@ -345,8 +448,8 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	    }
 	  else if (*fmt == 'x' || *fmt == 'X')
 	    {
-	      unsigned int value = va_arg (args, unsigned int);
 	      int len;
+	      char *digits;
 	      if (flags & __fmt_ALTCONV)
 		{
 		  /* Alternate conversion of %x or %X prints hex prefix */
@@ -354,12 +457,23 @@ vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 		    return EOF;
 		  count += 2;
 		}
-	      __cvtnumu (value, 16, *fmt == 'x' ? __cvtdgl : __cvtdgu);
+	      if (*fmt == 'x')
+		digits = __cvtdgl;
+	      else
+		digits = __cvtdgu;
+	      __printf_cvtnum (__cvtnumu (value, 16, digits));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
 				       __prec_MINWRITE);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
+	    }
+	  else if (*fmt == 'z')
+	    {
+	      if (lenmod == 0)
+		lenmod = __len_SIZE;
+	      fmt++;
+	      goto spec;
 	    }
 	  else
 	    {
