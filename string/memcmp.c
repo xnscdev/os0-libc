@@ -31,3 +31,15 @@ memcmp (const void *a, const void *b, size_t len)
     }
   return 0;
 }
+
+void *
+memchr (const void *str, int c, size_t len)
+{
+  size_t i;
+  for (i = 0; i < len; str++, i++)
+    {
+      if (*((unsigned char *) str) == c)
+	return str;
+    }
+  return NULL;
+}
