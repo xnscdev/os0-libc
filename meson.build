@@ -100,7 +100,8 @@ libc_src = [
 
 libm_src = [
   'math/cos.S',
-  'math/sin.S'
+  'math/sin.S',
+  'math/tan.S'
 ]
 
 if get_option('shared')
