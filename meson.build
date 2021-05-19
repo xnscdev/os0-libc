@@ -56,6 +56,7 @@ libc_src = [
   'stdlib/init.c',
   'stdlib/isatty.c',
   'stdlib/malloc.c',
+  'stdlib/qsort.c',
   'stdlib/signal.c',
   'stdlib/stdmath.c',
   'stdlib/termios.c',

@@ -39,7 +39,7 @@ memchr (const void *str, int c, size_t len)
   for (i = 0; i < len; str++, i++)
     {
       if (*((unsigned char *) str) == c)
-	return str;
+	return (void *) str;
     }
   return NULL;
 }

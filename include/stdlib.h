@@ -53,6 +53,9 @@ int atoi (const char *str);
 long atol (const char *str);
 long long atoll (const char *str);
 
+void qsort (void *const pbase, size_t len, size_t size,
+	    int (*cmp) (const void *, const void *));
+
 __END_DECLS
 
 #endif
