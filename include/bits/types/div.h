@@ -1,0 +1,46 @@
+/* div.h -- This file is part of OS/0 libc.
+   Copyright (C) 2021 XNSC
+
+   OS/0 libc is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   OS/0 libc is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
+
+#ifndef _BITS_TYPES_DIV_H
+#define _BITS_TYPES_DIV_H
+
+#include <stdint.h>
+
+typedef struct
+{
+  int quot;
+  int rem;
+} div_t;
+
+typedef struct
+{
+  long quot;
+  long rem;
+} ldiv_t;
+
+typedef struct
+{
+  long long quot;
+  long long rem;
+} lldiv_t;
+
+typedef struct
+{
+  intmax_t quot;
+  intmax_t rem;
+} imaxdiv_t;
+
+#endif

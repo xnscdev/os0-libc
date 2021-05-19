@@ -57,6 +57,7 @@ libc_src = [
   'stdlib/isatty.c',
   'stdlib/malloc.c',
   'stdlib/signal.c',
+  'stdlib/stdmath.c',
   'stdlib/termios.c',
   'string/memcmp.c',
   'string/memset.c',

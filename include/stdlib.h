@@ -25,6 +25,8 @@
 
 #define __atexit_LIMIT 32
 
+#include <bits/types/div.h>
+
 __BEGIN_DECLS
 
 void *malloc (size_t size);
@@ -40,6 +42,12 @@ int unsetenv (const char *name);
 int atexit (void (*func) (void));
 void exit (int code) __attribute__ ((noreturn));
 void abort (void) __attribute__ ((noreturn));
+
+int abs (int n);
+div_t div (int num, int denom);
+ldiv_t ldiv (long num, long denom);
+lldiv_t lldiv (long long num, long long denom);
+imaxdiv_t imaxdiv (intmax_t num, intmax_t denom);
 
 int atoi (const char *str);
 long atol (const char *str);
