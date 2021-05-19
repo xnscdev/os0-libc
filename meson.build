@@ -61,6 +61,7 @@ libc_src = [
   'stdlib/qsort.c',
   'stdlib/signal.c',
   'stdlib/stdmath.c',
+  'stdlib/strtol.c',
   'stdlib/termios.c',
   'string/memcmp.c',
   'string/memset.c',

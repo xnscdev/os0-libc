@@ -52,6 +52,8 @@ imaxdiv_t imaxdiv (intmax_t num, intmax_t denom);
 int atoi (const char *str);
 long atol (const char *str);
 long long atoll (const char *str);
+long strtol (const char *__restrict str, char **__restrict end, int base);
+long long strtoll (const char *__restrict str, char **__restrict end, int base);
 
 void qsort (void *const pbase, size_t len, size_t size,
 	    int (*cmp) (const void *, const void *));
