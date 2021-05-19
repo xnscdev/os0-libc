@@ -50,6 +50,7 @@ libc_src = [
   'stdlib/abort.c',
   'stdlib/assert.c',
   'stdlib/bitsearch.c',
+  'stdlib/bsearch.c',
   'stdlib/ctype.c',
   'stdlib/dlmalloc.c',
   'stdlib/env.c',
