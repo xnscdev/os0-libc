@@ -201,7 +201,7 @@ __printf_padwrite (FILE *__restrict stream, const char *__restrict str,
   size_t len = strlen (str);
   size_t pad = width > len ? width - len : 0;
   int count = 0;
-  char c = flags & __fmt_PADZERO ? '0' : ' '; /* Padding character */
+  char c = (flags & __fmt_PADZERO) && !(flags & __fmt_LJUST) ? '0' : ' ';
 
   if (mode == __prec_MINWRITE && prec > len - !isdigit (*str))
     {
