@@ -52,6 +52,7 @@ libc_src = [
   'stdlib/bitsearch.c',
   'stdlib/ctype.c',
   'stdlib/dlmalloc.c',
+  'stdlib/env.c',
   'stdlib/errno.c',
   'stdlib/exit.c',
   'stdlib/init.c',
