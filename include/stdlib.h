@@ -57,6 +57,10 @@ long long strtoll (const char *__restrict str, char **__restrict end, int base);
 
 void *bsearch (const void *key, const void *base, size_t len, size_t size,
 	       int (*cmp) (const void *, const void *));
+void *lfind (const void *key, const void *base, size_t *len, size_t size,
+	     int (*cmp) (const void *, const void *));
+void *lsearch (const void *key, const void *base, size_t *len, size_t size,
+	       int (*cmp) (const void *, const void *));
 void qsort (void *const pbase, size_t len, size_t size,
 	    int (*cmp) (const void *, const void *));
 
