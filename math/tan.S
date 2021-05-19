@@ -23,3 +23,21 @@ tan:
 	ret
 
 	.size tan, . - tan
+
+	.global tanf
+tanf:
+	flds	4(%esp)
+	fptan
+	fstp	%st(0)
+	ret
+
+	.size tanf, . - tanf
+
+	.global tanl
+tanl:
+	fldt	4(%esp)
+	fptan
+	fstp	%st(0)
+	ret
+
+	.size tanl, . - tanl

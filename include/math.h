@@ -25,6 +25,14 @@ double sin (double n);
 float sinf (float n);
 long double sinl (long double n);
 
+double cos (double n);
+float cosf (float n);
+long double cosl (long double n);
+
+double tan (double n);
+float tanf (float n);
+long double tanl (long double n);
+
 __END_DECLS
 
 #endif

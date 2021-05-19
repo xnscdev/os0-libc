@@ -22,3 +22,19 @@ sin:
 	ret
 
 	.size sin, . - sin
+
+	.global sinf
+sinf:
+	flds	4(%esp)
+	fsin
+	ret
+
+	.size sinf, . - sinf
+
+	.global sinl
+sinl:
+	fldt	4(%esp)
+	fsin
+	ret
+
+	.size sinl, . - sinl

@@ -22,3 +22,19 @@ cos:
 	ret
 
 	.size cos, . - cos
+
+	.global cosf
+cosf:
+	flds	4(%esp)
+	fcos
+	ret
+
+	.size cosf, . - cosf
+
+	.global cosl
+cosl:
+	fldt	4(%esp)
+	fcos
+	ret
+
+	.size cosl, . - cosl
