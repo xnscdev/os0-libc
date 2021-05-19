@@ -40,6 +40,7 @@ libc_src = [
   'stdio/ferror.c',
   'stdio/fflush.c',
   'stdio/fio.c',
+  'stdio/fopen.c',
   'stdio/fprintf.c',
   'stdio/fputc.c',
   'stdio/fputs.c',
