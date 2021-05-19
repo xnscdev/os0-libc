@@ -98,14 +98,25 @@ libc_src = [
   'syscall/unlink.c'
 ]
 
-if get_option('shared')
-  libc_targ = 'both_libraries'
-else
-  libc_targ = 'static_library'
-endif
+libm_src = [
+  'math/cos.S',
+  'math/sin.S'
+]
 
-build_target('c', libc_src, install: true, include_directories: libc_inc,
-	     target_type: libc_targ, version: '1.0.0',
-	     link_args: ['-nostartfiles', '-nostdlib', '-lgcc'])
+if get_option('shared')
+  lib_targ = 'both_libraries'
+else
+  lib_targ = 'static_library'
+endif
+lib_ldflags = ['-nostartfiles', '-nostdlib', '-lgcc']
+
+libc = build_target('c', libc_src, install: true, include_directories: libc_inc,
+		    target_type: lib_targ, version: '1.0.0',
+		    link_args: lib_ldflags)
+
+libc_dep = declare_dependency(include_directories: libc_inc, link_with: libc)
+
+build_target('m', libm_src, install: true, dependencies: libc_dep,
+	     target_type: lib_targ, version: '1.0.0', link_args: lib_ldflags)
 
 subdir('rt')
