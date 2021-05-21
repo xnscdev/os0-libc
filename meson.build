@@ -96,6 +96,7 @@ libc_src = [
   'syscall/readlink.c',
   'syscall/rename.c',
   'syscall/sigaction.c',
+  'syscall/signal.S',
   'syscall/stat.c',
   'syscall/symlink.c',
   'syscall/syscall.S',

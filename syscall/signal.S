@@ -1,4 +1,4 @@
-/* signal.c -- This file is part of OS/0 libc.
+/* signal.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,11 +14,23 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <signal.h>
-#include <unistd.h>
+#include <sys/errno.h>
+#include <sys/syscall.h>
 
-int
-raise (int sig)
-{
-  return kill (getpid (), sig);
-}
+	.section .text
+	.global signal
+	.type signal, @function
+signal:
+	push	%ebx
+	mov	$SYS_signal, %eax
+	mov	8(%esp), %ebx
+	mov	12(%esp), %ecx
+	int	$0x80
+	pop	%ebx
+
+	/* Set errno to EINVAL if returned SIG_ERR */
+	cmp	$-1, %eax
+	jne	1f
+	movl	$EINVAL, errno
+1:
+	ret
