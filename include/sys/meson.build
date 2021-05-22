@@ -1,5 +1,7 @@
 install_headers('ioctl.h',
+		'resource.h',
 		'stat.h',
 		'statvfs.h',
 		'syscall.h',
-		'time.h', subdir: 'sys')
+		'time.h',
+		'wait.h', subdir: 'sys')

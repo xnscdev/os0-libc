@@ -101,7 +101,8 @@ libc_src = [
   'syscall/symlink.c',
   'syscall/syscall.S',
   'syscall/truncate.c',
-  'syscall/unlink.c'
+  'syscall/unlink.c',
+  'syscall/wait.c'
 ]
 
 libm_src = [
