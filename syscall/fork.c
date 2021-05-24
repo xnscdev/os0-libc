@@ -28,3 +28,9 @@ getpid (void)
 {
   return syscall (SYS_getpid);
 }
+
+pid_t
+getppid (void)
+{
+  return syscall (SYS_getppid);
+}
