@@ -23,8 +23,6 @@
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
-#define __atexit_LIMIT 32
-
 #include <bits/types/div.h>
 
 __BEGIN_DECLS

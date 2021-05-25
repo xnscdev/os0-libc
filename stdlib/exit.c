@@ -14,17 +14,18 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/syslimits.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-static void (*__atexit_funcs[__atexit_LIMIT]) (void);
+static void (*__atexit_funcs[ATEXIT_MAX]) (void);
 static int __atexit_ptr;
 
 int
 atexit (void (*func) (void))
 {
-  if (__atexit_ptr >= __atexit_LIMIT)
+  if (__atexit_ptr >= ATEXIT_MAX)
     {
       errno = ENOMEM;
       return -1;
