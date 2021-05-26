@@ -1,4 +1,4 @@
-/* time.h -- This file is part of OS/0 libc.
+/* sprintf.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,18 +14,26 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _TIME_H
-#define _TIME_H
+#include <stdio.h>
 
-#include <sys/cdefs.h>
-#include <sys/time.h>
+int
+sprintf (char *__restrict str, const char *__restrict fmt, ...)
+{
+  va_list args;
+  int ret;
+  va_start (args, fmt);
+  ret = vsprintf (str, fmt, args);
+  va_end (args);
+  return ret;
+}
 
-__BEGIN_DECLS
-
-char *asctime (const struct tm *tp);
-char *asctime_r (const struct tm *__restrict tp, char *__restrict buffer);
-time_t time (time_t *t);
-
-__END_DECLS
-
-#endif
+int
+snprintf (char *__restrict str, size_t size, const char *__restrict fmt, ...)
+{
+  va_list args;
+  int ret;
+  va_start (args, fmt);
+  ret = vsnprintf (str, size, fmt, args);
+  va_end (args);
+  return ret;
+}

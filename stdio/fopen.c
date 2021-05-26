@@ -171,6 +171,7 @@ fdopen (int fd, const char *mode)
   if (stream->_buffer == NULL)
     {
       free (stream);
+      errno = ENOMEM;
       return NULL;
     }
   stream->_ptr = stream->_buffer;

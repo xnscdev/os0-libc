@@ -1,4 +1,4 @@
-/* vfprintf.c -- This file is part of OS/0 libc.
+/* time.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,27 +14,47 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <ctype.h>
-#include <errno.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stream.h>
-#include <string.h>
+#include <time.h>
 
-static int
-__fprintf_put (void *stream, char c)
+static char *__day_names[] = {
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat"
+};
+
+static char *__month_names[] = {
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+};
+
+static char __time_buf[26];
+
+char *
+asctime (const struct tm *tp)
 {
-  return fputc (c, stream);
+  return asctime_r (tp, __time_buf);
 }
 
-int
-vprintf (const char *__restrict fmt, va_list args)
+char *
+asctime_r (const struct tm *__restrict tp, char *__restrict buffer)
 {
-  return vfprintf (stdout, fmt, args);
-}
-
-int
-vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
-{
-  return __vxprintf (stream, fmt, __fprintf_put, args);
+  sprintf (buffer, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
+	   __day_names[tp->tm_wday], __month_names[tp->tm_mon], tp->tm_mday,
+	   tp->tm_hour, tp->tm_min, tp->tm_sec, tp->tm_year + 1900);
+  return buffer;
 }
