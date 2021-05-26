@@ -14,11 +14,11 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <fcntl.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 
 int
 creat (const char *path, mode_t mode)
 {
-  return open (path, O_CREAT | O_TRUNC | O_WRONLY, mode);
+  return syscall (SYS_creat, path, mode);
 }
