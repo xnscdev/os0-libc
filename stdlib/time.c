@@ -14,10 +14,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <errno.h>
 #include <stdio.h>
 #include <time.h>
 
-static char *__day_names[] = {
+/* Adopted from the GNU C Library */
+
+#define SECSPERHOUR 3600
+#define SECSPERDAY  86400
+
+#define TDIV(a, b) ((a) / (b) - ((a) % (b) < 0))
+#define LEAPTHROUGH(y) (TDIV (y, 4) - TDIV (y, 100) + TDIV (y, 400))
+#define LEAPYEAR(y) ((y) % 4 == 0 && ((y) % 100 != 0 || (y) % 400 == 0))
+
+static const char *__day_names[] = {
   "Sun",
   "Mon",
   "Tue",
@@ -27,7 +37,7 @@ static char *__day_names[] = {
   "Sat"
 };
 
-static char *__month_names[] = {
+static const char *__month_names[] = {
   "Jan",
   "Feb",
   "Mar",
@@ -42,7 +52,68 @@ static char *__month_names[] = {
   "Dec"
 };
 
+static const unsigned short __month_doys[2][13] = {
+  {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365},
+  {0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366}
+};
+
 static char __time_buf[26];
+static struct tm __tm_buf;
+
+char *tzname[2] = {"GMT", "GMT"};
+
+static int
+__time_calc (time_t time, long offset, struct tm *tp)
+{
+  time_t days = time / SECSPERDAY;
+  time_t rem = time % SECSPERDAY;
+  time_t year;
+  const unsigned short *ip;
+  int i;
+  rem += offset;
+  while (rem < 0)
+    {
+      rem += SECSPERDAY;
+      days--;
+    }
+  while (rem >= SECSPERDAY)
+    {
+      rem -= SECSPERDAY;
+      days++;
+    }
+
+  tp->tm_hour = rem / SECSPERHOUR;
+  rem %= SECSPERHOUR;
+  tp->tm_min = rem / 60;
+  tp->tm_sec = rem % 60;
+  tp->tm_wday = (days + 4) % 7;
+  if (tp->tm_wday < 0)
+    tp->tm_wday += 7;
+  year = 1970;
+
+  while (days < 0 || days >= (LEAPYEAR (year) ? 366 : 365))
+    {
+      time_t yg = year + days / 365 - (days % 365 < 0);
+      days -= ((yg - year) * 365 + LEAPTHROUGH (yg - 1) -
+	       LEAPTHROUGH (year - 1));
+      year = yg;
+    }
+  tp->tm_year = year - 1900;
+  if (tp->tm_year != year - 1900)
+    {
+      errno = EOVERFLOW;
+      return 0;
+    }
+  tp->tm_yday = days;
+
+  ip = __month_doys[LEAPYEAR (year)];
+  for (i = 11; days < ip[i]; i--)
+    ;
+  days -= ip[i];
+  tp->tm_mon = i;
+  tp->tm_mday = days + 1;
+  return 1;
+}
 
 char *
 asctime (const struct tm *tp)
@@ -57,4 +128,19 @@ asctime_r (const struct tm *__restrict tp, char *__restrict buffer)
 	   __day_names[tp->tm_wday], __month_names[tp->tm_mon], tp->tm_mday,
 	   tp->tm_hour, tp->tm_min, tp->tm_sec, tp->tm_year + 1900);
   return buffer;
+}
+
+struct tm *
+gmtime (const time_t *time)
+{
+  return gmtime_r (time, &__tm_buf);
+}
+
+struct tm *
+gmtime_r (const time_t *__restrict time, struct tm *__restrict tp)
+{
+  if (!__time_calc (*time, 0, tp))
+    return NULL;
+  tp->tm_isdst = 0;
+  return tp;
 }

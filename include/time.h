@@ -22,8 +22,12 @@
 
 __BEGIN_DECLS
 
+extern char *tzname[2];
+
 char *asctime (const struct tm *tp);
 char *asctime_r (const struct tm *__restrict tp, char *__restrict buffer);
+struct tm *gmtime (const time_t *time);
+struct tm *gmtime_r (const time_t *__restrict time, struct tm *__restrict tp);
 time_t time (time_t *t);
 
 __END_DECLS
