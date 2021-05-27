@@ -36,5 +36,5 @@ vprintf (const char *__restrict fmt, va_list args)
 int
 vfprintf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 {
-  return __vxprintf (stream, fmt, __fprintf_put, args);
+  return __vxnprintf (stream, (size_t) -1, fmt, __fprintf_put, args);
 }

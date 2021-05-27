@@ -28,12 +28,24 @@ __vsprintf_put (void *stream, char c)
 int
 vsprintf (char *__restrict str, const char *__restrict fmt, va_list args)
 {
-  return __vxprintf ((void *) &str, fmt, __vsprintf_put, args);
+  return __vxnprintf ((void *) &str, (size_t) -1, fmt, __vsprintf_put, args);
 }
 
 int
 vsnprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 	   va_list args)
 {
-  return EOF;
+  int ret;
+  if (size == 0)
+    return 0;
+  else if (size == 1)
+    {
+      *str = '\0';
+      return 0;
+    }
+  ret = __vxnprintf ((void *) &str, size, fmt, __vsprintf_put, args);
+  if (ret == EOF)
+    return EOF;
+  str[ret] = '\0';
+  return ret;
 }

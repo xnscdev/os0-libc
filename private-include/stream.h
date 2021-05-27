@@ -19,6 +19,7 @@
 
 #include <sys/cdefs.h>
 #include <stdarg.h>
+#include <stddef.h>
 
 #define __IO_buf_mask  0x03
 #define __IO_buf_alloc 0x04
@@ -28,8 +29,9 @@
 
 __BEGIN_DECLS
 
-int __vxprintf (void *__restrict stream, const char *__restrict fmt,
-		int (*put) (void *, char), va_list args) __hidden;
+int __vxnprintf (void *__restrict stream, size_t size,
+		 const char *__restrict fmt, int (*put) (void *, char),
+		 va_list args) __hidden;
 
 void __libc_setup_stdstr (void) __hidden;
 

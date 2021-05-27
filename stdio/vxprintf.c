@@ -171,11 +171,11 @@ __cvtnumu (uintmax_t value, int base, const char *digits)
 }
 
 static int
-__printf_write (void *__restrict stream, const char *__restrict str,
+__printf_write (void *__restrict stream, const char *__restrict str, size_t max,
 		int (*put) (void *, char))
 {
   int count;
-  for (; *str != '\0'; str++, count++)
+  for (; *str != '\0' && count < max; str++, count++)
     {
       if (put (stream, *str) == EOF)
 	return EOF;
@@ -184,26 +184,31 @@ __printf_write (void *__restrict stream, const char *__restrict str,
 }
 
 static int
-__printf_fillchars (void *stream, size_t len, char c, int (*put) (void *, char))
+__printf_fillchars (void *stream, size_t len, char c, size_t max,
+		    int (*put) (void *, char))
 {
   size_t i;
-  for (i = 0; i < len; i++)
+  for (i = 0; i < len && i < max; i++)
     {
       if (put (stream, c) == EOF)
 	return EOF;
     }
-  return 0;
+  return i;
 }
 
 static int
 __printf_padwrite (FILE *__restrict stream, const char *__restrict str,
-		   size_t width, size_t prec, int flags, int mode,
+		   size_t width, size_t prec, int flags, size_t max, int mode,
 		   int (*put) (void *, char))
 {
   size_t len = strlen (str);
   size_t pad = width > len ? width - len : 0;
   int count = 0;
+  int temp;
   char c = (flags & __fmt_PADZERO) && !(flags & __fmt_LJUST) ? '0' : ' ';
+
+  if (max == 0)
+    return 0;
 
   if (mode == __prec_MINWRITE && prec > len - !isdigit (*str))
     {
@@ -217,9 +222,12 @@ __printf_padwrite (FILE *__restrict stream, const char *__restrict str,
   /* Write left padding characters if right-justifying */
   if (!(flags & __fmt_LJUST))
     {
-      if (__printf_fillchars (stream, pad, c, put) == EOF)
+      temp = __printf_fillchars (stream, pad, c, max, put);
+      if (temp == EOF)
 	return EOF;
-      count += pad;
+      count += temp;
+      if (count == max)
+	return count;
     }
 
   if (prec > 0)
@@ -233,37 +241,47 @@ __printf_padwrite (FILE *__restrict stream, const char *__restrict str,
 	    {
 	      if (put (stream, *str++) == EOF)
 		return EOF;
-	      count++;
+	      if (++count == max)
+		return count;
 	      len--;
 	    }
 	  if (prec > len)
 	    {
-	      if (__printf_fillchars (stream, prec - len, '0', put) == EOF)
+	      temp = __printf_fillchars (stream, prec - len, '0', max, put);
+	      if (temp == EOF)
 		return EOF;
-	      count += prec - len;
+	      count += temp;
+	      if (count == max)
+		return count;
 	    }
 	}
     }
 
-  if (fwrite (str, 1, len, stream) < len)
+  temp = max - count;
+  if (temp > len)
+    temp = len;
+  if (fwrite (str, 1, temp, stream) < temp)
     return EOF;
-  count += len;
+  count += temp;
+  if (count == max)
+    return count;
 
   /* Write right padding characters if left-justifying */
   if (flags & __fmt_LJUST)
     {
-      if (__printf_fillchars (stream, pad, c, put) == EOF)
+      temp = __printf_fillchars (stream, pad, c, max, put);
+      if (temp == EOF)
 	return EOF;
-      count += pad;
+      count += temp;
     }
   return count;
 }
 
 int
-__vxprintf (void *__restrict stream, const char *__restrict fmt,
-	    int (*put) (void *, char), va_list args)
+__vxnprintf (void *__restrict stream, size_t size, const char *__restrict fmt,
+	     int (*put) (void *, char), va_list args)
 {
-  int count = 0;
+  size_t count = 0;
   while (*fmt != '\0')
     {
       if (*fmt == '%')
@@ -354,16 +372,20 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	      unsigned char c = va_arg (args, int);
 	      if (put (stream, c) == EOF)
 		return EOF;
+	      if (++count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 'd' || *fmt == 'i')
 	    {
 	      int len;
 	      __printf_cvtnum (__cvtnums (value, 10, __cvtdgl, flags));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
-				       __prec_MINWRITE, put);
+				       size - count - 1, __prec_MINWRITE, put);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
+	      if (count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 'h')
 	    {
@@ -397,23 +419,31 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	      int len;
 	      __printf_cvtnum (__cvtnumu (value, 8, __cvtdgl));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
-				       __prec_MINWRITE, put);
+				       size - count - 1, __prec_MINWRITE, put);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
+	      if (count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 'p')
 	    {
 	      void *ptr = va_arg (args, void *);
 	      int len;
 	      __cvtnumu ((uintptr_t) ptr, 16, __cvtdgl);
-	      if (__printf_write (stream, "0x", put) == EOF)
-		return EOF;
-	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags, 0,
-				       put);
+	      len = __printf_write (stream, "0x", size - count - 1, put);
 	      if (len == EOF)
 		return EOF;
-	      count += len + 2;
+	      count += len;
+	      if (count == size - 1)
+		return count;
+	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
+				       size - count - 1, 0, put);
+	      if (len == EOF)
+		return EOF;
+	      count += len;
+	      if (count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 's')
 	    {
@@ -422,10 +452,12 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	      if (str == NULL)
 	        str = "(null)";
 	      len = __printf_padwrite (stream, str, width, prec, flags,
-				       __prec_MAXWRITE, put);
+				       size - count - 1, __prec_MAXWRITE, put);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
+	      if (count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 't')
 	    {
@@ -439,10 +471,12 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	      int len;
 	      __printf_cvtnum (__cvtnumu (value, 10, __cvtdgl));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
-				       __prec_MINWRITE, put);
+				       size - count - 1, __prec_MINWRITE, put);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
+	      if (count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 'x' || *fmt == 'X')
 	    {
@@ -451,10 +485,13 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	      if (flags & __fmt_ALTCONV)
 		{
 		  /* Alternate conversion of %x or %X prints hex prefix */
-		  if (__printf_write (stream, *fmt == 'x' ? "0x" : "0X",
-				      put) == EOF)
+		  len = __printf_write (stream, *fmt == 'x' ? "0x" : "0X",
+					size - count - 1, put);
+		  if (len == EOF)
 		    return EOF;
-		  count += 2;
+		  count += len;
+		  if (count == size - 1)
+		    return count;
 		}
 	      if (*fmt == 'x')
 		digits = __cvtdgl;
@@ -462,10 +499,12 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 		digits = __cvtdgu;
 	      __printf_cvtnum (__cvtnumu (value, 16, digits));
 	      len = __printf_padwrite (stream, __cvtbuf, width, prec, flags,
-				       __prec_MINWRITE, put);
+				       size - count - 1, __prec_MINWRITE, put);
 	      if (len == EOF)
 		return EOF;
 	      count += len;
+	      if (count == size - 1)
+		return count;
 	    }
 	  else if (*fmt == 'z')
 	    {
@@ -479,7 +518,8 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	      /* Also handles '%%' conversion specifier */
 	      if (put (stream, *fmt) == EOF)
 		return EOF;
-	      count++;
+	      if (++count == size - 1)
+		return count;
 	    }
 	  fmt++;
 	}
@@ -487,7 +527,8 @@ __vxprintf (void *__restrict stream, const char *__restrict fmt,
 	{
 	  if (put (stream, *fmt++) == EOF)
 	    return EOF;
-	  count++;
+	  if (++count == size - 1)
+	    return count;
 	}
     }
   return count;
