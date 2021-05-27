@@ -29,10 +29,6 @@
 
 __BEGIN_DECLS
 
-int __vxnprintf (void *__restrict stream, size_t size,
-		 const char *__restrict fmt, int (*put) (void *, char),
-		 va_list args) __hidden;
-
 void __libc_setup_stdstr (void) __hidden;
 
 __END_DECLS
