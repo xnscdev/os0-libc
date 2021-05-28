@@ -39,6 +39,8 @@ libc_inc = include_directories('include', 'private-include')
 libc_src = [
   'stdio/ferror.c',
   'stdio/fflush.c',
+  'stdio/fgetc.c',
+  'stdio/fgets.c',
   'stdio/fio.c',
   'stdio/fopen.c',
   'stdio/fputc.c',

@@ -63,6 +63,13 @@ int putchar (int c);
 int fputs (const char *__restrict str, FILE *__restrict stream);
 int puts (const char *str);
 
+int fgetc (FILE *stream);
+#define getc(stream) fgetc (stream)
+int getchar (void);
+
+char *fgets (char *__restrict str, int size, FILE *__restrict stream);
+char *gets (char *str);
+
 FILE *fopen (const char *__restrict path, const char *__restrict mode);
 FILE *fdopen (int fd, const char *mode);
 FILE *freopen (const char *__restrict path, const char *__restrict mode,
