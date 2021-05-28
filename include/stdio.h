@@ -59,6 +59,7 @@ int vsnprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 int fputc (int c, FILE *stream);
 #define putc(c, stream) fputc (c, stream) 
 int putchar (int c);
+int ungetc (int c, FILE *stream);
 
 int fputs (const char *__restrict str, FILE *__restrict stream);
 int puts (const char *str);

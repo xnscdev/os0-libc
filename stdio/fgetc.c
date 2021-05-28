@@ -33,3 +33,13 @@ getchar (void)
 {
   return fgetc (stdin);
 }
+
+int
+ungetc (int c, FILE *stream)
+{
+  if (c == EOF || stream->_read_buf == NULL
+      || stream->_read_ptr_len >= stream->_read_buf_len)
+    return EOF;
+  stream->_read_buf[stream->_read_ptr_len++] = c;
+  return c;
+}
