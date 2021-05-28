@@ -84,6 +84,7 @@ libc_src = [
   'syscall/exit.c',
   'syscall/fcntl.S',
   'syscall/fork.c',
+  'syscall/getrusage.c',
   'syscall/gettimeofday.c',
   'syscall/io.c',
   'syscall/ioctl.S',
@@ -100,6 +101,7 @@ libc_src = [
   'syscall/stat.c',
   'syscall/symlink.c',
   'syscall/syscall.S',
+  'syscall/time.c',
   'syscall/truncate.c',
   'syscall/unlink.c',
   'syscall/wait.c'
