@@ -20,9 +20,11 @@
 #include <sys/cdefs.h>
 #include <sys/errno.h>
 
+#define errno *__errno ()
+
 __BEGIN_DECLS
 
-extern int errno;
+int *__errno (void);
 
 __END_DECLS
 

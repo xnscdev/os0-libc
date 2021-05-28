@@ -143,9 +143,9 @@ static const char *errno_names[] = {
 };
 
 const char *
-strerror (int errno)
+strerror (int err)
 {
-  if (errno >= 0 || errno < -(sizeof (errno_names) / sizeof (errno_names[0])))
+  if (err < 0 || err > sizeof (errno_names) / sizeof (errno_names[0]))
     return NULL;
-  return errno_names[-errno];
+  return errno_names[err];
 }

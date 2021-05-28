@@ -49,7 +49,7 @@ char *strcat (char *__restrict a, const char *__restrict b);
 char *strncat (char *__restrict a, const char *__restrict b, size_t len);
 char *strtok (char *__restrict s, const char *__restrict delims);
 
-const char *strerror (int errno);
+const char *strerror (int err);
 
 __END_DECLS
 

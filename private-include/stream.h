@@ -21,11 +21,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#define __IO_buf_mask  0x03
-#define __IO_buf_alloc 0x04
-#define __IO_eof       0x08
-#define __IO_err       0x10
-#define __IO_stt_alloc 0x20
+#define __IO_buf_mask   0x03
+#define __IO_rbuf_alloc 0x04
+#define __IO_wbuf_alloc 0x08
+#define __IO_eof        0x10
+#define __IO_err        0x20
+#define __IO_stt_alloc  0x40
 
 __BEGIN_DECLS
 

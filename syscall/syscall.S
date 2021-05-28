@@ -53,7 +53,9 @@ syscall_asm_ret:
 1:
 	/* Set errno and return -1 */
 	neg	%eax
-	mov	%eax, errno
+	push	%eax
+	call	__libc_set_errno
+	add	$4, %esp
 	mov	$-1, %eax
 	ret
 

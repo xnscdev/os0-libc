@@ -34,7 +34,11 @@ brk:
 
 1:
 	dec	%eax
-	movl	$ENOMEM, errno
+	push	%eax
+	pushl	$ENOMEM
+	call	__libc_set_errno
+	add	$4, %esp
+	pop	%eax
 	ret
 
 	.size brk, . - brk
@@ -54,7 +58,9 @@ sbrk:
 	jns	2f
 
 1:
-	movl	$ENOMEM, errno
+	pushl	$ENOMEM
+	call	__libc_set_errno
+	add	$4, %esp
 	mov	$-1, %eax
 	pop	%ebx
 	ret

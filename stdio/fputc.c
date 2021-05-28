@@ -24,12 +24,12 @@ fputc (int c, FILE *stream)
   char ch = c;
   if ((stream->_flags & __IO_buf_mask) == _IONBF)
     return write (stream->_fd, &ch, 1);
-  if (++stream->_ptr_len > stream->_buf_len)
+  if (stream->_write_ptr_len >= stream->_write_buf_len)
     {
       if (fflush (stream) == EOF)
 	return EOF;
     }
-  *stream->_ptr++ = ch;
+  stream->_write_buf[stream->_write_ptr_len++] = ch;
   if (ch == '\n' && (stream->_flags & __IO_buf_mask) == _IOLBF)
     return fflush (stream);
   return 0;

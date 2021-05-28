@@ -94,18 +94,17 @@ fopen (const char *__restrict path, const char *__restrict mode)
       close (fd);
       return NULL;
     }
-  stream->_flags = _IOFBF | __IO_buf_alloc | __IO_stt_alloc;
+  stream->_flags = _IOFBF | __IO_wbuf_alloc | __IO_stt_alloc;
   stream->_fd = fd;
-  stream->_buffer = malloc (BUFSIZ);
-  if (stream->_buffer == NULL)
+  stream->_write_buf = malloc (BUFSIZ);
+  if (stream->_write_buf == NULL)
     {
       close (fd);
       free (stream);
       return NULL;
     }
-  stream->_ptr = stream->_buffer;
-  stream->_buf_len = BUFSIZ;
-  stream->_ptr_len = 0;
+  stream->_write_buf_len = BUFSIZ;
+  stream->_write_ptr_len = 0;
   return stream;
 }
 
@@ -165,18 +164,17 @@ fdopen (int fd, const char *mode)
   stream = malloc (sizeof (FILE));
   if (stream == NULL)
     return NULL;
-  stream->_flags = _IOFBF | __IO_buf_alloc | __IO_stt_alloc;
+  stream->_flags = _IOFBF | __IO_wbuf_alloc | __IO_stt_alloc;
   stream->_fd = fd;
-  stream->_buffer = malloc (BUFSIZ);
-  if (stream->_buffer == NULL)
+  stream->_write_buf = malloc (BUFSIZ);
+  if (stream->_write_buf == NULL)
     {
       free (stream);
       errno = ENOMEM;
       return NULL;
     }
-  stream->_ptr = stream->_buffer;
-  stream->_buf_len = BUFSIZ;
-  stream->_ptr_len = 0;
+  stream->_write_buf_len = BUFSIZ;
+  stream->_write_ptr_len = 0;
   return stream;
 }
 
@@ -200,8 +198,10 @@ fclose (FILE *stream)
 {
   if (close (stream->_fd) == -1)
     return EOF;
-  if (stream->_flags & __IO_buf_alloc)
-    free (stream->_buffer);
+  if (stream->_flags & __IO_rbuf_alloc)
+    free (stream->_read_buf);
+  if (stream->_flags & __IO_wbuf_alloc)
+    free (stream->_write_buf);
   if (stream->_flags & __IO_stt_alloc)
     free (stream);
   return 0;

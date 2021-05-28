@@ -16,4 +16,16 @@
 
 #include <errno.h>
 
-int errno;
+static int __libc_errno;
+
+int *
+__errno (void)
+{
+  return &__libc_errno;
+}
+
+void
+__libc_set_errno (int err)
+{
+  errno = err;
+}

@@ -38,10 +38,9 @@ __libc_setup_stdstr (void)
 
   stdout->_flags = _IOLBF;
   stdout->_fd = STDOUT_FILENO;
-  stdout->_buffer = __stdout_buf;
-  stdout->_ptr = stdout->_buffer;
-  stdout->_buf_len = BUFSIZ;
-  stdout->_ptr_len = 0;
+  stdout->_write_buf = __stdout_buf;
+  stdout->_write_buf_len = BUFSIZ;
+  stdout->_write_ptr_len = 0;
 
   stderr->_flags = _IONBF;
   stderr->_fd = STDERR_FILENO;

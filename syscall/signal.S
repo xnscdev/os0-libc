@@ -31,6 +31,9 @@ signal:
 	/* Set errno to EINVAL if returned SIG_ERR */
 	cmp	$-1, %eax
 	jne	1f
-	movl	$EINVAL, errno
+	pushl	$EINVAL
+	call	__libc_set_errno
+	add	$4, %esp
+	mov	$-1, %eax
 1:
 	ret

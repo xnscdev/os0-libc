@@ -41,8 +41,8 @@ void
 setlinebuf (FILE *stream)
 {
   char *buffer;
-  if (stream->_flags & __IO_buf_alloc)
-    free (stream->_buffer);
+  if (stream->_flags & __IO_wbuf_alloc)
+    free (stream->_write_buf);
   buffer = malloc (BUFSIZ);
   if (buffer == NULL)
     {
@@ -50,11 +50,10 @@ setlinebuf (FILE *stream)
       return;
     }
   stream->_flags &= ~__IO_buf_mask;
-  stream->_flags |= _IOLBF | __IO_buf_alloc;
-  stream->_buffer = buffer;
-  stream->_ptr = buffer;
-  stream->_buf_len = BUFSIZ;
-  stream->_ptr_len = 0;
+  stream->_flags |= _IOLBF | __IO_wbuf_alloc;
+  stream->_write_buf = buffer;
+  stream->_write_buf_len = BUFSIZ;
+  stream->_write_ptr_len = 0;
 }
 
 int
@@ -71,16 +70,15 @@ setvbuf (FILE *__restrict stream, char *__restrict buffer, int mode,
 	  return -1;
 	}
     }
-  if (stream->_flags & __IO_buf_alloc)
+  if (stream->_flags & __IO_wbuf_alloc)
     {
-      free (stream->_buffer);
-      stream->_flags &= ~__IO_buf_alloc;
+      free (stream->_write_buf);
+      stream->_flags &= ~__IO_wbuf_alloc;
     }
   stream->_flags &= ~__IO_buf_mask;
   stream->_flags |= mode;
-  stream->_buffer = buffer;
-  stream->_ptr = buffer;
-  stream->_buf_len = size;
-  stream->_ptr_len = 0;
+  stream->_write_buf = buffer;
+  stream->_write_buf_len = size;
+  stream->_write_ptr_len = 0;
   return 0;
 }

@@ -23,10 +23,9 @@ fflush (FILE *stream)
 {
   if ((stream->_flags & __IO_buf_mask) == _IONBF)
     return 0;
-  if (write (stream->_fd, stream->_buffer, stream->_ptr_len) == -1)
+  if (write (stream->_fd, stream->_write_buf, stream->_write_ptr_len) == -1)
     return -1;
-  stream->_ptr = stream->_buffer;
-  stream->_ptr_len = 0;
+  stream->_write_ptr_len = 0;
   return 0;
 }
 
@@ -35,7 +34,6 @@ fpurge (FILE *stream)
 {
   if ((stream->_flags & __IO_buf_mask) == _IONBF)
     return 0;
-  stream->_ptr = stream->_buffer;
-  stream->_ptr_len = 0;
+  stream->_write_ptr_len = 0;
   return 0;
 }
