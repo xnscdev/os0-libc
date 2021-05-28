@@ -94,6 +94,7 @@ int fseek (FILE *stream, long offset, int whence);
 int fseeko (FILE *stream, off_t offset, int whence);
 long ftell (FILE *stream);
 off_t ftello (FILE *stream);
+void rewind (FILE *stream);
 
 int fflush (FILE *stream);
 int fpurge (FILE *stream);
