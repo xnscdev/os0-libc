@@ -60,6 +60,7 @@ libc_src = [
   'stdlib/exit.c',
   'stdlib/init.c',
   'stdlib/isatty.c',
+  'stdlib/locks.c',
   'stdlib/lsearch.c',
   'stdlib/malloc.c',
   'stdlib/qsort.c',

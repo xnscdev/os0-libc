@@ -14,10 +14,11 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <stream.h>
+#include <setup.h>
 
 __hidden void
 __libc_init (void)
 {
+  __libc_setup_env ();
   __libc_setup_stdstr ();
 }

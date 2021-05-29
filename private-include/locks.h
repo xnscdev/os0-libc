@@ -1,4 +1,4 @@
-/* assert.h -- This file is part of OS/0 libc.
+/* locks.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,23 +14,17 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _ASSERT_H
-#define _ASSERT_H
+#ifndef _LOCKS_H
+#define _LOCKS_H
 
 #include <sys/cdefs.h>
 
-#ifdef NDEBUG
-#define assert(x) (void) 0
-#else
-#define assert(x) (x) ? (void) 0 :			\
-    _assert_fail (#x, __FILE__, __LINE__, __func__)
-#endif
+typedef volatile int __lock_t;
 
 __BEGIN_DECLS
 
-void _assert_fail (const char *msg, const char *file, int line, \
-		   const char *func)				\
-  __attribute__ ((noreturn));
+void __libc_lock (__lock_t *lock) __hidden;
+void __libc_unlock (__lock_t *lock) __hidden;
 
 __END_DECLS
 
