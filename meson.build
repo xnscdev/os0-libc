@@ -57,6 +57,7 @@ libc_src = [
   'stdlib/dlmalloc.c',
   'stdlib/env.c',
   'stdlib/errno.c',
+  'stdlib/exec.c',
   'stdlib/exit.c',
   'stdlib/init.c',
   'stdlib/isatty.c',
