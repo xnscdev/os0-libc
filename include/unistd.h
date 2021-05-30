@@ -57,6 +57,9 @@ int openat (int fd, const char *path, int flags, ...);
 int creat (const char *path, mode_t mode);
 int close (int fd);
 
+int dup (int fd);
+int dup2 (int fd1, int fd2);
+
 int access (const char *path, int mode);
 int faccessat (int fd, const char *path, int mode, int flags);
 

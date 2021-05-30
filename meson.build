@@ -85,6 +85,7 @@ libc_src = [
   'syscall/chown.c',
   'syscall/close.c',
   'syscall/creat.c',
+  'syscall/dup.c',
   'syscall/execve.c',
   'syscall/exit.c',
   'syscall/fcntl.S',
@@ -109,7 +110,8 @@ libc_src = [
   'syscall/time.c',
   'syscall/truncate.c',
   'syscall/unlink.c',
-  'syscall/wait.c'
+  'syscall/wait.c',
+  'syscall/xattr.c'
 ]
 
 libm_src = [

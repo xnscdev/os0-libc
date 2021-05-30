@@ -5,4 +5,5 @@ install_headers('ioctl.h',
 		'syscall.h',
 		'time.h',
 		'times.h',
-		'wait.h', subdir: 'sys')
+		'wait.h',
+		'xattr.h', subdir: 'sys')
