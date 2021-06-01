@@ -28,7 +28,10 @@ fgets (char *__restrict str, int size, FILE *__restrict stream)
 	break;
       str[i] = c;
       if (c == '\n')
-	break;
+	{
+	  i++;
+	  break;
+	}
     }
   str[i] = '\0';
   return str;
