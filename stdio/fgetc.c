@@ -21,11 +21,15 @@ int
 fgetc (FILE *stream)
 {
   char c;
+  int ret;
   if (feof (stream) || ferror (stream))
     return EOF;
   if (stream->_read_buf_len > 0)
     return stream->_read_buf[--stream->_read_buf_len];
-  return read (stream->_fd, &c, 1);
+  ret = read (stream->_fd, &c, 1);
+  if (ret != 1)
+    return EOF;
+  return c;
 }
 
 int
