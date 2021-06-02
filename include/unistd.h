@@ -28,6 +28,21 @@ int fork (void);
 pid_t getpid (void);
 pid_t getppid (void);
 
+int setuid (uid_t uid);
+uid_t getuid (void);
+int setgid (gid_t gid);
+gid_t getgid (void);
+int seteuid (uid_t euid);
+uid_t geteuid (void);
+int setegid (gid_t egid);
+gid_t getegid (void);
+int setreuid (uid_t ruid, uid_t euid);
+int setregid (gid_t rgid, gid_t egid);
+int setresuid (uid_t ruid, uid_t euid, uid_t suid);
+int getresuid (uid_t *ruid, uid_t *euid, uid_t *suid);
+int setresgid (gid_t rgid, gid_t egid, gid_t sgid);
+int getresgid (gid_t *rgid, gid_t *egid, gid_t *sgid);
+
 int execl (const char *path, const char *arg0, ...);
 int execle (const char *path, const char *arg0, ...);
 int execlp (const char *file, const char *arg0, ...);
