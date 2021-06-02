@@ -14,5 +14,9 @@ install_headers('assert.h',
 		'time.h',
 		'unistd.h')
 
+# Install a limits.h that provides more macros
+install_data('_limits.h', install_dir: get_option('includedir'),
+	     rename: 'limits.h')
+
 subdir('bits/types')
 subdir('sys')
