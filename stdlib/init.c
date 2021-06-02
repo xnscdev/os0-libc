@@ -20,5 +20,6 @@ __hidden void
 __libc_init (void)
 {
   __libc_setup_env ();
+  __libc_setup_locale ();
   __libc_setup_stdstr ();
 }

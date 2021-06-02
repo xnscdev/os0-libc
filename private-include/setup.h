@@ -22,6 +22,7 @@
 __BEGIN_DECLS
 
 void __libc_setup_env (void) __hidden;
+void __libc_setup_locale (void) __hidden;
 void __libc_setup_stdstr (void) __hidden;
 
 __END_DECLS

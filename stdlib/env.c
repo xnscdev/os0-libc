@@ -195,6 +195,8 @@ __libc_setup_env (void)
   char **buffer;
   size_t len;
   size_t i;
+  if (environ == NULL)
+    return;
   for (len = 0; environ[len] != NULL; len++)
     ;
 
