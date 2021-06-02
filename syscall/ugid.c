@@ -50,9 +50,7 @@ seteuid (uid_t euid)
 uid_t
 geteuid (void)
 {
-  uid_t euid;
-  getresuid (NULL, &euid, NULL);
-  return euid;
+  return syscall (SYS_geteuid);
 }
 
 int
@@ -64,9 +62,7 @@ setegid (gid_t egid)
 gid_t
 getegid (void)
 {
-  gid_t egid;
-  getresgid (NULL, &egid, NULL);
-  return egid;
+  return syscall (SYS_getegid);
 }
 
 int
