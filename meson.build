@@ -46,6 +46,7 @@ libc_src = [
   'stdio/fpos.c',
   'stdio/fputc.c',
   'stdio/fputs.c',
+  'stdio/getdelim.c',
   'stdio/printf.c',
   'stdio/setvbuf.c',
   'stdio/stdstr.c',

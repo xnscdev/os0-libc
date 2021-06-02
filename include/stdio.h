@@ -106,6 +106,11 @@ void setlinebuf (FILE *stream);
 int setvbuf (FILE *__restrict stream, char *__restrict buffer, int mode,
 	     size_t size);
 
+ssize_t getdelim (char **__restrict line, size_t *__restrict len, int delim,
+		  FILE *__restrict stream);
+ssize_t getline (char **__restrict line, size_t *__restrict len,
+		 FILE *__restrict stream);
+
 __END_DECLS
 
 #endif
