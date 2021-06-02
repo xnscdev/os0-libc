@@ -38,6 +38,8 @@ getenv (const char *name)
       return NULL;
     }
 
+  if (environ == NULL)
+    return NULL;
   __libc_lock (&__libc_env_lock);
   for (i = 0; environ[i] != NULL; i++)
     {
@@ -71,32 +73,35 @@ setenv (const char *name, const char *value, int overwrite)
 
   /* Search for an existing environment variable and replace it if desired */
   __libc_lock (&__libc_env_lock);
-  for (i = 0; environ[i] != NULL; i++)
+  if (environ != NULL)
     {
-      char *eq = strchr (environ[i], '=');
-      if (eq == NULL)
-	continue; /* Invalid environment value? */
-      *eq = '\0';
-      if (strcmp (environ[i], name) == 0)
+      for (i = 0; environ[i] != NULL; i++)
 	{
-	  if (overwrite)
+	  char *eq = strchr (environ[i], '=');
+	  if (eq == NULL)
+	    continue; /* Invalid environment value? */
+	  *eq = '\0';
+	  if (strcmp (environ[i], name) == 0)
 	    {
-	      char *buffer = malloc (eq - environ[i] + strlen (value) + 2);
-	      if (buffer == NULL)
+	      if (overwrite)
 		{
-		  errno = ENOMEM;
-		  return -1;
+		  char *buffer = malloc (eq - environ[i] + strlen (value) + 2);
+		  if (buffer == NULL)
+		    {
+		      errno = ENOMEM;
+		      return -1;
+		    }
+		  sprintf (buffer, "%s=%s", environ[i], value);
+		  free (environ[i]);
+		  environ[i] = buffer;
 		}
-	      sprintf (buffer, "%s=%s", environ[i], value);
-	      free (environ[i]);
-	      environ[i] = buffer;
+	      else
+		*eq = '=';
+	      __libc_unlock (&__libc_env_lock);
+	      return 0;
 	    }
-	  else
-	    *eq = '=';
-	  __libc_unlock (&__libc_env_lock);
-	  return 0;
+	  *eq = '=';
 	}
-      *eq = '=';
     }
 
   /* Create a new entry in the environment variable array */
@@ -173,6 +178,14 @@ unsetenv (const char *name)
 	}
     }
   __libc_unlock (&__libc_env_lock);
+  return 0;
+}
+
+int
+clearenv (void)
+{
+  free (environ);
+  environ = NULL;
   return 0;
 }
 

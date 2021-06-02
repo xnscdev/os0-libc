@@ -36,6 +36,7 @@ char *getenv (const char *name);
 int setenv (const char *name, const char *value, int overwrite);
 int putenv (char *str);
 int unsetenv (const char *name);
+int clearenv (void);
 
 int atexit (void (*func) (void));
 void exit (int code) __attribute__ ((noreturn));
