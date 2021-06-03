@@ -3,6 +3,7 @@ configure_file(input: 'stdint.h.in', output: 'stdint.h',
 	       install_dir: get_option('includedir'))
 
 install_headers('assert.h',
+		'ctype.h',
 		'errno.h',
 		'fcntl.h',
 		'locale.h',
