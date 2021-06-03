@@ -1,4 +1,4 @@
-/* signal.h -- This file is part of OS/0 libc.
+/* sigsetjmp.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,25 +14,26 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SIGNAL_H
-#define _SIGNAL_H
+	.section .text
+	.global sigsetjmp
+	.type sigsetjmp, @function
+sigsetjmp:
+	mov	4(%esp), %eax
 
-#include <sys/cdefs.h>
-#include <sys/signal.h>
+	/* Save registers */
+	mov	%ebx, (%eax)
+	mov	%esi, 4(%eax)
+	mov	%edi, 8(%eax)
 
-typedef int sig_atomic_t;
+	lea	4(%esp), %ecx
+	mov	%ecx, 16(%eax)
 
-__BEGIN_DECLS
+	/* Save return address and frame pointer */
+	mov	(%esp), %ecx
+	mov	%ecx, 20(%eax)
+	mov	%ebp, 12(%eax)
 
-int kill (pid_t pid, int sig);
-int raise (int sig);
+	/* Save the signal mask if desired and return */
+	jmp	__sigsetjmp_maybe_save_mask
 
-int sigaction (int sig, const struct sigaction *__restrict act,
-	       struct sigaction *__restrict old);
-sighandler_t signal (int sig, sighandler_t func);
-int sigprocmask (int how, const sigset_t *__restrict set,
-		 sigset_t *__restrict old);
-
-__END_DECLS
-
-#endif
+	.size sigsetjmp, . - sigsetjmp

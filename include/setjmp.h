@@ -1,4 +1,4 @@
-/* signal.h -- This file is part of OS/0 libc.
+/* setjmp.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,24 +14,30 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SIGNAL_H
-#define _SIGNAL_H
+#ifndef _SETJMP_H
+#define _SETJMP_H
 
 #include <sys/cdefs.h>
 #include <sys/signal.h>
 
-typedef int sig_atomic_t;
+struct __jmp_buf
+{
+  int __env[6];
+  int __mask_saved;
+  sigset_t __mask;
+};
+
+typedef struct __jmp_buf jmp_buf[1];
+typedef struct __jmp_buf sigjmp_buf[1];
 
 __BEGIN_DECLS
 
-int kill (pid_t pid, int sig);
-int raise (int sig);
-
-int sigaction (int sig, const struct sigaction *__restrict act,
-	       struct sigaction *__restrict old);
-sighandler_t signal (int sig, sighandler_t func);
-int sigprocmask (int how, const sigset_t *__restrict set,
-		 sigset_t *__restrict old);
+void _longjmp (jmp_buf env, int val) __attribute__ ((noreturn));
+int _setjmp (jmp_buf env) __attribute__ ((returns_twice));
+void longjmp (jmp_buf env, int val) __attribute__ ((noreturn));
+int setjmp (jmp_buf env) __attribute__ ((returns_twice));
+void siglongjmp (sigjmp_buf env, int val) __attribute__ ((noreturn));
+int sigsetjmp (sigjmp_buf env, int save_mask) __attribute__ ((returns_twice));
 
 __END_DECLS
 

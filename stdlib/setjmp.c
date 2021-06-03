@@ -1,4 +1,4 @@
-/* signal.h -- This file is part of OS/0 libc.
+/* setjmp.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,25 +14,40 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SIGNAL_H
-#define _SIGNAL_H
+#include <setjmp.h>
+#include <signal.h>
+#include <stddef.h>
 
-#include <sys/cdefs.h>
-#include <sys/signal.h>
+void
+_longjmp (jmp_buf env, int val)
+{
+  longjmp (env, val);
+}
 
-typedef int sig_atomic_t;
+int
+_setjmp (jmp_buf env)
+{
+  return sigsetjmp (env, 0);
+}
 
-__BEGIN_DECLS
+int
+setjmp (jmp_buf env)
+{
+  return sigsetjmp (env, 1);
+}
 
-int kill (pid_t pid, int sig);
-int raise (int sig);
+void
+siglongjmp (sigjmp_buf env, int val)
+{
+  if (env[0].__mask_saved)
+    sigprocmask (SIG_SETMASK, &env[0].__mask, NULL);
+  longjmp (env, val);
+}
 
-int sigaction (int sig, const struct sigaction *__restrict act,
-	       struct sigaction *__restrict old);
-sighandler_t signal (int sig, sighandler_t func);
-int sigprocmask (int how, const sigset_t *__restrict set,
-		 sigset_t *__restrict old);
-
-__END_DECLS
-
-#endif
+__hidden int
+__sigsetjmp_maybe_save_mask (sigjmp_buf env, int save_mask)
+{
+  env[0].__mask_saved =
+    save_mask && sigprocmask (SIG_BLOCK, NULL, &env[0].__mask) == 0;
+  return 0;
+}

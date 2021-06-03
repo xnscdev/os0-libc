@@ -1,4 +1,4 @@
-/* signal.h -- This file is part of OS/0 libc.
+/* sigprocmask.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,25 +14,12 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SIGNAL_H
-#define _SIGNAL_H
+#include <sys/syscall.h>
+#include <signal.h>
+#include <unistd.h>
 
-#include <sys/cdefs.h>
-#include <sys/signal.h>
-
-typedef int sig_atomic_t;
-
-__BEGIN_DECLS
-
-int kill (pid_t pid, int sig);
-int raise (int sig);
-
-int sigaction (int sig, const struct sigaction *__restrict act,
-	       struct sigaction *__restrict old);
-sighandler_t signal (int sig, sighandler_t func);
-int sigprocmask (int how, const sigset_t *__restrict set,
-		 sigset_t *__restrict old);
-
-__END_DECLS
-
-#endif
+int
+sigprocmask (int how, const sigset_t *__restrict set, sigset_t *__restrict old)
+{
+  return syscall (SYS_sigprocmask, how, set, old);
+}
