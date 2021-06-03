@@ -14,19 +14,22 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <ctype.h>
 #include <string.h>
 
 int
 strcmp (const char *a, const char *b)
 {
+  const unsigned char *ua = (const unsigned char *) a;
+  const unsigned char *ub = (const unsigned char *) b;
   size_t i = 0;
   while (1)
     {
-      if (a[i] > b[i])
+      if (ua[i] > ub[i])
 	return 1;
-      if (a[i] < b[i])
+      if (ua[i] < ub[i])
 	return -1;
-      if (a[i] == '\0' && b[i] == '\0')
+      if (ua[i] == '\0' && ub[i] == '\0')
 	return 0;
       i++;
     }
@@ -35,13 +38,54 @@ strcmp (const char *a, const char *b)
 int
 strncmp (const char *a, const char *b, size_t len)
 {
+  const unsigned char *ua = (const unsigned char *) a;
+  const unsigned char *ub = (const unsigned char *) b;
   size_t i;
   for (i = 0; i < len; i++)
     {
-      if (a[i] > b[i])
+      if (ua[i] > ub[i])
 	return 1;
-      if (a[i] < b[i])
+      if (ua[i] < ub[i])
 	return -1;
+    }
+  return 0;
+}
+
+int
+strcasecmp (const char *a, const char *b)
+{
+  const unsigned char *ua = (const unsigned char *) a;
+  const unsigned char *ub = (const unsigned char *) b;
+  size_t i = 0;
+  while (1)
+    {
+      unsigned char ca = tolower (ua[i]);
+      unsigned char cb = tolower (ub[i]);
+      if (ca > cb)
+	return 1;
+      if (ca < cb)
+	return -1;
+      if (ca == '\0' && cb == '\0')
+	return 0;
+      i++;
+    }
+}
+
+int
+strncasecmp (const char *a, const char *b, size_t len)
+{
+  const unsigned char *ua = (const unsigned char *) a;
+  const unsigned char *ub = (const unsigned char *) b;
+  size_t i;
+  for (i = 0; i < len; i++)
+    {
+      unsigned char ca = tolower (ua[i]);
+      unsigned char cb = tolower (ub[i]);
+      if (ca > cb)
+	return 1;
+      if (ca < cb)
+	return -1;
+      i++;
     }
   return 0;
 }

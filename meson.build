@@ -78,6 +78,7 @@ libc_src = [
   'stdlib/time.c',
   'string/memcmp.c',
   'string/memset.c',
+  'string/strcasestr.c',
   'string/strcat.c',
   'string/strcmp.c',
   'string/strcpy.c',
