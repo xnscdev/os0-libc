@@ -70,6 +70,7 @@ libc_src = [
   'stdlib/qsort.c',
   'stdlib/setjmp.c',
   'stdlib/signal.c',
+  'stdlib/sigset.c',
   'stdlib/sigsetjmp.S',
   'stdlib/stdmath.c',
   'stdlib/strtol.c',
