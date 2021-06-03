@@ -22,13 +22,6 @@
 
 __BEGIN_DECLS
 
-int ffs (int value);
-int ffsl (long value);
-int ffsll (long long value);
-int fls (int value);
-int flsl (long value);
-int flsll (long long value);
-
 void *memcpy (void *__restrict dest, const void *__restrict src, size_t len);
 void *memmove (void *dest, const void *src, size_t len);
 void *memset (void *ptr, int c, size_t len);
@@ -36,6 +29,7 @@ int memcmp (const void *a, const void *b, size_t len);
 void *memchr (const void *str, int c, size_t len);
 
 size_t strlen (const char *s);
+size_t strnlen (const char *s, size_t len);
 char *strdup (const char *s);
 char *stpcpy (char *dest, const char *src);
 char *stpncpy (char *dest, const char *src, size_t len);
@@ -45,9 +39,14 @@ int strcmp (const char *a, const char *b);
 int strncmp (const char *a, const char *b, size_t len);
 char *strchr (const char *s, int c);
 char *strrchr (const char *s, int c);
+char *strstr (const char *haystack, const char *needle);
+char *strcasestr (const char *haystack, const char *needle);
 char *strcat (char *__restrict a, const char *__restrict b);
 char *strncat (char *__restrict a, const char *__restrict b, size_t len);
+
 char *strtok (char *__restrict s, const char *__restrict delims);
+char *strtok_r (char *__restrict s, const char *__restrict delims,
+		char **__restrict saveptr);
 
 const char *strerror (int err);
 

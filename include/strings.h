@@ -1,4 +1,4 @@
-/* string.c -- This file is part of OS/0 libc.
+/* strings.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,35 +14,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <branch.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef _STRINGS_H
+#define _STRINGS_H
 
-size_t
-strlen (const char *s)
-{
-  size_t i = 0;
-  while (s[i] != '\0')
-    i++;
-  return i;
-}
+#include <sys/cdefs.h>
 
-size_t
-strnlen (const char *s, size_t len)
-{
-  size_t i = 0;
-  while (s[i] != '\0' && i < len)
-    i++;
-  return i;
-}
+__BEGIN_DECLS
 
-char *
-strdup (const char *s)
-{
-  size_t len = strlen (s);
-  char *buffer = malloc (len + 1);
-  if (unlikely (buffer == NULL))
-    return NULL;
-  strcpy (buffer, s);
-  return buffer;
-}
+int ffs (int value);
+int ffsl (long value);
+int ffsll (long long value);
+int fls (int value);
+int flsl (long value);
+int flsll (long long value);
+
+__END_DECLS
+
+#endif

@@ -83,6 +83,7 @@ libc_src = [
   'string/strcpy.c',
   'string/strerror.c',
   'string/string.c',
+  'string/strstr.c',
   'string/strtok.c',
   'syscall/access.c',
   'syscall/brk.S',

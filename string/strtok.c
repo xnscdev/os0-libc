@@ -16,23 +16,27 @@
 
 #include <string.h>
 
-static char strtok_save;
-static char *strtok_ptr;
+static char *__libc_strtok_saveptr;
 
 char *
 strtok (char *__restrict s, const char *__restrict delims)
 {
+  return strtok_r (s, delims, &__libc_strtok_saveptr);
+}
+
+char *
+strtok_r (char *__restrict s, const char *__restrict delims,
+	  char **__restrict saveptr)
+{
   size_t i;
   char *ptr = NULL;
   char *end;
+
+  /* Set or restore context */
   if (s != NULL)
-    strtok_ptr = s;
-  else if (strtok_ptr == NULL)
-    return NULL; /* No string initialized */
+    *saveptr = s;
   else
-    s = strtok_ptr;
-  if (strtok_save != '\0')
-    *strtok_ptr = strtok_save; /* Restore state from previous call */
+    s = *saveptr + 1;
 
   for (end = s; *end != '\0'; end++)
     {
@@ -50,13 +54,11 @@ strtok (char *__restrict s, const char *__restrict delims)
 	ptr = end;
       else if (is_delim && ptr != NULL)
 	{
-	  strtok_save = *end;
-	  strtok_ptr = end;
+	  *saveptr = end;
 	  *end = '\0';
 	  return ptr;
 	}
     }
-  strtok_save = '\0';
-  strtok_ptr = end;
+  *saveptr = end;
   return ptr;
 }

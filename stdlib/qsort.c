@@ -29,7 +29,7 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-/* Code adopted from _quicksort() from the GNU C Library */
+/* Code adapted from _quicksort() from the GNU C Library */
 
 #include <sys/param.h>
 #include <stdlib.h>

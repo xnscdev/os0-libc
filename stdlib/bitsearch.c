@@ -15,7 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <limits.h>
-#include <string.h>
+#include <strings.h>
 
 int
 ffs (int value)
