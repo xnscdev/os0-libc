@@ -25,6 +25,12 @@ fstat (int fd, struct stat *st)
 }
 
 int
+lstat (const char *__restrict path, struct stat *__restrict st)
+{
+  return syscall (SYS_lstat, path, st);
+}
+
+int
 stat (const char *__restrict path, struct stat *__restrict st)
 {
   return syscall (SYS_stat, path, st);
