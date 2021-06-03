@@ -1,4 +1,4 @@
-/* time.h -- This file is part of OS/0 libc.
+/* nanosleep.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,25 +14,12 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _TIME_H
-#define _TIME_H
+#include <sys/syscall.h>
+#include <time.h>
+#include <unistd.h>
 
-#include <sys/cdefs.h>
-#include <sys/time.h>
-
-__BEGIN_DECLS
-
-extern char *tzname[2];
-
-char *asctime (const struct tm *tp);
-char *asctime_r (const struct tm *__restrict tp, char *__restrict buffer);
-struct tm *gmtime (const time_t *time);
-struct tm *gmtime_r (const time_t *__restrict time, struct tm *__restrict tp);
-time_t time (time_t *t);
-
-int nanosleep (const struct timespec *req, struct timespec *rem);
-unsigned int sleep (unsigned int seconds);
-
-__END_DECLS
-
-#endif
+int
+nanosleep (const struct timespec *req, struct timespec *rem)
+{
+  return syscall (SYS_nanosleep, req, rem);
+}
