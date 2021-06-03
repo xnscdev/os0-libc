@@ -67,6 +67,7 @@ libc_src = [
   'stdlib/longjmp.S',
   'stdlib/lsearch.c',
   'stdlib/malloc.c',
+  'stdlib/passwd.c',
   'stdlib/qsort.c',
   'stdlib/setjmp.c',
   'stdlib/signal.c',
