@@ -75,6 +75,7 @@ libc_src = [
   'stdlib/sigsetjmp.S',
   'stdlib/stdmath.c',
   'stdlib/strtol.c',
+  'stdlib/sysconf.c',
   'stdlib/termios.c',
   'stdlib/time.c',
   'string/memcmp.c',

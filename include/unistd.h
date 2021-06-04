@@ -116,6 +116,8 @@ int ftruncate (int fd, off_t len);
 
 long syscall (long num, ...);
 
+long sysconf (int name);
+
 __END_DECLS
 
 #endif

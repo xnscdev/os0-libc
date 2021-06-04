@@ -29,6 +29,19 @@ typedef unsigned short uint16_t;
 typedef @__UINT32_T@ uint32_t;
 typedef @__UINT64_T@ uint64_t;
 
+/* Non-POSIX names for unsigned integer types */
+
+typedef unsigned char u_char;
+typedef unsigned short u_short;
+typedef unsigned int u_int;
+typedef unsigned long u_long;
+typedef unsigned long long u_long_long;
+
+typedef uint8_t u_int8_t;
+typedef uint16_t u_int16_t;
+typedef uint32_t u_int32_t;
+typedef uint64_t u_int64_t;
+
 /* Minimum-width integer types */
 
 typedef int8_t int_least8_t;
