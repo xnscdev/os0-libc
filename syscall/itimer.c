@@ -1,4 +1,4 @@
-/* time.h -- This file is part of OS/0 libc.
+/* itimer.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,23 +14,25 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SYS_TIME_H
-#define _SYS_TIME_H
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-#include <bits/types/tm.h>
-#include <bits/time.h>
-#include <sys/cdefs.h>
+int
+setitimer (int which, const struct itimerval *__restrict new,
+	   struct itimerval *__restrict old)
+{
+  return syscall (SYS_setitimer, which, new, old);
+}
 
-__BEGIN_DECLS
+int
+getitimer (int which, struct itimerval *curr)
+{
+  return syscall (SYS_getitimer, which, curr);
+}
 
-int gettimeofday (struct timeval *__restrict tv,
-		  struct timezone *__restrict tz);
-
-int setitimer (int which, const struct itimerval *__restrict new,
-	       struct itimerval *__restrict old);
-int getitimer (int which, struct itimerval *curr);
-unsigned int alarm (unsigned int seconds);
-
-__END_DECLS
-
-#endif
+unsigned int
+alarm (unsigned int seconds)
+{
+  return syscall (SYS_alarm, seconds);
+}

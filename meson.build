@@ -104,6 +104,7 @@ libc_src = [
   'syscall/gettimeofday.c',
   'syscall/io.c',
   'syscall/ioctl.S',
+  'syscall/itimer.c',
   'syscall/kill.c',
   'syscall/link.c',
   'syscall/lseek.c',
