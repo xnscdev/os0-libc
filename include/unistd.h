@@ -114,6 +114,8 @@ ssize_t readlinkat (int fd, const char *__restrict path,
 int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
 
+unsigned int alarm (unsigned int seconds);
+
 long syscall (long num, ...);
 
 long sysconf (int name);

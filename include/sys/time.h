@@ -29,7 +29,6 @@ int gettimeofday (struct timeval *__restrict tv,
 int setitimer (int which, const struct itimerval *__restrict new,
 	       struct itimerval *__restrict old);
 int getitimer (int which, struct itimerval *curr);
-unsigned int alarm (unsigned int seconds);
 
 __END_DECLS
 
