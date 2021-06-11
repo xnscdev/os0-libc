@@ -17,10 +17,7 @@
 #ifndef _SIGNAL_H
 #define _SIGNAL_H
 
-#include <sys/cdefs.h>
 #include <sys/signal.h>
-
-typedef int sig_atomic_t;
 
 __BEGIN_DECLS
 
@@ -29,15 +26,9 @@ int raise (int sig);
 
 int sigaction (int sig, const struct sigaction *__restrict act,
 	       struct sigaction *__restrict old);
-sighandler_t signal (int sig, sighandler_t func);
+sig_t signal (int sig, sig_t func);
 int sigprocmask (int how, const sigset_t *__restrict set,
 		 sigset_t *__restrict old);
-
-int sigemptyset (sigset_t *set);
-int sigfillset (sigset_t *set);
-int sigaddset (sigset_t *set, int sig);
-int sigdelset (sigset_t *set, int sig);
-int sigismember (const sigset_t *set, int sig);
 
 __END_DECLS
 
