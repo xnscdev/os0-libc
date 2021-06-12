@@ -2,7 +2,8 @@ configure_file(input: 'stdint.h.in', output: 'stdint.h',
 	       configuration: libc_config,
 	       install_dir: get_option('includedir'))
 
-install_headers('assert.h',
+install_headers('alloca.h',
+		'assert.h',
 		'ctype.h',
 		'errno.h',
 		'fcntl.h',
