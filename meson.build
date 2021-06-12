@@ -112,6 +112,7 @@ libc_src = [
   'syscall/mknod.c',
   'syscall/nanosleep.c',
   'syscall/open.S',
+  'syscall/pgid.c',
   'syscall/readlink.c',
   'syscall/rename.c',
   'syscall/sigaction.c',

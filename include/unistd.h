@@ -42,6 +42,10 @@ int setresuid (uid_t ruid, uid_t euid, uid_t suid);
 int getresuid (uid_t *ruid, uid_t *euid, uid_t *suid);
 int setresgid (gid_t rgid, gid_t egid, gid_t sgid);
 int getresgid (gid_t *rgid, gid_t *egid, gid_t *sgid);
+int setpgid (pid_t pid, pid_t pgid);
+pid_t getpgid (pid_t pid);
+pid_t getpgrp (void);
+int setpgrp (void);
 
 int execl (const char *path, const char *arg0, ...);
 int execle (const char *path, const char *arg0, ...);

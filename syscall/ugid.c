@@ -1,4 +1,4 @@
-/* unlink.c -- This file is part of OS/0 libc.
+/* ugid.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
