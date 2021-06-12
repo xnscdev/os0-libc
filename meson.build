@@ -116,7 +116,7 @@ libc_src = [
   'syscall/rename.c',
   'syscall/sigaction.c',
   'syscall/signal.S',
-  'syscall/sigprocmask.c',
+  'syscall/signal.c',
   'syscall/stat.c',
   'syscall/symlink.c',
   'syscall/syscall.S',

@@ -29,6 +29,8 @@ int sigaction (int sig, const struct sigaction *__restrict act,
 sig_t signal (int sig, sig_t func);
 int sigprocmask (int how, const sigset_t *__restrict set,
 		 sigset_t *__restrict old);
+int sigsuspend (const sigset_t *mask);
+int sigpending (sigset_t *set);
 
 __END_DECLS
 

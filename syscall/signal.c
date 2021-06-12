@@ -1,4 +1,4 @@
-/* sigprocmask.c -- This file is part of OS/0 libc.
+/* signal.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -22,4 +22,28 @@ int
 sigprocmask (int how, const sigset_t *__restrict set, sigset_t *__restrict old)
 {
   return syscall (SYS_sigprocmask, how, set, old);
+}
+
+int
+sigsuspend (const sigset_t *mask)
+{
+  return syscall (SYS_sigsuspend, mask);
+}
+
+int
+sigpending (sigset_t *set)
+{
+  return syscall (SYS_sigpending, set);
+}
+
+unsigned int
+alarm (unsigned int seconds)
+{
+  return syscall (SYS_alarm, seconds);
+}
+
+int
+pause (void)
+{
+  return syscall (SYS_pause);
 }

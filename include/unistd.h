@@ -115,6 +115,7 @@ int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
 
 unsigned int alarm (unsigned int seconds);
+int pause (void);
 
 long syscall (long num, ...);
 
