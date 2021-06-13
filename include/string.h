@@ -50,7 +50,8 @@ char *strtok (char *__restrict s, const char *__restrict delims);
 char *strtok_r (char *__restrict s, const char *__restrict delims,
 		char **__restrict saveptr);
 
-const char *strerror (int err);
+char *strerror (int err);
+char *strerror_r (int err, char *buffer, size_t len);
 
 __END_DECLS
 

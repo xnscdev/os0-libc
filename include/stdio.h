@@ -58,6 +58,8 @@ int vsprintf (char *__restrict str, const char *__restrict fmt, va_list args);
 int vsnprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 	       va_list args);
 
+void perror (const char *str);
+
 int fputc (int c, FILE *stream);
 #define putc(c, stream) fputc (c, stream) 
 int putchar (int c);

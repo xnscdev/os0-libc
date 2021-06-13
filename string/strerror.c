@@ -119,10 +119,20 @@ const char *const sys_errlist[] = {
 
 const int sys_nerr = sizeof (sys_errlist) / sizeof (sys_errlist[0]);
 
-const char *
+char *
 strerror (int err)
 {
   if (err < 0 || err > sys_nerr)
     return NULL;
-  return sys_errlist[err];
+  return (char *) sys_errlist[err];
+}
+
+char *
+strerror_r (int err, char *buffer, size_t len)
+{
+  if (err < 0 || err > sys_nerr)
+    return NULL;
+  strncpy (buffer, sys_errlist[err], len - 1);
+  buffer[len - 1] = '\0';
+  return buffer;
 }
