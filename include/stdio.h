@@ -33,6 +33,8 @@
 #include <bits/types/file.h>
 #include <bits/types/fpos.h>
 
+#include <bits/errlist.h>
+
 __BEGIN_DECLS
 
 extern FILE *stdin;
