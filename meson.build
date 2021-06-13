@@ -60,6 +60,7 @@ libc_src = [
   'stdlib/errno.c',
   'stdlib/exec.c',
   'stdlib/exit.c',
+  'stdlib/getopt.c',
   'stdlib/init.c',
   'stdlib/isatty.c',
   'stdlib/locale.c',
