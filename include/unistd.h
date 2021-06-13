@@ -47,6 +47,9 @@ pid_t getpgid (pid_t pid);
 pid_t getpgrp (void);
 int setpgrp (void);
 
+char *getcwd (char *buffer, size_t len);
+char *getwd (char *buffer);
+
 int execl (const char *path, const char *arg0, ...);
 int execle (const char *path, const char *arg0, ...);
 int execlp (const char *file, const char *arg0, ...);

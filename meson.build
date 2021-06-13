@@ -101,6 +101,7 @@ libc_src = [
   'syscall/exit.c',
   'syscall/fcntl.S',
   'syscall/fork.c',
+  'syscall/getcwd.c',
   'syscall/getrusage.c',
   'syscall/gettimeofday.c',
   'syscall/io.c',
