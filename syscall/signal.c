@@ -36,12 +36,6 @@ sigpending (sigset_t *set)
   return syscall (SYS_sigpending, set);
 }
 
-unsigned int
-alarm (unsigned int seconds)
-{
-  return syscall (SYS_alarm, seconds);
-}
-
 int
 pause (void)
 {
