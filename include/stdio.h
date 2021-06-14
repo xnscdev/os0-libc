@@ -30,13 +30,14 @@
 #define _IOLBF 1
 #define _IOFBF 2
 
-#include <bits/types/fpos.h>
 #include <bits/errlist.h>
 
 #ifndef __FILE_defined
 typedef struct __FILE FILE;
 #define __FILE_defined
 #endif
+
+typedef off_t fpos_t;
 
 __BEGIN_DECLS
 

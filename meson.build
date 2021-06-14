@@ -37,6 +37,9 @@ subdir('include')
 libc_inc = include_directories('include', 'private-include')
 
 libc_src = [
+  'locale/localeconv.c',
+  'locale/posix.c',
+  'locale/setlocale.c',
   'stdio/ferror.c',
   'stdio/fflush.c',
   'stdio/fgetc.c',
@@ -67,7 +70,6 @@ libc_src = [
   'stdlib/getopt.c',
   'stdlib/init.c',
   'stdlib/isatty.c',
-  'stdlib/locale.c',
   'stdlib/locks.c',
   'stdlib/longjmp.S',
   'stdlib/lsearch.c',

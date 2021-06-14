@@ -17,6 +17,7 @@
 #ifndef _WCHAR_H
 #define _WCHAR_H
 
+#include <limits.h>
 #include <stdint.h>
 #include <wctype.h>
 
@@ -27,15 +28,9 @@ typedef struct __FILE FILE;
 #define __FILE_defined
 #endif
 
-typedef struct
-{
-  int _count;
-  union
-  {
-    wint_t _wch;
-    char _wchb[4];
-  } _value;
-} mbstate_t;
+#define MB_CUR_MAX MB_LEN_MAX
+
+#include <bits/types/mbstate.h>
 
 struct tm;
 
@@ -44,10 +39,14 @@ __BEGIN_DECLS
 wint_t btowc (int c);
 int wctob (wint_t c);
 
+size_t mblen (const char *str, size_t len);
 size_t mbrlen (const char *__restrict str, size_t len,
 	       mbstate_t *__restrict ps);
+
+int mbtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len);
 size_t mbrtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len,
 		mbstate_t *__restrict ps);
+int wctomb (char *str, wchar_t wc);
 size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);
 
 __END_DECLS

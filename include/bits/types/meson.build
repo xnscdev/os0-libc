@@ -1,2 +1,4 @@
 install_headers('div.h',
-		'fpos.h', subdir: 'bits/types')
+		'locale.h',
+		'mbstate.h',
+		subdir: 'bits/types')

@@ -26,6 +26,7 @@
 #define LC_NUMERIC  4
 #define LC_TIME     5
 #define LC_ALL      6
+#define __LC_LAST   6
 
 struct lconv
 {
@@ -54,6 +55,8 @@ struct lconv
   char int_p_sign_posn;
   char int_n_sign_posn;
 };
+
+#include <bits/types/locale.h>
 
 __BEGIN_DECLS
 

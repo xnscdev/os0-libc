@@ -22,7 +22,11 @@
 
 typedef int wctype_t;
 typedef int wctrans_t;
+
+#ifndef __wint_defined
 typedef int wint_t;
+#define __wint_defined
+#endif
 
 __BEGIN_DECLS
 
