@@ -1,4 +1,4 @@
-/* posix-locale.h -- This file is part of OS/0 libc.
+/* libc-locale.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,8 +14,8 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _POSIX_LOCALE_H
-#define _POSIX_LOCALE_H
+#ifndef _LIBC_LOCALE_H
+#define _LIBC_LOCALE_H
 
 #include <sys/cdefs.h>
 #include <locale.h>
@@ -23,18 +23,23 @@
 #include <stddef.h>
 
 #define LOCALE_BUFFER_SIZE 1024
-#define LOCALE_DATA_POSIX_INIT {__libc_posix_mbrtowc, __libc_posix_wcrtomb}
+
+#define CURRENT_LOCALE(category) (__libc_locale->__ ## category)
 
 __BEGIN_DECLS
 
-extern __lock_t __libc_locale_lock __hidden;
 extern struct __locale __libc_posix_locale __hidden;
+extern locale_t __libc_locale __hidden;
+extern __lock_t __libc_locale_lock __hidden;
 
 size_t __libc_posix_mbrtowc (wchar_t *__restrict pwc,
 			     const char *__restrict str, size_t len,
 			     mbstate_t *__restrict ps) __hidden;
 size_t __libc_posix_wcrtomb (char *__restrict str, wchar_t wc,
 			     mbstate_t *__restrict ps) __hidden;
+
+void __libc_locale_set_monetary_posix (void) __hidden;
+void __libc_locale_set_numeric_posix (void) __hidden;
 
 __END_DECLS
 

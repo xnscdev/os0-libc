@@ -21,16 +21,82 @@
 #include <stdlib.h>
 #include <string.h>
 
-static locale_t __libc_locale = &__libc_posix_locale;
 static char __libc_locale_buf[LOCALE_BUFFER_SIZE];
+static struct __locale __libc_current_locale;
 
+locale_t __libc_locale = &__libc_current_locale;
 __lock_t __libc_locale_lock;
 
 /* TODO Support setting other locales using files in /usr/share/locale */
 
 static int
+__set_lc_collate (const char *locale)
+{
+  if (strcmp (locale, "C") != 0)
+    return -1;
+
+  __libc_locale->__names[LC_COLLATE] = locale;
+  return 0;
+}
+
+static int
+__set_lc_ctype (const char *locale)
+{
+  if (strcmp (locale, "C") != 0)
+    return -1;
+
+  memcpy (&CURRENT_LOCALE (LC_CTYPE), &__libc_posix_locale.__LC_CTYPE,
+	  sizeof (struct __locale_ctype_data));
+  __libc_locale->__names[LC_CTYPE] = locale;
+  return 0;
+}
+
+static int
+__set_lc_messages (const char *locale)
+{
+  if (strcmp (locale, "C") != 0)
+    return -1;
+
+  __libc_locale->__names[LC_MESSAGES] = locale;
+  return 0;
+}
+
+static int
+__set_lc_monetary (const char *locale)
+{
+  if (strcmp (locale, "C") != 0)
+    return -1;
+
+  __libc_locale_set_monetary_posix ();
+  __libc_locale->__names[LC_MONETARY] = locale;
+  return 0;
+}
+
+static int
+__set_lc_numeric (const char *locale)
+{
+  if (strcmp (locale, "C") != 0)
+    return -1;
+
+  __libc_locale_set_numeric_posix ();
+  __libc_locale->__names[LC_NUMERIC] = locale;
+  return 0;
+}
+
+static int
+__set_lc_time (const char *locale)
+{
+  if (strcmp (locale, "C") != 0)
+    return -1;
+
+  __libc_locale->__names[LC_TIME] = locale;
+  return 0;
+}
+
+static int
 __set_locale (int category, const char *locale)
 {
+  int ret = -1;
   if (*locale == '\0' || strcmp (locale, "C") == 0
       || strcmp (locale, "POSIX") == 0)
     locale = "C";
@@ -38,16 +104,29 @@ __set_locale (int category, const char *locale)
     return -1;
 
   __libc_lock (&__libc_locale_lock);
-  if (strcmp (locale, "C") == 0)
+  switch (category)
     {
-      __libc_locale->__locales[category].mbrtowc = __libc_posix_mbrtowc;
-      __libc_locale->__locales[category].wcrtomb = __libc_posix_wcrtomb;
+    case LC_COLLATE:
+      ret = __set_lc_collate (locale);
+      break;
+    case LC_CTYPE:
+      ret = __set_lc_ctype (locale);
+      break;
+    case LC_MESSAGES:
+      ret = __set_lc_messages (locale);
+      break;
+    case LC_MONETARY:
+      ret = __set_lc_monetary (locale);
+      break;
+    case LC_NUMERIC:
+      ret = __set_lc_numeric (locale);
+      break;
+    case LC_TIME:
+      ret = __set_lc_time (locale);
+      break;
     }
-  else
-    ; /* TODO Read contents of locale files in /usr/share/locale */
-  __libc_locale->__names[category] = locale;
   __libc_unlock (&__libc_locale_lock);
-  return 0;
+  return ret;
 }
 
 static char *

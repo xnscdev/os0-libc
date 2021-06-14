@@ -14,11 +14,36 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <ctype.h>
 #include <libc-locale.h>
+#include <limits.h>
 #include <string.h>
 
 struct __locale __libc_posix_locale = {
-  {[0 ... (__LC_LAST - 1)] = LOCALE_DATA_POSIX_INIT}
+  .__lconv = {
+    ".", "", "", "", "", "", "", "", "", "",
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX
+  },
+  .__LC_CTYPE = {
+    {
+      (int (*) (wint_t)) isalnum,
+      (int (*) (wint_t)) isalpha,
+      (int (*) (wint_t)) isblank,
+      (int (*) (wint_t)) iscntrl,
+      (int (*) (wint_t)) isdigit,
+      (int (*) (wint_t)) isgraph,
+      (int (*) (wint_t)) islower,
+      (int (*) (wint_t)) isprint,
+      (int (*) (wint_t)) ispunct,
+      (int (*) (wint_t)) isspace,
+      (int (*) (wint_t)) isupper,
+      (int (*) (wint_t)) isxdigit,
+    },
+    __libc_posix_mbrtowc,
+    __libc_posix_wcrtomb
+  },
+  .__names = {"C", "C", "C", "C", "C", "C"}
 };
 
 size_t
@@ -39,4 +64,40 @@ __libc_posix_wcrtomb (char *__restrict str, wchar_t wc,
     *str = (char) wc;
   memset (ps, 0, sizeof (mbstate_t));
   return 1;
+}
+
+void
+__libc_locale_set_monetary_posix (void)
+{
+  struct lconv *l = &__libc_locale->__lconv;
+  l->int_curr_symbol = "";
+  l->currency_symbol = "";
+  l->mon_decimal_point = "";
+  l->mon_thousands_sep = "";
+  l->mon_grouping = "";
+  l->positive_sign = "";
+  l->negative_sign = "";
+  l->int_frac_digits = CHAR_MAX;
+  l->frac_digits = CHAR_MAX;
+  l->p_cs_precedes = CHAR_MAX;
+  l->p_sep_by_space = CHAR_MAX;
+  l->n_cs_precedes = CHAR_MAX;
+  l->n_sep_by_space = CHAR_MAX;
+  l->p_sign_posn = CHAR_MAX;
+  l->n_sign_posn = CHAR_MAX;
+  l->int_p_cs_precedes = CHAR_MAX;
+  l->int_p_sep_by_space = CHAR_MAX;
+  l->int_n_cs_precedes = CHAR_MAX;
+  l->int_n_sep_by_space = CHAR_MAX;
+  l->int_p_sign_posn = CHAR_MAX;
+  l->int_n_sign_posn = CHAR_MAX;
+}
+
+void
+__libc_locale_set_numeric_posix (void)
+{
+  struct lconv *l = &__libc_locale->__lconv;
+  l->decimal_point = ".";
+  l->thousands_sep = "";
+  l->grouping = "";
 }

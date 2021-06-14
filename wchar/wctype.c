@@ -16,34 +16,18 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <libc-locale.h>
 #include <string.h>
 #include <wctype.h>
 
+#define WCTYPE_ASCII 12
 #define NR_wctype_properties  13
+
 #define NR_wctrans_properties 2
 
-static int (*wctype_funcs_posix[]) (wint_t) = {
-  NULL,
-  (int (*) (wint_t)) isalnum,
-  (int (*) (wint_t)) isalpha,
-  (int (*) (wint_t)) isascii,
-  (int (*) (wint_t)) isblank,
-  (int (*) (wint_t)) iscntrl,
-  (int (*) (wint_t)) isdigit,
-  (int (*) (wint_t)) isgraph,
-  (int (*) (wint_t)) islower,
-  (int (*) (wint_t)) isprint,
-  (int (*) (wint_t)) ispunct,
-  (int (*) (wint_t)) isspace,
-  (int (*) (wint_t)) isupper,
-  (int (*) (wint_t)) isxdigit
-};
-
 static const char *const wctype_props[] = {
-  0,
   "alnum",
   "alpha",
-  "ascii",
   "blank",
   "cntrl",
   "digit",
@@ -185,19 +169,23 @@ wctrans (const char *property)
 int
 iswctype (wint_t wc, wctype_t type)
 {
-  if (type <= 0 || type > NR_wctype_properties)
+  if (type < 0 || type > NR_wctype_properties)
     {
       errno = EINVAL;
       return 0;
     }
-  return wctype_funcs_posix[type] (wc);
+  if (type == WCTYPE_ASCII)
+    return isascii (wc);
+  return CURRENT_LOCALE (LC_CTYPE).wctype[type] (wc);
 }
 
 wctype_t
 wctype (const char *property)
 {
   int i;
-  for (i = 1; i <= NR_wctype_properties; i++)
+  if (strcmp (property, "ascii") == 0)
+    return WCTYPE_ASCII;
+  for (i = 0; i < NR_wctype_properties; i++)
     {
       if (strcmp (wctype_props[i], property) == 0)
 	return i;
