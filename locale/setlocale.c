@@ -45,8 +45,7 @@ __set_lc_ctype (const char *locale)
   if (strcmp (locale, "C") != 0)
     return -1;
 
-  memcpy (&CURRENT_LOCALE (LC_CTYPE), &__libc_posix_locale.__LC_CTYPE,
-	  sizeof (struct __locale_ctype_data));
+  __libc_locale_set_ctype_posix ();
   __libc_locale->__names[LC_CTYPE] = locale;
   return 0;
 }

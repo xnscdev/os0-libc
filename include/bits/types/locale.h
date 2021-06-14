@@ -23,9 +23,14 @@
 #include <bits/types/lconv.h>
 #include <bits/types/mbstate.h>
 
+#define __LC_wctype_max  12
+#define __LC_wctrans_max 8
+
 struct __locale_ctype_data
 {
-  int (*wctype[12]) (wint_t);
+  int (*wctype[__LC_wctype_max]) (wint_t);
+  const char *wctrans_props[__LC_wctrans_max];
+  wint_t (*wctrans[__LC_wctrans_max]) (wint_t);
   size_t (*mbrtowc) (wchar_t *__restrict, const char *__restrict, size_t,
 		     mbstate_t *__restrict);
   size_t (*wcrtomb) (char *__restrict, wchar_t, mbstate_t *__restrict);

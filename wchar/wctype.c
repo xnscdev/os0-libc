@@ -20,12 +20,9 @@
 #include <string.h>
 #include <wctype.h>
 
-#define WCTYPE_ASCII 12
-#define NR_wctype_properties  13
+#define WCTYPE_ASCII __LC_wctype_max
 
-#define NR_wctrans_properties 2
-
-static const char *const wctype_props[] = {
+static const char *const wctype_props[__LC_wctype_max] = {
   "alnum",
   "alpha",
   "blank",
@@ -38,18 +35,6 @@ static const char *const wctype_props[] = {
   "space",
   "upper",
   "xdigit"
-};
-
-static wint_t (*wctrans_funcs_posix[]) (wint_t) = {
-  0,
-  (wint_t (*) (wint_t)) tolower,
-  (wint_t (*) (wint_t)) toupper
-};
-
-static const char *const wctrans_props[] = {
-  0,
-  "lower",
-  "upper"
 };
 
 int
@@ -133,33 +118,41 @@ iswxdigit (wint_t wc)
 wint_t
 towctrans (wint_t wc, wctrans_t desc)
 {
-  if (desc <= 0 || desc > NR_wctrans_properties)
+  wint_t (*func) (wint_t);
+  if (desc < 0 || desc >= __LC_wctrans_max)
     {
       errno = EINVAL;
       return wc;
     }
-  return wctrans_funcs_posix[desc] (wc);
+  func = CURRENT_LOCALE (LC_CTYPE).wctrans[desc];
+  if (func == NULL)
+    {
+      errno = EINVAL;
+      return wc;
+    }
+  return func (wc);
 }
 
 wint_t
 towlower (wint_t wc)
 {
-  return towctrans (wc, wctrans ("lower"));
+  return towctrans (wc, wctrans ("tolower"));
 }
 
 wint_t
 towupper (wint_t wc)
 {
-  return towctrans (wc, wctrans ("upper"));
+  return towctrans (wc, wctrans ("toupper"));
 }
 
 wctrans_t
 wctrans (const char *property)
 {
   int i;
-  for (i = 1; i <= NR_wctrans_properties; i++)
+  for (i = 1; i <= __LC_wctrans_max; i++)
     {
-      if (strcmp (wctrans_props[i], property) == 0)
+      const char *prop = CURRENT_LOCALE (LC_CTYPE).wctrans_props[i];
+      if (prop != NULL && strcmp (prop, property) == 0)
 	return i;
     }
   errno = EINVAL;
@@ -169,7 +162,7 @@ wctrans (const char *property)
 int
 iswctype (wint_t wc, wctype_t type)
 {
-  if (type < 0 || type > NR_wctype_properties)
+  if (type < 0 || type > __LC_wctype_max)
     {
       errno = EINVAL;
       return 0;
@@ -185,7 +178,7 @@ wctype (const char *property)
   int i;
   if (strcmp (property, "ascii") == 0)
     return WCTYPE_ASCII;
-  for (i = 0; i < NR_wctype_properties; i++)
+  for (i = 0; i < __LC_wctype_max; i++)
     {
       if (strcmp (wctype_props[i], property) == 0)
 	return i;

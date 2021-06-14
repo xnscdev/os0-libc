@@ -19,7 +19,7 @@
 #include <limits.h>
 #include <string.h>
 
-struct __locale __libc_posix_locale = {
+const struct __locale __libc_posix_locale = {
   .__lconv = {
     ".", "", "", "", "", "", "", "", "", "",
     CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -40,6 +40,8 @@ struct __locale __libc_posix_locale = {
       (int (*) (wint_t)) isupper,
       (int (*) (wint_t)) isxdigit,
     },
+    {"tolower", "toupper"},
+    {(wint_t (*) (wint_t)) tolower, (wint_t (*) (wint_t)) toupper},
     __libc_posix_mbrtowc,
     __libc_posix_wcrtomb
   },
@@ -64,6 +66,13 @@ __libc_posix_wcrtomb (char *__restrict str, wchar_t wc,
     *str = (char) wc;
   memset (ps, 0, sizeof (mbstate_t));
   return 1;
+}
+
+void
+__libc_locale_set_ctype_posix (void)
+{
+  memcpy (&__libc_locale->__LC_CTYPE, &__libc_posix_locale.__LC_CTYPE,
+	  sizeof (struct __locale_ctype_data));
 }
 
 void

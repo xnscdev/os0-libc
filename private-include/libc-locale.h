@@ -28,7 +28,7 @@
 
 __BEGIN_DECLS
 
-extern struct __locale __libc_posix_locale __hidden;
+extern const struct __locale __libc_posix_locale __hidden;
 extern locale_t __libc_locale __hidden;
 extern __lock_t __libc_locale_lock __hidden;
 
@@ -38,6 +38,7 @@ size_t __libc_posix_mbrtowc (wchar_t *__restrict pwc,
 size_t __libc_posix_wcrtomb (char *__restrict str, wchar_t wc,
 			     mbstate_t *__restrict ps) __hidden;
 
+void __libc_locale_set_ctype_posix (void) __hidden;
 void __libc_locale_set_monetary_posix (void) __hidden;
 void __libc_locale_set_numeric_posix (void) __hidden;
 
