@@ -33,7 +33,7 @@ getcwd (char *buffer, size_t len)
 	  errno = ENOMEM;
 	  return NULL;
 	}
-      if (syscall (SYS_getcwd, buffer, len) == -1)
+      if (syscall (SYS_getcwd, buffer, len + 1) == -1)
 	{
 	  free (buffer);
 	  return NULL;
