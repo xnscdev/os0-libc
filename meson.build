@@ -73,6 +73,7 @@ libc_src = [
   'stdlib/malloc.c',
   'stdlib/passwd.c',
   'stdlib/qsort.c',
+  'stdlib/rand.c',
   'stdlib/setjmp.c',
   'stdlib/signal.c',
   'stdlib/sigset.c',

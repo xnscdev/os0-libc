@@ -18,6 +18,7 @@
 #define _STDLIB_H
 
 #include <sys/cdefs.h>
+#include <limits.h>
 #include <stddef.h>
 
 #define EXIT_SUCCESS 0
@@ -62,6 +63,12 @@ void *lsearch (const void *key, const void *base, size_t *len, size_t size,
 	       int (*cmp) (const void *, const void *));
 void qsort (void *const pbase, size_t len, size_t size,
 	    int (*cmp) (const void *, const void *));
+
+#define RAND_MAX INT_MAX
+
+int rand (void);
+int rand_r (unsigned int *seed);
+void srand (unsigned int seed);
 
 __END_DECLS
 
