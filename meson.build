@@ -133,7 +133,8 @@ libc_src = [
   'syscall/ugid.c',
   'syscall/unlink.c',
   'syscall/wait.c',
-  'syscall/xattr.c'
+  'syscall/xattr.c',
+  'wchar/wctype.c'
 ]
 
 libm_src = [

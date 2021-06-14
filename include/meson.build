@@ -19,7 +19,8 @@ install_headers('alloca.h',
 		'strings.h',
 		'termios.h',
 		'time.h',
-		'unistd.h')
+		'unistd.h',
+		'wctype.h')
 
 # Install a limits.h that provides more macros
 install_data('_limits.h', install_dir: get_option('includedir'),
