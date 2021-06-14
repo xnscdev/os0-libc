@@ -57,3 +57,9 @@ ftello (FILE *stream)
 {
   return lseek (stream->_fd, 0, SEEK_CUR);
 }
+
+void
+rewind (FILE *stream)
+{
+  fseek (stream, 0, SEEK_SET);
+}

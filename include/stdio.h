@@ -68,6 +68,15 @@ int ungetc (int c, FILE *stream);
 int fputs (const char *__restrict str, FILE *__restrict stream);
 int puts (const char *str);
 
+int scanf (const char *__restrict fmt, ...);
+int fscanf (FILE *__restrict stream, const char *__restrict fmt, ...);
+int sscanf (const char *__restrict str, const char *__restrict fmt, ...);
+
+int vscanf (const char *__restrict fmt, va_list args);
+int vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args);
+int vsscanf (const char *__restrict str, const char *__restrict fmt,
+	     va_list args);
+
 int fgetc (FILE *stream);
 #define getc(stream) fgetc (stream)
 int getchar (void);
