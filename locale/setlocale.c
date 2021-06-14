@@ -173,7 +173,6 @@ __set_lc_all (const char *locale)
 char *
 setlocale (int category, const char *locale)
 {
-  /* TODO Implement */
   if (category < 0 || category > LC_ALL)
     return NULL;
   if (category == LC_ALL)
@@ -191,16 +190,40 @@ void
 __libc_setup_locale (void)
 {
   const char *locale;
-  const char *lc_all = getenv ("LC_ALL");
-  if (lc_all != NULL)
-    locale = lc_all;
+  const char *var = getenv ("LC_ALL");
+  if (var != NULL)
+    locale = var;
   else
     {
-      const char *lang = getenv ("LANG");
-      if (lang != NULL)
-	locale = lang;
+      var = getenv ("LANG");
+      if (var != NULL)
+	locale = var;
       else
 	locale = "C";
     }
   __set_lc_all (locale);
+
+  var = getenv ("LC_COLLATE");
+  if (var != NULL)
+    __set_lc_collate (var);
+
+  var = getenv ("LC_CTYPE");
+  if (var != NULL)
+    __set_lc_ctype (var);
+
+  var = getenv ("LC_MESSAGES");
+  if (var != NULL)
+    __set_lc_messages (var);
+
+  var = getenv ("LC_MONETARY");
+  if (var != NULL)
+    __set_lc_monetary (var);
+
+  var = getenv ("LC_NUMERIC");
+  if (var != NULL)
+    __set_lc_numeric (var);
+
+  var = getenv ("LC_TIME");
+  if (var != NULL)
+    __set_lc_time (var);
 }
