@@ -1052,7 +1052,9 @@ fprintf (FILE *stream, const char *format, ...)
   va_list va;
   int ret;
   va_start (va, format);
+  flockfile (stream);
   ret = _vsnprintf (_out_char, (void *) stream, (size_t) -1, format, va);
+  funlockfile (stream);
   va_end (va);
   return ret;
 }
@@ -1088,25 +1090,15 @@ vprintf (const char *format, va_list va)
 int
 vfprintf (FILE *__restrict stream, const char *__restrict format, va_list va)
 {
-  return _vsnprintf (_out_char, (void *) stream, (size_t) -1, format, va);
+  int ret;
+  flockfile (stream);
+  ret = _vsnprintf (_out_char, (void *) stream, (size_t) -1, format, va);
+  funlockfile (stream);
+  return ret;
 }
 
 int
 vsnprintf (char *buffer, size_t count, const char *format, va_list va)
 {
   return _vsnprintf (_out_buffer, buffer, count, format, va);
-}
-
-int
-fctprintf (void (*out) (char character, void *arg), void *arg,
-	   const char *format, ...)
-{
-  va_list va;
-  va_start (va, format);
-  const out_fct_wrap_type out_fct_wrap = { out, arg };
-  const int ret =
-    _vsnprintf (_out_fct, (char *) (uintptr_t) & out_fct_wrap, (size_t) -1,
-		format, va);
-  va_end (va);
-  return ret;
 }

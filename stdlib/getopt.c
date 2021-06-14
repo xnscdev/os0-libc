@@ -173,6 +173,7 @@ process_long_option (int argc, char **argv, const char *shortopts,
 			 prefix, next_char);
 	      else
 		{
+		  flockfile (stderr);
 		  fprintf (stderr, "%s: option '%s%s' is ambiguous; "
 			   "possibilities:", argv[0], prefix, next_char);
 		  for (opt_index = 0; opt_index < nopts; opt_index++)
@@ -182,6 +183,7 @@ process_long_option (int argc, char **argv, const char *shortopts,
 				 longopts[opt_index].name);
 		    }
 		  fputc ('\n', stderr);
+		  funlockfile (stderr);
 		}
 	    }
 	  if (ambig_alloc)
