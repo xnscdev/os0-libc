@@ -17,11 +17,28 @@
 #ifndef _STREAM_H
 #define _STREAM_H
 
+#include <locks.h>
+
 #define __IO_buf_mask   0x03
 #define __IO_rbuf_alloc 0x04
 #define __IO_wbuf_alloc 0x08
 #define __IO_eof        0x10
 #define __IO_err        0x20
 #define __IO_stt_alloc  0x40
+
+struct __FILE
+{
+  int _flags;
+  int _fd;
+  __lock_t _lock;
+  char *_read_buf;
+  int _read_buf_len;
+  int _read_ptr_len;
+  char *_write_buf;
+  int _write_buf_len;
+  int _write_ptr_len;
+};
+
+typedef struct __FILE FILE;
 
 #endif

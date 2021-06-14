@@ -30,10 +30,10 @@
 #define _IOLBF 1
 #define _IOFBF 2
 
-#include <bits/types/file.h>
 #include <bits/types/fpos.h>
-
 #include <bits/errlist.h>
+
+typedef struct __FILE FILE;
 
 __BEGIN_DECLS
 
@@ -112,6 +112,10 @@ void rewind (FILE *stream);
 
 int fflush (FILE *stream);
 int fpurge (FILE *stream);
+
+void flockfile (FILE *stream);
+int ftrylockfile (FILE *stream);
+void funlockfile (FILE *stream);
 
 void setbuf (FILE *__restrict stream, char *__restrict buffer);
 void setbuffer (FILE *__restrict stream, char *__restrict buffer, size_t size);

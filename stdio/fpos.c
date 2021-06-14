@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
+#include <stream.h>
 #include <unistd.h>
 
 int

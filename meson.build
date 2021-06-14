@@ -42,6 +42,7 @@ libc_src = [
   'stdio/fgetc.c',
   'stdio/fgets.c',
   'stdio/fio.c',
+  'stdio/flockfile.c',
   'stdio/fopen.c',
   'stdio/fpos.c',
   'stdio/fputc.c',

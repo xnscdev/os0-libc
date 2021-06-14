@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
+#include <stream.h>
 #include <unistd.h>
 
 int
@@ -45,5 +46,6 @@ ungetc (int c, FILE *stream)
       || stream->_read_ptr_len >= stream->_read_buf_len)
     return EOF;
   stream->_read_buf[stream->_read_ptr_len++] = c;
+  stream->_flags &= ~__IO_eof;
   return c;
 }

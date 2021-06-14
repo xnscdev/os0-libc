@@ -96,6 +96,7 @@ fopen (const char *__restrict path, const char *__restrict mode)
     }
   stream->_flags = _IOFBF | __IO_wbuf_alloc | __IO_stt_alloc;
   stream->_fd = fd;
+  stream->_lock = 0;
   stream->_write_buf = malloc (BUFSIZ);
   if (stream->_write_buf == NULL)
     {
@@ -166,6 +167,7 @@ fdopen (int fd, const char *mode)
     return NULL;
   stream->_flags = _IOFBF | __IO_wbuf_alloc | __IO_stt_alloc;
   stream->_fd = fd;
+  stream->_lock = 0;
   stream->_write_buf = malloc (BUFSIZ);
   if (stream->_write_buf == NULL)
     {

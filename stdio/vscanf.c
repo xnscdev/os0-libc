@@ -19,7 +19,7 @@
 int
 vscanf (const char *__restrict fmt, va_list args)
 {
-  return -1;
+  return vfscanf (stdin, fmt, args);
 }
 
 int
