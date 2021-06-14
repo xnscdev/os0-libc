@@ -20,6 +20,7 @@ install_headers('alloca.h',
 		'termios.h',
 		'time.h',
 		'unistd.h',
+		'wchar.h',
 		'wctype.h')
 
 # Install a limits.h that provides more macros

@@ -33,7 +33,10 @@
 #include <bits/types/fpos.h>
 #include <bits/errlist.h>
 
+#ifndef __FILE_defined
 typedef struct __FILE FILE;
+#define __FILE_defined
+#endif
 
 __BEGIN_DECLS
 
