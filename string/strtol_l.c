@@ -148,6 +148,8 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 		goto overflow;
 	      value *= 10;
 	    }
+	  if (value > max - temp)
+	    goto overflow;
 	  value += temp;
 	nextgroup:
 	  temp = 0;
@@ -163,6 +165,8 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 	  if (value > max / 10)
 	    goto overflow;
 	  value *= 10;
+	  if (value > max - b)
+	    goto overflow;
 	  value += b;
 	}
       else
@@ -172,6 +176,8 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 	  if (temp > max / 10)
 	    goto overflow;
 	  temp *= 10;
+	  if (temp > max - b)
+	    goto overflow;
 	  temp += b;
 	  currlen++;
 	}
@@ -238,6 +244,8 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 		goto overflow;
 	      value *= 10;
 	    }
+	  if (value > max - temp)
+	    goto overflow;
 	  value += temp;
 	nextgroup:
 	  temp = 0;
@@ -253,6 +261,8 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 	  if (value > max / 10)
 	    goto overflow;
 	  value *= 10;
+	  if (value > max - b)
+	    goto overflow;
 	  value += b;
 	}
       else
@@ -262,6 +272,8 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 	  if (temp > max / 10)
 	    goto overflow;
 	  temp *= 10;
+	  if (temp > max - b)
+	    goto overflow;
 	  temp += b;
 	  currlen++;
 	}
