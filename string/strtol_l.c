@@ -19,6 +19,7 @@
 #include <libc-locale.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wctype.h>
 
 /* Gets the digit value of the character in the specified base. */
@@ -90,14 +91,19 @@ __get_grouping (int group, locale_t loc)
 
 /* Calculates the number of groups that the input string has. */
 static int
-__calc_groups (const char *str, locale_t loc)
+__calc_groups (const char *str, char *sepseq, size_t seplen, locale_t loc)
 {
   int groups = 0;
-  const char *ptr;
-  for (ptr = str; *ptr == ',' || isdigit_l (*ptr, loc); ptr++)
+  const char *ptr = str;
+  while (*ptr == ',' || isdigit_l (*ptr, loc))
     {
-      if (*ptr == ',')
-	groups++;
+      if (strncmp (ptr, sepseq, seplen) == 0)
+	{
+	  groups++;
+	  ptr += seplen;
+	}
+      else
+	ptr++;
     }
   return groups;
 }
@@ -112,26 +118,28 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
   long long temp = 0;
   int grouplen = -1;
   int currlen = 0;
-  const char *comma;
+  const char *sep;
+  char *sepseq = loc->__lconv.thousands_sep;
+  size_t seplen = strlen (sepseq);
   int i;
   str = __get_base (str, &sign, &base);
 
-  if (group)
-    groups = __calc_groups (str, loc);
+  if (group && seplen > 0)
+    groups = __calc_groups (str, sepseq, seplen, loc);
 
   for (; *str != '\0'; str++)
     {
       int b;
-      if (*str == ',')
+      if (seplen > 0 && strncmp (str, sepseq, seplen) == 0)
 	{
 	  if (!groups)
 	    goto finish;
-	  str++;
+	  str += seplen;
 	  if (grouplen == -1)
 	    goto nextgroup;
 	  if (currlen != grouplen)
 	    {
-	      str = comma;
+	      str = sep;
 	      goto finish;
 	    }
 	  for (i = 0; i < grouplen; i++)
@@ -145,7 +153,7 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 	  temp = 0;
 	  currlen = 0;
 	  grouplen = __get_grouping (groups--, loc);
-	  comma = str;
+	  sep = str;
 	}
       b = __baseval (*str, base, loc);
       if (b == -1)
@@ -200,26 +208,28 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
   unsigned long long temp = 0;
   int grouplen = -1;
   int currlen = 0;
-  const char *comma;
+  const char *sep;
+  char *sepseq = loc->__lconv.thousands_sep;
+  size_t seplen = strlen (sepseq);
   int i;
   str = __get_base (str, &sign, &base);
 
-  if (group)
-    groups = __calc_groups (str, loc);
+  if (group && seplen > 0)
+    groups = __calc_groups (str, sepseq, seplen, loc);
 
   for (; *str != '\0'; str++)
     {
       int b;
-      if (*str == ',')
+      if (strncmp (str, sepseq, seplen) == 0)
 	{
 	  if (!groups)
 	    goto finish;
-	  str++;
+	  str += seplen;
 	  if (grouplen == -1)
 	    goto nextgroup;
 	  if (currlen != grouplen)
 	    {
-	      str = comma;
+	      str = sep;
 	      goto finish;
 	    }
 	  for (i = 0; i < grouplen; i++)
@@ -233,7 +243,7 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 	  temp = 0;
 	  currlen = 0;
 	  grouplen = __get_grouping (groups--, loc);
-	  comma = str;
+	  sep = str;
 	}
       b = __baseval (*str, base, loc);
       if (b == -1)
