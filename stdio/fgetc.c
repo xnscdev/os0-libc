@@ -21,6 +21,16 @@
 int
 fgetc (FILE *stream)
 {
+  int ret;
+  flockfile (stream);
+  ret = fgetc_unlocked (stream);
+  funlockfile (stream);
+  return ret;
+}
+
+int
+fgetc_unlocked (FILE *stream)
+{
   char c;
   int ret;
   if (feof (stream) || ferror (stream))
@@ -30,6 +40,8 @@ fgetc (FILE *stream)
   ret = read (stream->_fd, &c, 1);
   if (ret != 1)
     return EOF;
+  stream->_flags |= __IO_orient;
+  stream->_flags &= ~__IO_wide;
   return c;
 }
 
@@ -40,12 +52,19 @@ getchar (void)
 }
 
 int
+getchar_unlocked (void)
+{
+  return fgetc_unlocked (stdin);
+}
+
+int
 ungetc (int c, FILE *stream)
 {
   if (c == EOF || stream->_read_buf == NULL
       || stream->_read_ptr_len >= stream->_read_buf_len)
     return EOF;
   stream->_read_buf[stream->_read_ptr_len++] = c;
-  stream->_flags &= ~__IO_eof;
+  stream->_flags |= __IO_orient;
+  stream->_flags &= ~(__IO_eof | __IO_wide);
   return c;
 }

@@ -19,12 +19,14 @@
 
 #include <locks.h>
 
-#define __IO_buf_mask   0x03
-#define __IO_rbuf_alloc 0x04
-#define __IO_wbuf_alloc 0x08
-#define __IO_eof        0x10
-#define __IO_err        0x20
-#define __IO_stt_alloc  0x40
+#define __IO_buf_mask   0x0003 /* Mask for stream mode */
+#define __IO_rbuf_alloc 0x0004 /* If the read buffer was allocated */
+#define __IO_wbuf_alloc 0x0008 /* If the write buffer was allocated */
+#define __IO_eof        0x0010 /* If the stream is at the end of input */
+#define __IO_err        0x0020 /* If an error occurred */
+#define __IO_stt_alloc  0x0040 /* If the FILE structure itself was allocated */
+#define __IO_orient     0x0080 /* If stream orientation has been determined */
+#define __IO_wide       0x0100 /* If stream orientation is wide */
 
 struct __FILE
 {

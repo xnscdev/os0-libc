@@ -22,22 +22,36 @@
 __BEGIN_DECLS
 
 int isalnum (int c);
+#define isalnum_l(c, loc) iswalnum_l (c, loc)
 int isalpha (int c);
+#define isalpha_l(c, loc) iswalpha_l (c, loc)
 int isascii (int c);
 int isblank (int c);
+#define isblank_l(c, loc) iswblank_l (c, loc)
 int iscntrl (int c);
+#define iscntrl_l(c, loc) iswcntrl_l (c, loc)
 int isdigit (int c);
+#define isdigit_l(c, loc) iswdigit_l (c, loc)
 int isgraph (int c);
+#define isgraph_l(c, loc) iswgraph_l (c, loc)
 int islower (int c);
+#define islower_l(c, loc) iswlower_l (c, loc)
 int isprint (int c);
+#define isprint_l(c, loc) iswprint_l (c, loc)
 int ispunct (int c);
+#define ispunct_l(c, loc) iswpunct_l (c, loc)
 int isspace (int c);
+#define isspace_l(c, loc) iswspace_l (c, loc)
 int isupper (int c);
+#define isupper_l(c, loc) iswupper_l (c, loc)
 int isxdigit (int c);
+#define isxdigit_l(c, loc) iswxdigit_l (c, loc)
 
 int toascii (int c);
 int tolower (int c);
+#define tolower_l(c, loc) towlower_l (c, loc)
 int toupper (int c);
+#define toupper_l(c, loc) towupper_l (c, loc)
 
 __END_DECLS
 

@@ -23,6 +23,7 @@
 __BEGIN_DECLS
 
 void *memcpy (void *__restrict dest, const void *__restrict src, size_t len);
+void *mempcpy (void *__restrict dest, const void *__restrict src, size_t len);
 void *memmove (void *dest, const void *src, size_t len);
 void *memset (void *ptr, int c, size_t len);
 int memcmp (const void *a, const void *b, size_t len);

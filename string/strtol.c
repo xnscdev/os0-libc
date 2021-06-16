@@ -1,4 +1,4 @@
-/* fputs.c -- This file is part of OS/0 libc.
+/* strtol.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,31 +14,30 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <stdio.h>
+#include <libc-locale.h>
+#include <stdlib.h>
+#include <strtol.h>
 
-int
-fputs (const char *__restrict str, FILE *__restrict stream)
+long
+strtol (const char *__restrict str, char **__restrict end, int base)
 {
-  int ret;
-  flockfile (stream);
-  ret = fputs_unlocked (str, stream);
-  funlockfile (stream);
-  return ret;
+  return __strtol (str, end, base, 0);
 }
 
-int
-fputs_unlocked (const char *__restrict str, FILE *__restrict stream)
+unsigned long
+strtoul (const char *__restrict str, char **__restrict end, int base)
 {
-  for (; *str != '\0'; str++)
-    {
-      if (fputc_unlocked (*str, stream) == EOF)
-	return EOF;
-    }
-  return fputc_unlocked ('\n', stream);
+  return __strtoul (str, end, base, 0);
 }
 
-int
-puts (const char *str)
+long long
+strtoll (const char *__restrict str, char **__restrict end, int base)
 {
-  return fputs (str, stdout);
+  return strtoll_l (str, end, base, __libc_locale);
+}
+
+unsigned long long
+strtoull (const char *__restrict str, char **__restrict end, int base)
+{
+  return strtoull_l (str, end, base, __libc_locale);
 }

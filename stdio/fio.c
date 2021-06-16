@@ -22,6 +22,17 @@ size_t
 fread (void *__restrict buffer, size_t size, size_t len,
        FILE *__restrict stream)
 {
+  size_t ret;
+  flockfile (stream);
+  ret = fread_unlocked (buffer, size, len, stream);
+  funlockfile (stream);
+  return ret;
+}
+
+size_t
+fread_unlocked (void *__restrict buffer, size_t size, size_t len,
+		FILE *__restrict stream)
+{
   size_t i;
   for (i = 0; i < len; i++)
     {
@@ -37,6 +48,17 @@ fread (void *__restrict buffer, size_t size, size_t len,
 size_t
 fwrite (const void *__restrict buffer, size_t size, size_t len,
 	FILE *__restrict stream)
+{
+  size_t ret;
+  flockfile (stream);
+  ret = fwrite_unlocked (buffer, size, len, stream);
+  funlockfile (stream);
+  return ret;
+}
+
+size_t
+fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
+		 FILE *__restrict stream)
 {
   size_t i;
   for (i = 0; i < len; i++)

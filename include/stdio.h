@@ -65,11 +65,15 @@ int vsnprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 void perror (const char *str);
 
 int fputc (int c, FILE *stream);
-#define putc(c, stream) fputc (c, stream) 
+int fputc_unlocked (int c, FILE *stream);
+#define putc(c, stream) fputc (c, stream)
+#define putc_unlocked(c, stream) fputc_unlocked (c, stream)
 int putchar (int c);
+int putchar_unlocked (int c);
 int ungetc (int c, FILE *stream);
 
 int fputs (const char *__restrict str, FILE *__restrict stream);
+int fputs_unlocked (const char *__restrict str, FILE *__restrict stream);
 int puts (const char *str);
 
 int scanf (const char *__restrict fmt, ...);
@@ -82,10 +86,14 @@ int vsscanf (const char *__restrict str, const char *__restrict fmt,
 	     va_list args);
 
 int fgetc (FILE *stream);
+int fgetc_unlocked (FILE *stream);
 #define getc(stream) fgetc (stream)
+#define getc_unlocked(stream) fgetc_unlocked (stream)
 int getchar (void);
+int getchar_unlocked (void);
 
 char *fgets (char *__restrict str, int size, FILE *__restrict stream);
+char *fgets_unlocked (char *__restrict str, int size, FILE *__restrict stream);
 char *gets (char *str);
 
 FILE *fopen (const char *__restrict path, const char *__restrict mode);
@@ -98,13 +106,21 @@ int fclose (FILE *stream);
 
 size_t fread (void *__restrict buffer, size_t size, size_t len,
 	      FILE *__restrict stream);
+size_t fread_unlocked (void *__restrict buffer, size_t size, size_t len,
+		       FILE *__restrict stream);
 size_t fwrite (const void *__restrict buffer, size_t size, size_t len,
 	       FILE *__restrict stream);
+size_t fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
+			FILE *__restrict stream);
 
 void clearerr (FILE *stream);
+void clearerr_unlocked (FILE *stream);
 int feof (FILE *stream);
+#define feof_unlocked(stream) feof (stream)
 int ferror (FILE *stream);
+#define ferror_unlocked(stream) ferror (stream)
 int fileno (FILE *stream);
+#define fileno_unlocked(stream) fileno (stream)
 
 int fgetpos (FILE *__restrict stream, fpos_t *__restrict pos);
 int fsetpos (FILE *__restrict stream, const fpos_t *__restrict pos);
@@ -116,6 +132,8 @@ void rewind (FILE *stream);
 
 int fflush (FILE *stream);
 int fpurge (FILE *stream);
+
+int fwide (FILE *stream, int mode);
 
 void flockfile (FILE *stream);
 int ftrylockfile (FILE *stream);

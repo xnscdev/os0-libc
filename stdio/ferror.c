@@ -20,6 +20,14 @@
 void
 clearerr (FILE *stream)
 {
+  flockfile (stream);
+  clearerr_unlocked (stream);
+  funlockfile (stream);
+}
+
+void
+clearerr_unlocked (FILE *stream)
+{
   stream->_flags &= ~(__IO_err | __IO_eof);
 }
 

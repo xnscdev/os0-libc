@@ -26,6 +26,11 @@
 
 #include <bits/types/div.h>
 
+#ifndef __locale_defined
+typedef struct __locale *locale_t;
+#define __locale_defined
+#endif
+
 __BEGIN_DECLS
 
 void *malloc (size_t size);
@@ -52,8 +57,21 @@ imaxdiv_t imaxdiv (intmax_t num, intmax_t denom);
 int atoi (const char *str);
 long atol (const char *str);
 long long atoll (const char *str);
+
 long strtol (const char *__restrict str, char **__restrict end, int base);
+long strtol_l (const char *__restrict str, char **__restrict end, int base,
+	       locale_t loc);
+unsigned long strtoul (const char *__restrict str, char **__restrict end,
+		       int base);
+unsigned long strtoul_l (const char *__restrict str, char **__restrict end,
+			 int base, locale_t loc);
 long long strtoll (const char *__restrict str, char **__restrict end, int base);
+long long strtoll_l (const char *__restrict str, char **__restrict end,
+		     int base, locale_t loc);
+unsigned long long strtoull (const char *__restrict str, char **__restrict end,
+			     int base);
+unsigned long long strtoull_l (const char *__restrict str,
+			       char **__restrict end, int base, locale_t loc);
 
 void *bsearch (const void *key, const void *base, size_t len, size_t size,
 	       int (*cmp) (const void *, const void *));

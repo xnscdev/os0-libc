@@ -20,10 +20,20 @@
 char *
 fgets (char *__restrict str, int size, FILE *__restrict stream)
 {
+  char *ret;
+  flockfile (stream);
+  ret = fgets_unlocked (str, size, stream);
+  funlockfile (stream);
+  return ret;
+}
+
+char *
+fgets_unlocked (char *__restrict str, int size, FILE *__restrict stream)
+{
   int i;
   for (i = 0; i < size - 1; i++)
     {
-      char c = fgetc (stream);
+      char c = fgetc_unlocked (stream);
       if (feof (stream) || ferror (stream))
 	break;
       str[i] = c;

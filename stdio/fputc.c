@@ -21,9 +21,26 @@
 int
 fputc (int c, FILE *stream)
 {
-  char ch = c;
+  int ret;
+  flockfile (stream);
+  ret = fputc_unlocked (c, stream);
+  funlockfile (stream);
+  return ret;
+}
+
+int
+fputc_unlocked (int c, FILE *stream)
+{
+  unsigned char ch = c;
   if ((stream->_flags & __IO_buf_mask) == _IONBF)
-    return write (stream->_fd, &ch, 1);
+    {
+      int ret = write (stream->_fd, &ch, 1);
+      if (ret != 1)
+	return ret;
+      stream->_flags |= __IO_orient;
+      stream->_flags &= ~__IO_wide;
+      return ch;
+    }
   if (stream->_write_ptr_len >= stream->_write_buf_len)
     {
       if (fflush (stream) == EOF)
@@ -31,12 +48,23 @@ fputc (int c, FILE *stream)
     }
   stream->_write_buf[stream->_write_ptr_len++] = ch;
   if (ch == '\n' && (stream->_flags & __IO_buf_mask) == _IOLBF)
-    return fflush (stream);
-  return 0;
+    {
+      if (fflush (stream) == EOF)
+	return EOF;
+    }
+  stream->_flags |= __IO_orient;
+  stream->_flags &= ~__IO_wide;
+  return ch;
 }
 
 int
 putchar (int c)
 {
   return fputc (c, stdout);
+}
+
+int
+putchar_unlocked (int c)
+{
+  return fputc_unlocked (c, stdout);
 }

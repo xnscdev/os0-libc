@@ -43,6 +43,9 @@ struct __locale
   const char *__names[__LC_LAST];
 };
 
+#ifndef __locale_defined
 typedef struct __locale *locale_t;
+#define __locale_defined
+#endif
 
 #endif

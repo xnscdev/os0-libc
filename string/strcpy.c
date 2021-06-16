@@ -17,42 +17,6 @@
 #include <stdint.h>
 #include <string.h>
 
-void *
-memcpy (void *__restrict dest, const void *__restrict src, size_t len)
-{
-  size_t i;
-  if ((uint32_t) dest % 2 == 0 && (uint32_t) src % 2 == 0 && len % 2 == 0)
-    {
-      for (i = 0; i < len / 2; i++)
-	((uint16_t *) dest)[i] = ((uint16_t *) src)[i];
-    }
-  else
-    {
-      for (i = 0; i < len; i++)
-	((unsigned char *) dest)[i] = ((unsigned char *) src)[i];
-    }
-  return dest;
-}
-
-void *
-memmove (void *dest, const void *src, size_t len)
-{
-  size_t i;
-  if (dest < src)
-    return memcpy (dest, src, len);
-  if ((uint32_t) dest % 2 == 0 && (uint32_t) src % 2 == 0 && len % 2 == 0)
-    {
-      for (i = len / 2; i > 0; i--)
-	((uint16_t *) dest)[i - 1] = ((uint16_t *) src)[i - 1];
-    }
-  else
-    {
-      for (i = len; i > 0; i--)
-	((unsigned char *) dest)[i - 1] = ((unsigned char *) src)[i - 1];
-    }
-  return dest;
-}
-
 char *
 stpcpy (char *dest, const char *src)
 {

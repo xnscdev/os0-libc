@@ -1,4 +1,4 @@
-/* fputs.c -- This file is part of OS/0 libc.
+/* atol.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,31 +14,22 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <stdio.h>
+#include <stdlib.h>
 
 int
-fputs (const char *__restrict str, FILE *__restrict stream)
+atoi (const char *str)
 {
-  int ret;
-  flockfile (stream);
-  ret = fputs_unlocked (str, stream);
-  funlockfile (stream);
-  return ret;
+  return (int) atol (str);
 }
 
-int
-fputs_unlocked (const char *__restrict str, FILE *__restrict stream)
+long
+atol (const char *str)
 {
-  for (; *str != '\0'; str++)
-    {
-      if (fputc_unlocked (*str, stream) == EOF)
-	return EOF;
-    }
-  return fputc_unlocked ('\n', stream);
+  return strtol (str, NULL, 10);
 }
 
-int
-puts (const char *str)
+long long
+atoll (const char *str)
 {
-  return fputs (str, stdout);
+  return strtoll (str, NULL, 10);
 }
