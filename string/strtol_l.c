@@ -229,7 +229,7 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
   for (; *str != '\0'; str++)
     {
       int b;
-      if (strncmp (str, sepseq, seplen) == 0)
+      if (seplen > 0 && strncmp (str, sepseq, seplen) == 0)
 	{
 	  if (!groups)
 	    goto finish;

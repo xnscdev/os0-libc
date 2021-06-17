@@ -353,6 +353,8 @@ vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	      c = fgetc_unlocked (stream);
 	      if (c != '%')
 		goto end;
+	      fmt++;
+	      continue;
 	    }
 
 	  /* Parse characters before conversion specifier */
