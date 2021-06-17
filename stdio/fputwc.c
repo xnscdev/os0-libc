@@ -1,4 +1,4 @@
-/* fputc.c -- This file is part of OS/0 libc.
+/* fputwc.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,56 +15,61 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stream.h>
+#include <string.h>
 #include <unistd.h>
+#include <wchar.h>
 
-int
-fputc (int c, FILE *stream)
+wint_t
+fputwc (wchar_t wc, FILE *stream)
 {
   int ret;
   flockfile (stream);
-  ret = fputc_unlocked (c, stream);
+  ret = fputwc_unlocked (wc, stream);
   funlockfile (stream);
   return ret;
 }
 
-int
-fputc_unlocked (int c, FILE *stream)
+wint_t
+fputwc_unlocked (wchar_t wc, FILE *stream)
 {
-  unsigned char ch = c;
+  char buffer[MB_CUR_MAX];
+  size_t len = wctomb (buffer, wc);
+  if (len == (size_t) -1)
+    return WEOF;
   if ((stream->_flags & __IO_buf_mask) == _IONBF)
     {
-      int ret = write (stream->_fd, &ch, 1);
-      if (ret != 1)
-	return EOF;
-      stream->_flags |= __IO_orient;
-      stream->_flags &= ~__IO_wide;
-      return ch;
+      int ret = write (stream->_fd, buffer, len);
+      if (ret != len)
+	return WEOF;
+      stream->_flags |= __IO_orient | __IO_wide;
+      return wc;
     }
-  if (stream->_write_ptr_len >= stream->_write_buf_len)
+  if (stream->_write_ptr_len + len > stream->_write_buf_len)
     {
       if (fflush (stream) == EOF)
-	return EOF;
+	return WEOF;
     }
-  stream->_write_buf[stream->_write_ptr_len++] = ch;
-  if (ch == '\n' && (stream->_flags & __IO_buf_mask) == _IOLBF)
+  memcpy (stream->_write_buf + stream->_write_ptr_len, buffer, len);
+  stream->_write_ptr_len += len;
+  if (wc == '\n' && (stream->_flags & __IO_buf_mask) == _IOLBF)
     {
       if (fflush (stream) == EOF)
-	return EOF;
+	return WEOF;
     }
-  stream->_flags |= __IO_orient;
-  stream->_flags &= ~__IO_wide;
-  return ch;
+  stream->_flags |= __IO_orient | __IO_wide;
+  return wc;
+}
+
+wint_t
+putwchar (wint_t wc)
+{
+  return fputwc (wc, stdout);
 }
 
 int
-putchar (int c)
+putwchar_unlocked (wint_t wc)
 {
-  return fputc (c, stdout);
-}
-
-int
-putchar_unlocked (int c)
-{
-  return fputc_unlocked (c, stdout);
+  return fputwc_unlocked (wc, stdout);
 }

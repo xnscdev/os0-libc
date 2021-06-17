@@ -48,6 +48,7 @@ struct __locale_ctype_data
   size_t (*mbrtowc) (wchar_t *__restrict, const char *__restrict, size_t,
 		     mbstate_t *__restrict);
   size_t (*wcrtomb) (char *__restrict, wchar_t, mbstate_t *__restrict);
+  int has_shift_states;
 };
 
 struct __locale

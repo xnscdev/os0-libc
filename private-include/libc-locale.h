@@ -31,6 +31,7 @@ __BEGIN_DECLS
 extern const struct __locale __libc_posix_locale __hidden;
 extern locale_t __libc_locale __hidden;
 extern __lock_t __libc_locale_lock __hidden;
+extern mbstate_t __libc_mbstate __hidden;
 
 /* POSIX C locale functions */
 

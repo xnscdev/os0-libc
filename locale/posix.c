@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <ctype.h>
+#include <errno.h>
 #include <libc-locale.h>
 #include <limits.h>
 #include <string.h>
@@ -43,7 +44,8 @@ const struct __locale __libc_posix_locale = {
     {"tolower", "toupper"},
     {__libc_posix_towlower, __libc_posix_towupper},
     __libc_posix_mbrtowc,
-    __libc_posix_wcrtomb
+    __libc_posix_wcrtomb,
+    0 /* Don't support multibyte characters for POSIX locale */
   },
   .__names = {"C", "C", "C", "C", "C", "C"}
 };
@@ -62,8 +64,13 @@ size_t
 __libc_posix_wcrtomb (char *__restrict str, wchar_t wc,
 		      mbstate_t *__restrict ps)
 {
+  if (!isascii (wc))
+    {
+      errno = EILSEQ;
+      return (size_t) -1;
+    }
   if (str != NULL)
-    *str = (char) wc;
+    *str = toascii (wc);
   memset (ps, 0, sizeof (mbstate_t));
   return 1;
 }

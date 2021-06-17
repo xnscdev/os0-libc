@@ -37,6 +37,11 @@ typedef struct __FILE FILE;
 #define __FILE_defined
 #endif
 
+#ifndef __wint_defined
+typedef int wint_t;
+#define __wint_defined
+#endif
+
 typedef off_t fpos_t;
 
 __BEGIN_DECLS
@@ -71,6 +76,12 @@ int fputc_unlocked (int c, FILE *stream);
 int putchar (int c);
 int putchar_unlocked (int c);
 int ungetc (int c, FILE *stream);
+
+wint_t fputwc (wchar_t wc, FILE *stream);
+wint_t fputwc_unlocked (wchar_t wc, FILE *stream);
+#define putwc(wc, stream) fputwc (c, stream);
+wint_t putwchar (wint_t wc);
+wint_t putwchar_unlocked (wint_t wc);
 
 int fputs (const char *__restrict str, FILE *__restrict stream);
 int fputs_unlocked (const char *__restrict str, FILE *__restrict stream);

@@ -73,6 +73,9 @@ unsigned long long strtoull (const char *__restrict str, char **__restrict end,
 unsigned long long strtoull_l (const char *__restrict str,
 			       char **__restrict end, int base, locale_t loc);
 
+int mbtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len);
+int wctomb (char *str, wchar_t wc);
+
 void *bsearch (const void *key, const void *base, size_t len, size_t size,
 	       int (*cmp) (const void *, const void *));
 void *lfind (const void *key, const void *base, size_t *len, size_t size,

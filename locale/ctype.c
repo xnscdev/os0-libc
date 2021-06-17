@@ -16,6 +16,8 @@
 
 #include <libc-locale.h>
 
+mbstate_t __libc_mbstate;
+
 /* ctype functions for POSIX C locale */
 
 int

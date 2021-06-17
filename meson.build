@@ -52,6 +52,7 @@ libc_src = [
   'stdio/fpos.c',
   'stdio/fputc.c',
   'stdio/fputs.c',
+  'stdio/fputwc.c',
   'stdio/fwide.c',
   'stdio/getdelim.c',
   'stdio/perror.c',
@@ -142,6 +143,7 @@ libc_src = [
   'syscall/unlink.c',
   'syscall/wait.c',
   'syscall/xattr.c',
+  'wchar/wcrtomb.c',
   'wchar/wctype.c'
 ]
 

@@ -1,4 +1,4 @@
-/* wctype.h -- This file is part of OS/0 libc.
+/* wcrtomb.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,23 +14,26 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _WCTYPE_H
-#define _WCTYPE_H
+#include <libc-locale.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
 
-#include <bits/wctype.h>
+int
+wctomb (char *str, wchar_t wc)
+{
+  if (str == NULL)
+    {
+      memset (&__libc_mbstate, 0, sizeof (mbstate_t));
+      return __libc_locale->__LC_CTYPE.has_shift_states;
+    }
+  return wcrtomb (str, wc, &__libc_mbstate);
+}
 
-__BEGIN_DECLS
-
-wint_t towctrans (wint_t wc, wctrans_t desc);
-wint_t towctrans_l (wint_t wc, wctrans_t desc, locale_t loc);
-wctrans_t wctrans (const char *property);
-wctrans_t wctrans_l (const char *property, locale_t loc);
-
-int iswctype (wint_t wc, wctype_t type);
-int iswctype_l (wint_t wc, wctype_t type, locale_t loc);
-wctype_t wctype (const char *property);
-wctype_t wctype_l (const char *property, locale_t loc);
-
-__END_DECLS
-
-#endif
+size_t
+wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps)
+{
+  if (ps == NULL)
+    ps = &__libc_mbstate;
+  return __libc_locale->__LC_CTYPE.wcrtomb (str, wc, ps);
+}

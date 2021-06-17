@@ -43,10 +43,8 @@ size_t mblen (const char *str, size_t len);
 size_t mbrlen (const char *__restrict str, size_t len,
 	       mbstate_t *__restrict ps);
 
-int mbtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len);
 size_t mbrtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len,
 		mbstate_t *__restrict ps);
-int wctomb (char *str, wchar_t wc);
 size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);
 
 __END_DECLS
