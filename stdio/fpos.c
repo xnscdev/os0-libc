@@ -44,7 +44,11 @@ int
 fseeko (FILE *stream, off_t offset, int whence)
 {
   off_t ret = lseek (stream->_fd, offset, whence);
-  return ret == -1 ? -1 : 0;
+  if (ret == -1)
+    return -1;
+  stream->_flags &= ~__IO_eof;
+  stream->_read_buf_len = 0;
+  return 0;
 }
 
 long

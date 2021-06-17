@@ -20,11 +20,25 @@
 #include <sys/cdefs.h>
 #include <stddef.h>
 
+#define LC_COLLATE  0
+#define LC_CTYPE    1
+#define LC_MESSAGES 2
+#define LC_MONETARY 3
+#define LC_NUMERIC  4
+#define LC_TIME     5
+#define LC_ALL      6
+#define __LC_LAST   6
+
 #include <bits/types/lconv.h>
 #include <bits/types/mbstate.h>
 
 #define __LC_wctype_max  12
 #define __LC_wctrans_max 8
+
+#ifndef __wint_defined
+typedef int wint_t;
+#define __wint_defined
+#endif
 
 struct __locale_ctype_data
 {

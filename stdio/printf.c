@@ -105,7 +105,7 @@ static inline void
 _out_char (char character, void *buffer, size_t idx, size_t maxlen)
 {
   if (character)
-    fputc (character, buffer);
+    fputc_unlocked (character, buffer);
 }
 
 // internal output function wrapper

@@ -14,9 +14,35 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <branch.h>
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stream.h>
 #include <unistd.h>
+
+int
+__ungetc_unlocked (int c, FILE *stream)
+{
+  if (c == EOF || (stream->_read_buf != NULL
+		   && stream->_read_ptr_len >= stream->_read_buf_len))
+    return EOF;
+  if (stream->_read_buf == NULL)
+    {
+      stream->_read_buf = malloc (BUFSIZ);
+      if (unlikely (stream->_read_buf == NULL))
+	{
+	  errno = ENOMEM;
+	  return EOF;
+	}
+      stream->_read_buf_len = BUFSIZ;
+      stream->_flags |= __IO_rbuf_alloc;
+    }
+  stream->_read_buf[stream->_read_ptr_len++] = c;
+  stream->_flags |= __IO_orient;
+  stream->_flags &= ~(__IO_eof | __IO_wide);
+  return c;
+}
 
 int
 fgetc (FILE *stream)
@@ -35,8 +61,8 @@ fgetc_unlocked (FILE *stream)
   int ret;
   if (feof (stream) || ferror (stream))
     return EOF;
-  if (stream->_read_buf_len > 0)
-    return stream->_read_buf[--stream->_read_buf_len];
+  if (stream->_read_ptr_len > 0)
+    return stream->_read_buf[--stream->_read_ptr_len];
   ret = read (stream->_fd, &c, 1);
   if (ret != 1)
     return EOF;
@@ -60,11 +86,9 @@ getchar_unlocked (void)
 int
 ungetc (int c, FILE *stream)
 {
-  if (c == EOF || stream->_read_buf == NULL
-      || stream->_read_ptr_len >= stream->_read_buf_len)
-    return EOF;
-  stream->_read_buf[stream->_read_ptr_len++] = c;
-  stream->_flags |= __IO_orient;
-  stream->_flags &= ~(__IO_eof | __IO_wide);
-  return c;
+  int ret;
+  flockfile (stream);
+  ret = __ungetc_unlocked (c, stream);
+  funlockfile (stream);
+  return ret;
 }

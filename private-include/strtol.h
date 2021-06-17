@@ -17,10 +17,25 @@
 #ifndef _STRTOL_H
 #define _STRTOL_H
 
-#include <sys/cdefs.h>
 #include <libc-locale.h>
+#include <stdio.h>
 
 __BEGIN_DECLS
+
+int __strtox_baseval (char c, int base, locale_t loc) __hidden;
+char __strtox_get_grouping (int group, locale_t loc) __hidden;
+
+long long __strtox_l (const char *__restrict str, char **__restrict end,
+		      int base, int group, long long min, long long max,
+		      locale_t loc) __hidden;
+unsigned long long __strtoux_l (const char *__restrict str,
+				char **__restrict end, int base, int group,
+				unsigned long long max, locale_t loc) __hidden;
+long long __fstrtox_l (FILE *__restrict stream, int *good, int base, int group,
+		       long long min, long long max, locale_t loc) __hidden;
+unsigned long long __fstrtoux_l (FILE *__restrict stream, int *good, int base,
+				 int group, unsigned long long max,
+				 locale_t loc) __hidden;
 
 #define __strtol(str, end, base, group)			\
   __strtol_l (str, end, base, group, __libc_locale)

@@ -27,5 +27,5 @@ install_headers('alloca.h',
 install_data('_limits.h', install_dir: get_option('includedir'),
 	     rename: 'limits.h')
 
-subdir('bits/types')
+subdir('bits')
 subdir('sys')

@@ -43,4 +43,10 @@ struct __FILE
 
 typedef struct __FILE FILE;
 
+__BEGIN_DECLS
+
+int __ungetc_unlocked (int c, FILE *stream) __hidden;
+
+__END_DECLS
+
 #endif

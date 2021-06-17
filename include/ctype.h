@@ -17,42 +17,42 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
-#include <sys/cdefs.h>
+#include <bits/wctype.h>
 
-__BEGIN_DECLS
-
-int isalnum (int c);
+#define isalnum(c) iswalnum (c)
 #define isalnum_l(c, loc) iswalnum_l (c, loc)
-int isalpha (int c);
+#define isalpha(c) iswalpha (c)
 #define isalpha_l(c, loc) iswalpha_l (c, loc)
-int isascii (int c);
-int isblank (int c);
+#define isblank(c) iswblank (c)
 #define isblank_l(c, loc) iswblank_l (c, loc)
-int iscntrl (int c);
+#define iscntrl(c) iswcntrl (c)
 #define iscntrl_l(c, loc) iswcntrl_l (c, loc)
-int isdigit (int c);
+#define isdigit(c) iswdigit (c)
 #define isdigit_l(c, loc) iswdigit_l (c, loc)
-int isgraph (int c);
+#define isgraph(c) iswgraph (c)
 #define isgraph_l(c, loc) iswgraph_l (c, loc)
-int islower (int c);
+#define islower(c) iswlower (c)
 #define islower_l(c, loc) iswlower_l (c, loc)
-int isprint (int c);
+#define isprint(c) iswprint (c)
 #define isprint_l(c, loc) iswprint_l (c, loc)
-int ispunct (int c);
+#define ispunct(c) iswpunct (c)
 #define ispunct_l(c, loc) iswpunct_l (c, loc)
-int isspace (int c);
+#define isspace(c) iswspace (c)
 #define isspace_l(c, loc) iswspace_l (c, loc)
-int isupper (int c);
+#define isupper(c) iswupper (c)
 #define isupper_l(c, loc) iswupper_l (c, loc)
-int isxdigit (int c);
+#define isxdigit(c) isxdigit (c)
 #define isxdigit_l(c, loc) iswxdigit_l (c, loc)
 
-int toascii (int c);
-int tolower (int c);
+#define tolower(c) towlower (c)
 #define tolower_l(c, loc) towlower_l (c, loc)
-int toupper (int c);
+#define toupper(c) towupper (c)
 #define toupper_l(c, loc) towupper_l (c, loc)
 
-__END_DECLS
+#define isascii(c) ({				\
+      int _c = c;				\
+      _c >= 0 && _c < 0x80;			\
+    })
+#define toascii(c) (c & 0x7f)
 
 #endif

@@ -37,9 +37,11 @@ subdir('include')
 libc_inc = include_directories('include', 'private-include')
 
 libc_src = [
+  'locale/ctype.c',
   'locale/localeconv.c',
   'locale/posix.c',
   'locale/setlocale.c',
+  'locale/uselocale.c',
   'stdio/ferror.c',
   'stdio/fflush.c',
   'stdio/fgetc.c',
@@ -62,7 +64,6 @@ libc_src = [
   'stdlib/assert.c',
   'stdlib/bitsearch.c',
   'stdlib/bsearch.c',
-  'stdlib/ctype.c',
   'stdlib/dlmalloc.c',
   'stdlib/env.c',
   'stdlib/errno.c',
@@ -87,6 +88,7 @@ libc_src = [
   'stdlib/termios.c',
   'stdlib/time.c',
   'string/atol.c',
+  'string/fstrtol_l.c',
   'string/memcmp.c',
   'string/memcpy.c',
   'string/memset.c',

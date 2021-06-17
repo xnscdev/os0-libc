@@ -1,4 +1,4 @@
-/* locale.h -- This file is part of OS/0 libc.
+/* uselocale.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,23 +14,24 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _LOCALE_H
-#define _LOCALE_H
+#include <libc-locale.h>
+#include <locks.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <sys/cdefs.h>
+locale_t
+uselocale (locale_t loc)
+{
+  locale_t temp;
+  if (loc == NULL)
+    return LC_GLOBAL_LOCALE;
+  temp = __libc_locale;
+  __libc_locale = loc;
+  return temp;
+}
 
-#include <bits/types/locale.h>
-
-#define LC_GLOBAL_LOCALE (__libc_get_locale ())
-
-__BEGIN_DECLS
-
-struct lconv *localeconv (void);
-char *setlocale (int category, const char *locale);
-locale_t uselocale (locale_t loc);
-
-locale_t __libc_get_locale (void) __hidden;
-
-__END_DECLS
-
-#endif
+locale_t
+__libc_get_locale (void)
+{
+  return __libc_locale;
+}
