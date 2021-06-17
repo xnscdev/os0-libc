@@ -24,14 +24,14 @@
 #include <stream.h>
 #include <strtol.h>
 
+#define STRBUF_START_SIZE 16
+
 /* *scanf flags */
 
 #define NOASSIGN 0x01
 #define MALLOC   0x02
 
 #define POSARG   0x1000
-#define ASSIGNS  0x2000
-#define ASSIGNU  0x4000
 
 /* Length modifiers */
 
@@ -57,8 +57,10 @@ struct arguments
 
 #define DO_OR_RETURN(expr) do			\
     {						\
-      if ((expr) != 0)				\
+      int ret = (expr);				\
+      if (ret == -1)				\
         goto end;				\
+      amt += ret;				\
     }						\
   while (0)
 
@@ -77,8 +79,62 @@ pull_leading_whitespace (FILE *stream, locale_t loc)
 }
 
 static const char *
-parse_lenmod_chars (const char *fmt, int *lenmod)
+parse_preconvspec_chars (const char *fmt, int *flags, unsigned long *argpos,
+			 unsigned long *max_field_width, int *lenmod)
 {
+  unsigned long num;
+ flagcheck:
+  num = 0;
+
+  /* Check for assignment suppression character */
+  if (*fmt == '*')
+    {
+      *flags |= NOASSIGN;
+      fmt++;
+    }
+
+  /* Check for and parse maximum field width */
+  if (isdigit (*fmt) && *fmt != '0')
+    {
+      do
+	{
+	  if (num > ULONG_MAX / 10)
+	    num = ULONG_MAX;
+	  else
+	    {
+	      num *= 10;
+	      if (num > ULONG_MAX - *fmt + '0')
+		num = ULONG_MAX;
+	      else
+		num += *fmt - '0';
+	    }
+	}
+      while (isdigit (*++fmt));
+    }
+
+  /* If the next char is $, see if the previously read characters
+     were of the form %n$, and set the positional argument and retry
+     flag checking if so */
+  if (num > 0 && *fmt == '$' && *flags == 0 /* No *flags given */)
+    {
+      /* The digits we read for the max field width were actually for
+	 the argument position */
+      *argpos = num;
+      *flags |= POSARG; /* Don't allow this check to happen again */
+      fmt++;
+      goto flagcheck;
+    }
+  else
+    *max_field_width = num;
+
+  /* Check for assignment allocation character */
+  if (*fmt == 'm')
+    {
+      *flags |= MALLOC;
+      fmt++;
+    }
+
+  /* Check for length modifier characters */
  lencheck:
   switch (*fmt)
     {
@@ -166,46 +222,98 @@ truncate_assign_unsigned (unsigned long long value, int lenmod, void *ptr)
     }
 }
 
-static int
-assign_numval (int flags, unsigned long argpos, int lenmod,
-	       struct arguments *ar, va_list *args, long long sval,
-	       unsigned long long uval)
+static void *
+get_argument (struct arguments *ar, va_list *args, unsigned long pos)
 {
-  void *ptr;
-  if (argpos == 0)
+  if (pos == 0)
     {
       if (ar->curr < ar->len)
 	{
-	  ptr = ar->args[ar->curr];
+	  void *ptr = ar->args[ar->curr];
 	  ar->curr++;
+	  return ptr;
 	}
-      else
-	ptr = va_arg (*args, void *);
+      return va_arg (*args, void *);
     }
   else
     {
-      if (argpos > ar->len)
+      if (pos > ar->len)
 	{
 	  void **temp;
 	  int i = ar->len;
-	  ar->len = argpos;
+	  ar->len = pos;
 	  temp = realloc (ar->args, ar->len);
 	  if (unlikely (temp == NULL))
 	    {
 	      errno = ENOMEM;
-	      return -1;
+	      return NULL;
 	    }
 	  ar->args = temp;
 	  for (; i < ar->len; i++)
 	    ar->args[i] = va_arg (*args, void *);
 	}
-      ptr = ar->args[argpos - 1];
+      return ar->args[pos - 1];
     }
+}
 
-  if (flags & ASSIGNS)
-    truncate_assign_signed (sval, lenmod, ptr);
-  else
-    truncate_assign_unsigned (uval, lenmod, ptr);
+static int
+handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
+		      va_list *args, unsigned long pos)
+{
+  size_t bufsize = STRBUF_START_SIZE;
+  size_t count = 0;
+  char *buffer;
+  char c;
+  if (!(flags & NOASSIGN))
+    {
+      if (flags & MALLOC)
+	{
+	  buffer = malloc (bufsize);
+	  if (unlikely (buffer == NULL))
+	    {
+	      errno = ENOMEM;
+	      return -1;
+	    }
+	}
+      else
+	buffer = get_argument (ar, args, pos);
+    }
+  if (pull_leading_whitespace (stream, __libc_locale) != 0)
+    {
+      free (buffer);
+      return -1;
+    }
+  while (1)
+    {
+      c = fgetc_unlocked (stream);
+      if (c == EOF || isspace (c))
+	break;
+      if (!(flags & NOASSIGN))
+	{
+	  buffer[count++] = c;
+	  if ((flags & MALLOC) && count == bufsize)
+	    {
+	      char *temp;
+	      bufsize *= 2;
+	      temp = realloc (buffer, bufsize);
+	      if (unlikely (temp == NULL))
+		{
+		  errno = ENOMEM;
+		  free (buffer);
+		  return -1;
+		}
+	      buffer = temp;
+	    }
+	}
+    }
+  __ungetc_unlocked (c, stream);
+  if (!(flags & NOASSIGN))
+    {
+      buffer[count] = '\0';
+      if (flags & MALLOC)
+	*((char **) get_argument (ar, args, pos)) = buffer;
+      return 1;
+    }
   return 0;
 }
 
@@ -236,9 +344,7 @@ vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	  int flags = 0;
 	  int lenmod = LEN_INT;
 	  unsigned long argpos = 0;
-	  unsigned long max_field_width = 0;
-	  long long sval;
-	  unsigned long long uval;
+	  unsigned long max_field_width;
 	  fmt++;
 
 	  /* Check for %% directive */
@@ -249,56 +355,9 @@ vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 		goto end;
 	    }
 
-	flagcheck:
-	  /* Check for assignment suppression character */
-	  if (*fmt == '*')
-	    {
-	      flags |= NOASSIGN;
-	      fmt++;
-	    }
-
-	  /* Check for and parse maximum field width */
-	  if (isdigit (*fmt) && *fmt != '0')
-	    {
-	      do
-		{
-		  if (max_field_width > ULONG_MAX / 10)
-		    max_field_width = ULONG_MAX;
-		  else
-		    {
-		      max_field_width *= 10;
-		      if (max_field_width > ULONG_MAX - *fmt + '0')
-			max_field_width = ULONG_MAX;
-		      else
-			max_field_width += *fmt - '0';
-		    }
-		}
-	      while (isdigit (*++fmt));
-	    }
-
-	  /* If the next char is $, see if the previously read characters
-	     were of the form %n$, and set the positional argument and retry
-	     flag checking if so */
-	  if (*fmt == '$' && flags == 0 /* No flags given */)
-	    {
-	      /* The digits we read for the max field width were actually for
-		 the argument position */
-	      argpos = max_field_width;
-	      max_field_width = 0;
-	      flags |= POSARG; /* Don't allow this check to happen again */
-	      fmt++;
-	      goto flagcheck;
-	    }
-
-	  /* Check for assignment allocation character */
-	  if (*fmt == 'm')
-	    {
-	      flags |= MALLOC;
-	      fmt++;
-	    }
-
-	  /* Check for length modifier characters */
-	  fmt = parse_lenmod_chars (fmt, &lenmod);
+	  /* Parse characters before conversion specifier */
+	  fmt = parse_preconvspec_chars (fmt, &flags, &argpos, &max_field_width,
+					 &lenmod);
 	  if (fmt == NULL)
 	    goto end;
 
@@ -306,24 +365,50 @@ vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 	  switch (*fmt)
 	    {
 	    case 'd':
+	    case 'i':
 	      {
 		int good;
-	        sval = __fstrtox_l (stream, &good, 10, 1, LLONG_MIN, LLONG_MAX,
-				    __libc_locale);
+	        long long value =
+		  __fstrtox_l (stream, &good, (*fmt == 'd') * 10, 1,
+			       max_field_width, LLONG_MIN, LLONG_MAX,
+			       __libc_locale);
+		void *ptr;
 		if (!good)
 		  goto end;
-		flags |= ASSIGNS;
+		ptr = get_argument (&ar, &args, argpos);
+		if (!(flags & NOASSIGN))
+		  {
+		    truncate_assign_signed (value, lenmod, ptr);
+		    amt++;
+		  }
 		break;
 	      }
+	    case 'o':
+	    case 'u':
+	    case 'x':
+	      {
+		int good;
+		int base = *fmt == 'o' ? 8 : *fmt == 'u' ? 10 : 16;
+	        unsigned long long value =
+		  __fstrtoux_l (stream, &good, base, 1, max_field_width,
+				ULLONG_MAX, __libc_locale);
+		void *ptr;
+		if (!good)
+		  goto end;
+		ptr = get_argument (&ar, &args, argpos);
+		if (!(flags & NOASSIGN))
+		  {
+		    truncate_assign_unsigned (value, lenmod, ptr);
+		    amt++;
+		  }
+		break;
+	      }
+	    case 's':
+	      DO_OR_RETURN (handle_fscanf_string (stream, flags, lenmod, &ar,
+						  &args, argpos));
+	      break;
 	    default:
 	      goto end;
-	    }
-
-	  if ((flags & ASSIGNS || flags & ASSIGNU) && !(flags & NOASSIGN))
-	    {
-	      DO_OR_RETURN (assign_numval (flags, argpos, lenmod, &ar, &args,
-					   sval, uval));
-	      amt++;
 	    }
 	}
       else
