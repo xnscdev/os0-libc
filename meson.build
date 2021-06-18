@@ -69,6 +69,7 @@ libc_src = [
   'stdlib/assert.c',
   'stdlib/bitsearch.c',
   'stdlib/bsearch.c',
+  'stdlib/dirent.c',
   'stdlib/dlmalloc.c',
   'stdlib/env.c',
   'stdlib/errno.c',
