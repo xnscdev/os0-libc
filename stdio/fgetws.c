@@ -1,4 +1,4 @@
-/* fputs.c -- This file is part of OS/0 libc.
+/* fgetws.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,42 +15,34 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <stdio.h>
+#include <unistd.h>
 
-int
-fputs (const char *__restrict str, FILE *__restrict stream)
+wchar_t *
+fgetws (wchar_t *__restrict ws, int size, FILE *__restrict stream)
 {
-  int ret;
+  wchar_t *ret;
   flockfile (stream);
-  ret = fputs_unlocked (str, stream);
+  ret = fgetws_unlocked (ws, size, stream);
   funlockfile (stream);
   return ret;
 }
 
-int
-fputs_unlocked (const char *__restrict str, FILE *__restrict stream)
+wchar_t *
+fgetws_unlocked (wchar_t *__restrict ws, int size, FILE *__restrict stream)
 {
-  for (; *str != '\0'; str++)
+  int i;
+  for (i = 0; i < size - 1; i++)
     {
-      if (fputc_unlocked (*str, stream) == EOF)
-	return EOF;
-    }
-  return 0;
-}
-
-int
-puts (const char *str)
-{
-  int ret;
-  flockfile (stdout);
-  for (; *str != '\0'; str++)
-    {
-      if (putchar_unlocked (*str) == EOF)
+      wchar_t c = fgetwc_unlocked (stream);
+      if (feof (stream) || ferror (stream))
+	break;
+      ws[i] = c;
+      if (c == '\n')
 	{
-	  funlockfile (stdout);
-	  return EOF;
+	  i++;
+	  break;
 	}
     }
-  ret = putchar_unlocked ('\n');
-  funlockfile (stdout);
-  return ret == EOF ? EOF : 0;
+  ws[i] = L'\0';
+  return ws;
 }

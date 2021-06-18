@@ -79,12 +79,15 @@ int putchar_unlocked (int c);
 wint_t fputwc (wchar_t wc, FILE *stream);
 wint_t fputwc_unlocked (wchar_t wc, FILE *stream);
 #define putwc(wc, stream) fputwc (c, stream);
-wint_t putwchar (wint_t wc);
-wint_t putwchar_unlocked (wint_t wc);
+wint_t putwchar (wchar_t wc);
+wint_t putwchar_unlocked (wchar_t wc);
 
 int fputs (const char *__restrict str, FILE *__restrict stream);
 int fputs_unlocked (const char *__restrict str, FILE *__restrict stream);
 int puts (const char *str);
+
+int fputws (const wchar_t *__restrict ws, FILE *__restrict stream);
+int fputws_unlocked (const wchar_t *__restrict ws, FILE *__restrict stream);
 
 int scanf (const char *__restrict fmt, ...);
 int fscanf (FILE *__restrict stream, const char *__restrict fmt, ...);
@@ -114,6 +117,10 @@ wint_t ungetwc (wint_t wc, FILE *stream);
 char *fgets (char *__restrict str, int size, FILE *__restrict stream);
 char *fgets_unlocked (char *__restrict str, int size, FILE *__restrict stream);
 char *gets (char *str);
+
+wchar_t *fgetws (wchar_t *__restrict ws, int len, FILE *__restrict stream);
+wchar_t *fgetws_unlocked (wchar_t *__restrict ws, int len,
+			  FILE *__restrict stream);
 
 FILE *fopen (const char *__restrict path, const char *__restrict mode);
 FILE *fdopen (int fd, const char *mode);

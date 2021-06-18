@@ -1,4 +1,4 @@
-/* fputs.c -- This file is part of OS/0 libc.
+/* fputws.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,40 +17,22 @@
 #include <stdio.h>
 
 int
-fputs (const char *__restrict str, FILE *__restrict stream)
+fputws (const wchar_t *__restrict ws, FILE *__restrict stream)
 {
   int ret;
   flockfile (stream);
-  ret = fputs_unlocked (str, stream);
+  ret = fputws_unlocked (ws, stream);
   funlockfile (stream);
   return ret;
 }
 
 int
-fputs_unlocked (const char *__restrict str, FILE *__restrict stream)
+fputws_unlocked (const wchar_t *__restrict ws, FILE *__restrict stream)
 {
-  for (; *str != '\0'; str++)
+  for (; *ws != '\0'; ws++)
     {
-      if (fputc_unlocked (*str, stream) == EOF)
+      if (fputwc_unlocked (*ws, stream) == EOF)
 	return EOF;
     }
   return 0;
-}
-
-int
-puts (const char *str)
-{
-  int ret;
-  flockfile (stdout);
-  for (; *str != '\0'; str++)
-    {
-      if (putchar_unlocked (*str) == EOF)
-	{
-	  funlockfile (stdout);
-	  return EOF;
-	}
-    }
-  ret = putchar_unlocked ('\n');
-  funlockfile (stdout);
-  return ret == EOF ? EOF : 0;
 }

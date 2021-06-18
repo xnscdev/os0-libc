@@ -66,13 +66,13 @@ fputwc_unlocked (wchar_t wc, FILE *stream)
 }
 
 wint_t
-putwchar (wint_t wc)
+putwchar (wchar_t wc)
 {
   return fputwc (wc, stdout);
 }
 
 int
-putwchar_unlocked (wint_t wc)
+putwchar_unlocked (wchar_t wc)
 {
   return fputwc_unlocked (wc, stdout);
 }
