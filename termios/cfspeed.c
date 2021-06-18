@@ -1,4 +1,4 @@
-/* termios.c -- This file is part of OS/0 libc.
+/* cfspeed.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <sys/ioctl.h>
 #include <errno.h>
 #include <termios.h>
 
@@ -80,32 +79,4 @@ cfsetspeed (struct termios *tp, speed_t speed)
   tp->c_cflag &= ~(CBAUD | CBAUDEX);
   tp->c_cflag |= speed;
   return 0;
-}
-
-int
-tcgetattr (int fd, struct termios *tp)
-{
-  return ioctl (fd, TCGETS, tp);
-}
-
-int
-tcsetattr (int fd, int optacts, const struct termios *tp)
-{
-  unsigned long req;
-  switch (optacts)
-    {
-    case TCSANOW:
-      req = TCSETS;
-      break;
-    case TCSADRAIN:
-      req = TCSETSW;
-      break;
-    case TCSAFLUSH:
-      req = TCSETSF;
-      break;
-    default:
-      errno = EINVAL;
-      return -1;
-    }
-  return ioctl (fd, req, tp);
 }

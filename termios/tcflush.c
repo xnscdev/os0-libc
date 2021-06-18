@@ -1,4 +1,4 @@
-/* termios.h -- This file is part of OS/0 libc.
+/* tcflush.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,27 +14,17 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _TERMIOS_H
-#define _TERMIOS_H
+#include <sys/ioctl.h>
+#include <termios.h>
 
-#include <bits/termios.h>
-#include <sys/cdefs.h>
+int
+tcdrain (int fd)
+{
+  return 0;
+}
 
-__BEGIN_DECLS
-
-speed_t cfgetispeed (const struct termios *tp);
-speed_t cfgetospeed (const struct termios *tp);
-void cfmakeraw (struct termios *tp);
-int cfsetispeed (struct termios *tp, speed_t speed);
-int cfsetospeed (struct termios *tp, speed_t speed);
-int cfsetspeed (struct termios *tp, speed_t speed);
-
-int tcgetattr (int fd, struct termios *tp);
-int tcsetattr (int fd, int optacts, const struct termios *tp);
-
-int tcdrain (int fd);
-int tcflush (int fd, int action);
-
-__END_DECLS
-
-#endif
+int
+tcflush (int fd, int action)
+{
+  return ioctl (fd, TCFLSH, action);
+}
