@@ -1,4 +1,4 @@
-/* strtol.c -- This file is part of OS/0 libc.
+/* strtod.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,26 +17,20 @@
 #include <stdlib.h>
 #include <strtol.h>
 
-long
-strtol (const char *__restrict str, char **__restrict end, int base)
+double
+strtod (const char *__restrict str, char **__restrict end)
 {
-  return __strtol (str, end, base, 0);
+  return strtod_l (str, end, __libc_locale);
 }
 
-unsigned long
-strtoul (const char *__restrict str, char **__restrict end, int base)
+float
+strtof (const char *__restrict str, char **__restrict end)
 {
-  return __strtoul (str, end, base, 0);
+  return strtof_l (str, end, __libc_locale);
 }
 
-long long
-strtoll (const char *__restrict str, char **__restrict end, int base)
+long double
+strtold (const char *__restrict str, char **__restrict end)
 {
-  return strtoll_l (str, end, base, __libc_locale);
-}
-
-unsigned long long
-strtoull (const char *__restrict str, char **__restrict end, int base)
-{
-  return strtoull_l (str, end, base, __libc_locale);
+  return strtold_l (str, end, __libc_locale);
 }

@@ -16,7 +16,6 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <libc-locale.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>

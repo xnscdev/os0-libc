@@ -56,6 +56,11 @@ unsigned long long __strtoull_l (const char *__restrict str,
 				 char **__restrict end, int base,
 				 int group, locale_t loc) __hidden;
 
+#define __strtold(str, end, group)		\
+  __strtold_l (str, end, group, __libc_locale)
+long double __strtold_l (const char *__restrict str, char **__restrict end,
+			 int group, locale_t loc) __hidden;
+
 __END_DECLS
 
 #endif

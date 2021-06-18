@@ -73,6 +73,16 @@ unsigned long long strtoull (const char *__restrict str, char **__restrict end,
 unsigned long long strtoull_l (const char *__restrict str,
 			       char **__restrict end, int base, locale_t loc);
 
+double strtod (const char *__restrict str, char **__restrict end);
+double strtod_l (const char *__restrict str, char **__restrict end,
+		 locale_t loc);
+float strtof (const char *__restrict str, char **__restrict end);
+float strtof_l (const char *__restrict str, char **__restrict end,
+		locale_t loc);
+long double strtold (const char *__restrict str, char **__restrict end);
+long double strtold_l (const char *__restrict str, char **__restrict end,
+		       locale_t loc);
+
 int mbtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len);
 int wctomb (char *str, wchar_t wc);
 

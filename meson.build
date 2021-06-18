@@ -103,6 +103,8 @@ libc_src = [
   'string/strerror.c',
   'string/string.c',
   'string/strstr.c',
+  'string/strtod.c',
+  'string/strtod_l.c',
   'string/strtok.c',
   'string/strtol.c',
   'string/strtol_l.c',
