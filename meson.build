@@ -63,6 +63,7 @@ libc_src = [
   'stdio/scanf.c',
   'stdio/setvbuf.c',
   'stdio/stdstr.c',
+  'stdio/tmpnam.c',
   'stdio/vscanf.c',
   'stdlib/abort.c',
   'stdlib/assert.c',

@@ -26,6 +26,13 @@
 
 #define BUFSIZ 512
 
+/* tmpnam(3) macros */
+#define TMP_MAX  1000000
+#define P_tmpdir "/tmp"
+#define L_tmpnam 20
+
+/* Stream buffering modes */
+
 #define _IONBF 0
 #define _IOLBF 1
 #define _IOFBF 2
@@ -175,6 +182,9 @@ ssize_t getdelim (char **__restrict line, size_t *__restrict len, int delim,
 		  FILE *__restrict stream);
 ssize_t getline (char **__restrict line, size_t *__restrict len,
 		 FILE *__restrict stream);
+
+char *tmpnam (char *str);
+char *tmpnam_r (char *str);
 
 __END_DECLS
 
