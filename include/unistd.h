@@ -59,6 +59,8 @@ int execve (const char *path, char *const *argv, char *const *envp);
 void _exit (int code) __attribute__ ((noreturn));
 
 int isatty (int fd);
+char *ttyname (int fd);
+int ttyname_r (int fd, char *buffer, size_t len);
 
 int chdir (const char *path);
 int fchdir (int fd);
@@ -121,6 +123,7 @@ ssize_t readlinkat (int fd, const char *__restrict path,
 int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
 
+unsigned int sleep (unsigned int seconds);
 unsigned int alarm (unsigned int seconds);
 int pause (void);
 

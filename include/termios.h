@@ -19,6 +19,7 @@
 
 #include <bits/termios.h>
 #include <sys/cdefs.h>
+#include <sys/types.h>
 
 __BEGIN_DECLS
 
@@ -34,6 +35,9 @@ int tcsetattr (int fd, int optacts, const struct termios *tp);
 
 int tcdrain (int fd);
 int tcflush (int fd, int action);
+
+pid_t tcgetpgrp (int fd);
+int tcsetpgrp (int fd, pid_t pgid);
 
 __END_DECLS
 

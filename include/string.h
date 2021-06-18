@@ -48,6 +48,7 @@ char *strcat (char *__restrict a, const char *__restrict b);
 char *strncat (char *__restrict a, const char *__restrict b, size_t len);
 size_t strspn (const char *str, const char *accept);
 size_t strcspn (const char *str, const char *reject);
+char *strpbrk (const char *str, const char *accept);
 
 char *strtok (char *__restrict s, const char *__restrict delims);
 char *strtok_r (char *__restrict s, const char *__restrict delims,
