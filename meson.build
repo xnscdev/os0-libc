@@ -146,6 +146,7 @@ libc_src = [
   'syscall/signal.S',
   'syscall/signal.c',
   'syscall/stat.c',
+  'syscall/statfs.c',
   'syscall/symlink.c',
   'syscall/syscall.S',
   'syscall/time.c',

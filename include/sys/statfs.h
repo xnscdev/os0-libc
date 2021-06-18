@@ -1,4 +1,4 @@
-/* dirent.h -- This file is part of OS/0 libc.
+/* statfs.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,30 +14,16 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _DIRENT_H
-#define _DIRENT_H
+#ifndef _SYS_STATFS_H
+#define _SYS_STATFS_H
 
-#include <bits/dirent.h>
+#include <bits/statfs.h>
 #include <sys/cdefs.h>
-#include <stddef.h>
-
-typedef struct
-{
-  int _fd;
-  int _close;
-} DIR;
 
 __BEGIN_DECLS
 
-int closedir (DIR *dir);
-DIR *opendir (const char *path);
-DIR *fdopendir (int fd);
-struct dirent *readdir (DIR *dir);
-int readdir_r (DIR *__restrict dir, struct dirent *__restrict entry,
-	       struct dirent **__restrict saveptr);
-void rewinddir (DIR *dir);
-void seekdir (DIR *dir, long pos);
-long telldir (DIR *dir);
+int statfs (const char *path, struct statfs *st);
+int fstatfs (int fd, struct statfs *st);
 
 __END_DECLS
 

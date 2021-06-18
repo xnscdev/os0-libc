@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/syscall.h>
 #include <branch.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -27,7 +28,11 @@ static struct dirent *__libc_readdir_saveptr;
 int
 closedir (DIR *dir)
 {
-  free (dir->_data);
+  if (dir->_close)
+    {
+      if (close (dir->_fd) == -1)
+	return -1;
+    }
   free (dir);
   return 0;
 }
@@ -46,10 +51,18 @@ opendir (const char *path)
       return NULL;
     }
   dir->_fd = fd;
-  dir->_count = 0;
-  dir->_offset = 0;
-  dir->_block = 0;
-  dir->_data = NULL;
+  dir->_close = 1;
+  return dir;
+}
+
+DIR *
+fdopendir (int fd)
+{
+  DIR *dir = malloc (sizeof (DIR));
+  if (unlikely (dir == NULL))
+    return NULL;
+  dir->_fd = fd;
+  dir->_close = 0;
   return dir;
 }
 
@@ -65,25 +78,30 @@ int
 readdir_r (DIR *__restrict dir, struct dirent *__restrict entry,
 	   struct dirent **__restrict saveptr)
 {
-  errno = ENOSYS;
-  return -1;
+  int ret = syscall (SYS_getdents, dir->_fd, entry, 1);
+  if (ret == -1)
+    {
+      *saveptr = NULL;
+      return -1;
+    }
+  *saveptr = entry;
+  return 0;
 }
 
 void
 rewinddir (DIR *dir)
 {
-  dir->_offset = 0;
-  dir->_block = 0;
+  lseek (dir->_fd, 0, SEEK_SET);
 }
 
 void
 seekdir (DIR *dir, long pos)
 {
-  dir->_offset = pos;
+  lseek (dir->_fd, pos, SEEK_SET);
 }
 
 long
 telldir (DIR *dir)
 {
-  return dir->_offset;
+  return lseek (dir->_fd, 0, SEEK_CUR);
 }
