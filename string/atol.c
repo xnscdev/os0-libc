@@ -33,3 +33,9 @@ atoll (const char *str)
 {
   return strtoll (str, NULL, 10);
 }
+
+double
+atof (const char *str)
+{
+  return strtod (str, NULL);
+}

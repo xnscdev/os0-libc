@@ -59,6 +59,7 @@ imaxdiv_t imaxdiv (intmax_t num, intmax_t denom);
 int atoi (const char *str);
 long atol (const char *str);
 long long atoll (const char *str);
+double atof (const char *str);
 
 long strtol (const char *__restrict str, char **__restrict end, int base);
 long strtol_l (const char *__restrict str, char **__restrict end, int base,
