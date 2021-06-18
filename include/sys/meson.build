@@ -1,6 +1,7 @@
 install_headers('ioctl.h',
 		'resource.h',
 		'stat.h',
+		'statfs.h',
 		'statvfs.h',
 		'syscall.h',
 		'time.h',

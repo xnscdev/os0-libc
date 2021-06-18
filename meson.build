@@ -91,6 +91,7 @@ libc_src = [
   'stdlib/sigset.c',
   'stdlib/sigsetjmp.S',
   'stdlib/sleep.c',
+  'stdlib/statvfs.c',
   'stdlib/stdmath.c',
   'stdlib/sysconf.c',
   'stdlib/system.c',
