@@ -258,11 +258,14 @@ get_argument (struct arguments *ar, va_list *args, unsigned long pos)
 }
 
 static int
-handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
-		      va_list *args, unsigned long pos)
+handle_fscanf_string (FILE *stream, int flags, int lenmod, unsigned long width,
+		      struct arguments *ar, va_list *args, unsigned long pos,
+		      int charmode)
 {
   size_t bufsize = STRBUF_START_SIZE;
   size_t count = 0;
+  if (charmode && width == 0)
+    width = 1;
   if (lenmod == LEN_LONG)
     {
       /* %ls: use wide characters */
@@ -290,7 +293,7 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
       while (1)
 	{
 	  wc = fgetwc_unlocked (stream);
-	  if (wc == WEOF || iswspace (wc))
+	  if (wc == WEOF || iswspace (wc) || count == width)
 	    break;
 	  if (!(flags & NOASSIGN))
 	    {
@@ -313,7 +316,8 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
       __ungetwc_unlocked (wc, stream);
       if (!(flags & NOASSIGN))
 	{
-	  buffer[count] = '\0';
+	  if (!charmode)
+	    buffer[count] = '\0';
 	  if (flags & MALLOC)
 	    *((wchar_t **) get_argument (ar, args, pos)) = buffer;
 	  return 1;
@@ -346,7 +350,7 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
       while (1)
 	{
 	  c = fgetc_unlocked (stream);
-	  if (c == EOF || isspace (c))
+	  if (c == EOF || isspace (c) || count == width)
 	    break;
 	  if (!(flags & NOASSIGN))
 	    {
@@ -369,7 +373,8 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
       __ungetc_unlocked (c, stream);
       if (!(flags & NOASSIGN))
 	{
-	  buffer[count] = '\0';
+	  if (!charmode)
+	    buffer[count] = '\0';
 	  if (flags & MALLOC)
 	    *((char **) get_argument (ar, args, pos)) = buffer;
 	  return 1;
@@ -467,8 +472,17 @@ vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 		break;
 	      }
 	    case 's':
-	      DO_OR_RETURN (handle_fscanf_string (stream, flags, lenmod, &ar,
-						  &args, argpos));
+	    case 'c':
+	      DO_OR_RETURN (handle_fscanf_string (stream, flags, lenmod,
+						  max_field_width, &ar, &args,
+						  argpos, *fmt == 'c'));
+	      break;
+	    case 'S':
+	    case 'C':
+	      /* Synonyms for %ls and %lc */
+	      DO_OR_RETURN (handle_fscanf_string (stream, flags, LEN_LONG,
+						  max_field_width, &ar, &args,
+						  argpos, *fmt == 'C'));
 	      break;
 	    default:
 	      goto end;
