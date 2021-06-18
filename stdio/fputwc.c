@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <libc-locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stream.h>
@@ -24,7 +25,7 @@
 wint_t
 fputwc (wchar_t wc, FILE *stream)
 {
-  int ret;
+  wint_t ret;
   flockfile (stream);
   ret = fputwc_unlocked (wc, stream);
   funlockfile (stream);
@@ -35,7 +36,9 @@ wint_t
 fputwc_unlocked (wchar_t wc, FILE *stream)
 {
   char buffer[MB_CUR_MAX];
-  size_t len = wctomb (buffer, wc);
+  size_t len;
+  memset (&__libc_mbstate, 0, sizeof (mbstate_t));
+  len = wctomb (buffer, wc);
   if (len == (size_t) -1)
     return WEOF;
   if ((stream->_flags & __IO_buf_mask) == _IONBF)

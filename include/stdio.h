@@ -75,7 +75,6 @@ int fputc_unlocked (int c, FILE *stream);
 #define putc_unlocked(c, stream) fputc_unlocked (c, stream)
 int putchar (int c);
 int putchar_unlocked (int c);
-int ungetc (int c, FILE *stream);
 
 wint_t fputwc (wchar_t wc, FILE *stream);
 wint_t fputwc_unlocked (wchar_t wc, FILE *stream);
@@ -102,6 +101,15 @@ int fgetc_unlocked (FILE *stream);
 #define getc_unlocked(stream) fgetc_unlocked (stream)
 int getchar (void);
 int getchar_unlocked (void);
+int ungetc (int c, FILE *stream);
+
+wint_t fgetwc (FILE *stream);
+wint_t fgetwc_unlocked (FILE *stream);
+#define getwc(stream) fgetwc (stream)
+#define getwc_unlocked(stream) fgetwc_unlocked (stream)
+wint_t getwchar (void);
+wint_t getwchar_unlocked (void);
+wint_t ungetwc (wint_t wc, FILE *stream);
 
 char *fgets (char *__restrict str, int size, FILE *__restrict stream);
 char *fgets_unlocked (char *__restrict str, int size, FILE *__restrict stream);

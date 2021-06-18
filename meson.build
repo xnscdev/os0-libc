@@ -46,6 +46,7 @@ libc_src = [
   'stdio/fflush.c',
   'stdio/fgetc.c',
   'stdio/fgets.c',
+  'stdio/fgetwc.c',
   'stdio/fio.c',
   'stdio/flockfile.c',
   'stdio/fopen.c',
@@ -143,6 +144,7 @@ libc_src = [
   'syscall/unlink.c',
   'syscall/wait.c',
   'syscall/xattr.c',
+  'wchar/mbrtowc.c',
   'wchar/wcrtomb.c',
   'wchar/wctype.c'
 ]
