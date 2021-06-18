@@ -37,7 +37,7 @@ struct tm;
 __BEGIN_DECLS
 
 wint_t btowc (int c);
-int wctob (wint_t c);
+int wctob (wint_t wc);
 
 size_t mblen (const char *str, size_t len);
 size_t mbrlen (const char *__restrict str, size_t len,

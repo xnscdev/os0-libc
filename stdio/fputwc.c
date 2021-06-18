@@ -35,7 +35,7 @@ fputwc (wchar_t wc, FILE *stream)
 wint_t
 fputwc_unlocked (wchar_t wc, FILE *stream)
 {
-  char buffer[MB_CUR_MAX];
+  char buffer[MB_LEN_MAX];
   size_t len;
   memset (&__libc_mbstate, 0, sizeof (mbstate_t));
   len = wctomb (buffer, wc);

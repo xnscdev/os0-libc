@@ -62,7 +62,7 @@ fgetwc (FILE *stream)
 wint_t
 fgetwc_unlocked (FILE *stream)
 {
-  char buffer[MB_CUR_MAX];
+  char buffer[MB_LEN_MAX];
   wint_t wc;
   size_t n;
   if (feof (stream) || ferror (stream))

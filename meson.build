@@ -144,8 +144,10 @@ libc_src = [
   'syscall/unlink.c',
   'syscall/wait.c',
   'syscall/xattr.c',
+  'wchar/btowc.c',
   'wchar/mbrtowc.c',
   'wchar/wcrtomb.c',
+  'wchar/wctob.c',
   'wchar/wctype.c'
 ]
 
