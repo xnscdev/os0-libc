@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stream.h>
 #include <strtol.h>
+#include <wchar.h>
 
 #define STRBUF_START_SIZE 16
 
@@ -262,57 +263,117 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, struct arguments *ar,
 {
   size_t bufsize = STRBUF_START_SIZE;
   size_t count = 0;
-  char *buffer;
-  char c;
-  if (!(flags & NOASSIGN))
+  if (lenmod == LEN_LONG)
     {
-      if (flags & MALLOC)
-	{
-	  buffer = malloc (bufsize);
-	  if (unlikely (buffer == NULL))
-	    {
-	      errno = ENOMEM;
-	      return -1;
-	    }
-	}
-      else
-	buffer = get_argument (ar, args, pos);
-    }
-  if (pull_leading_whitespace (stream, __libc_locale) != 0)
-    {
-      free (buffer);
-      return -1;
-    }
-  while (1)
-    {
-      c = fgetc_unlocked (stream);
-      if (c == EOF || isspace (c))
-	break;
+      /* %ls: use wide characters */
+      wchar_t *buffer;
+      wchar_t wc;
       if (!(flags & NOASSIGN))
 	{
-	  buffer[count++] = c;
-	  if ((flags & MALLOC) && count == bufsize)
+	  if (flags & MALLOC)
 	    {
-	      char *temp;
-	      bufsize *= 2;
-	      temp = realloc (buffer, bufsize);
-	      if (unlikely (temp == NULL))
+	      buffer = malloc (sizeof (wchar_t) * bufsize);
+	      if (unlikely (buffer == NULL))
 		{
 		  errno = ENOMEM;
-		  free (buffer);
 		  return -1;
 		}
-	      buffer = temp;
+	    }
+	  else
+	    buffer = get_argument (ar, args, pos);
+	}
+      if (pull_leading_whitespace (stream, __libc_locale) != 0)
+	{
+	  free (buffer);
+	  return -1;
+	}
+      while (1)
+	{
+	  wc = fgetwc_unlocked (stream);
+	  if (wc == WEOF || iswspace (wc))
+	    break;
+	  if (!(flags & NOASSIGN))
+	    {
+	      buffer[count++] = wc;
+	      if ((flags & MALLOC) && count == bufsize)
+		{
+		  wchar_t *temp;
+		  bufsize *= 2;
+		  temp = realloc (buffer, sizeof (wchar_t) * bufsize);
+		  if (unlikely (temp == NULL))
+		    {
+		      errno = ENOMEM;
+		      free (buffer);
+		      return -1;
+		    }
+		  buffer = temp;
+		}
 	    }
 	}
+      __ungetwc_unlocked (wc, stream);
+      if (!(flags & NOASSIGN))
+	{
+	  buffer[count] = '\0';
+	  if (flags & MALLOC)
+	    *((wchar_t **) get_argument (ar, args, pos)) = buffer;
+	  return 1;
+	}
     }
-  __ungetc_unlocked (c, stream);
-  if (!(flags & NOASSIGN))
+  else
     {
-      buffer[count] = '\0';
-      if (flags & MALLOC)
-	*((char **) get_argument (ar, args, pos)) = buffer;
-      return 1;
+      /* %s: use byte characters */
+      char *buffer;
+      char c;
+      if (!(flags & NOASSIGN))
+	{
+	  if (flags & MALLOC)
+	    {
+	      buffer = malloc (bufsize);
+	      if (unlikely (buffer == NULL))
+		{
+		  errno = ENOMEM;
+		  return -1;
+		}
+	    }
+	  else
+	    buffer = get_argument (ar, args, pos);
+	}
+      if (pull_leading_whitespace (stream, __libc_locale) != 0)
+	{
+	  free (buffer);
+	  return -1;
+	}
+      while (1)
+	{
+	  c = fgetc_unlocked (stream);
+	  if (c == EOF || isspace (c))
+	    break;
+	  if (!(flags & NOASSIGN))
+	    {
+	      buffer[count++] = c;
+	      if ((flags & MALLOC) && count == bufsize)
+		{
+		  char *temp;
+		  bufsize *= 2;
+		  temp = realloc (buffer, bufsize);
+		  if (unlikely (temp == NULL))
+		    {
+		      errno = ENOMEM;
+		      free (buffer);
+		      return -1;
+		    }
+		  buffer = temp;
+		}
+	    }
+	}
+      __ungetc_unlocked (c, stream);
+      if (!(flags & NOASSIGN))
+	{
+	  buffer[count] = '\0';
+	  if (flags & MALLOC)
+	    *((char **) get_argument (ar, args, pos)) = buffer;
+	  return 1;
+	}
     }
   return 0;
 }
