@@ -48,6 +48,8 @@ int atexit (void (*func) (void));
 void exit (int code) __attribute__ ((noreturn));
 void abort (void) __attribute__ ((noreturn));
 
+int system (const char *cmd);
+
 int abs (int n);
 div_t div (int num, int denom);
 ldiv_t ldiv (long num, long denom);
