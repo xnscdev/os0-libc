@@ -130,6 +130,26 @@ asctime_r (const struct tm *__restrict tp, char *__restrict buffer)
   return buffer;
 }
 
+char *
+ctime (const time_t *time)
+{
+  return ctime_r (time, __time_buf);
+}
+
+char *
+ctime_r (const time_t *__restrict time, char *__restrict buffer)
+{
+  struct tm tp;
+  localtime_r (time, &tp);
+  return asctime_r (&tp, buffer);
+}
+
+double
+difftime (time_t a, time_t b)
+{
+  return a > b ? a - b : b - a;
+}
+
 struct tm *
 gmtime (const time_t *time)
 {
@@ -143,6 +163,21 @@ gmtime_r (const time_t *__restrict time, struct tm *__restrict tp)
     return NULL;
   tp->tm_isdst = 0;
   return tp;
+}
+
+/* For now we only support UTC local time
+   TODO Support local time */
+
+struct tm *
+localtime (const time_t *time)
+{
+  return gmtime (time);
+}
+
+struct tm *
+localtime_r (const time_t *__restrict time, struct tm *__restrict tp)
+{
+  return gmtime_r (time, tp);
 }
 
 unsigned int

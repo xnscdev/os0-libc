@@ -49,6 +49,7 @@ int setpgrp (void);
 
 char *getcwd (char *buffer, size_t len);
 char *getwd (char *buffer);
+char *getlogin (void);
 
 int execl (const char *path, const char *arg0, ...);
 int execle (const char *path, const char *arg0, ...);

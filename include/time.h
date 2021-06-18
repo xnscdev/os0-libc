@@ -26,8 +26,18 @@ extern char *tzname[2];
 
 char *asctime (const struct tm *tp);
 char *asctime_r (const struct tm *__restrict tp, char *__restrict buffer);
+char *ctime (const time_t *time);
+char *ctime_r (const time_t *__restrict time, char *__restrict buffer);
+double difftime (time_t a, time_t b);
 struct tm *gmtime (const time_t *time);
 struct tm *gmtime_r (const time_t *__restrict time, struct tm *__restrict tp);
+struct tm *localtime (const time_t *time);
+struct tm *localtime_r (const time_t *__restrict time,
+			struct tm *__restrict tp);
+time_t timegm (struct tm *tp);
+time_t timelocal (struct tm *tp);
+#define mktime(tp) timelocal (tp)
+
 time_t time (time_t *t);
 
 int nanosleep (const struct timespec *req, struct timespec *rem);

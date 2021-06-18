@@ -79,6 +79,7 @@ libc_src = [
   'stdlib/init.c',
   'stdlib/isatty.c',
   'stdlib/locks.c',
+  'stdlib/login.c',
   'stdlib/longjmp.S',
   'stdlib/lsearch.c',
   'stdlib/malloc.c',
