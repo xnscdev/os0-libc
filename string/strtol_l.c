@@ -112,7 +112,8 @@ __strtox_get_grouping (int group, locale_t loc)
 
 long long
 __strtox_l (const char *__restrict str, char **__restrict end, int base,
-	    int group, long long min, long long max, locale_t loc)
+	    int group, unsigned long width, long long min, long long max,
+	    locale_t loc)
 {
   long long value = 0;
   int sign = 0;
@@ -123,6 +124,7 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
   const char *sep;
   char *sepseq = loc->__lconv.thousands_sep;
   size_t seplen = strlen (sepseq);
+  unsigned long count = 0;
   int i;
   str = __get_base (str, &sign, &base, loc);
 
@@ -132,8 +134,12 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
   for (; *str != '\0'; str++)
     {
       int b;
+      if (width > 0 && count >= width)
+	goto finish;
       if (seplen > 0 && strncmp (str, sepseq, seplen) == 0)
 	{
+	  if (width > 0 && count + seplen > width)
+	    goto finish;
 	  if (!groups)
 	    goto finish;
 	  str += seplen;
@@ -158,6 +164,7 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 	  currlen = 0;
 	  grouplen = __strtox_get_grouping (groups--, loc);
 	  sep = str;
+	  count += seplen;
 	}
       b = __strtox_baseval (*str, base, loc);
       if (b == -1)
@@ -183,6 +190,7 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 	  temp += b;
 	  currlen++;
 	}
+      count++;
     }
 
  finish:
@@ -208,7 +216,8 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
 
 unsigned long long
 __strtoux_l (const char *__restrict str, char **__restrict end, int base,
-	     int group, unsigned long long max, locale_t loc)
+	     int group, unsigned long width, unsigned long long max,
+	     locale_t loc)
 {
   unsigned long long value = 0;
   int sign = 0;
@@ -219,6 +228,7 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
   const char *sep;
   char *sepseq = loc->__lconv.thousands_sep;
   size_t seplen = strlen (sepseq);
+  unsigned long count = 0;
   int i;
   str = __get_base (str, &sign, &base, loc);
 
@@ -228,8 +238,12 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
   for (; *str != '\0'; str++)
     {
       int b;
+      if (width > 0 && count >= width)
+	goto finish;
       if (seplen > 0 && strncmp (str, sepseq, seplen) == 0)
 	{
+	  if (width > 0 && count + seplen > width)
+	    goto finish;
 	  if (!groups)
 	    goto finish;
 	  str += seplen;
@@ -254,6 +268,7 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 	  currlen = 0;
 	  grouplen = __strtox_get_grouping (groups--, loc);
 	  sep = str;
+	  count += seplen;
 	}
       b = __strtox_baseval (*str, base, loc);
       if (b == -1)
@@ -279,6 +294,7 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 	  temp += b;
 	  currlen++;
 	}
+      count++;
     }
 
  finish:
@@ -303,57 +319,29 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
 }
 
 long
-__strtol_l (const char *__restrict str, char **__restrict end, int base,
-	    int group, locale_t loc)
-{
-  return __strtox_l (str, end, base, group, LONG_MIN, LONG_MAX, loc);
-}
-
-unsigned long
-__strtoul_l (const char *__restrict str, char **__restrict end, int base,
-	     int group, locale_t loc)
-{
-  return __strtoux_l (str, end, base, group, ULONG_MAX, loc);
-}
-
-long long
-__strtoll_l (const char *__restrict str, char **__restrict end, int base,
-	     int group, locale_t loc)
-{
-  return __strtox_l (str, end, base, group, LLONG_MIN, LLONG_MAX, loc);
-}
-
-unsigned long long
-__strtoull_l (const char *__restrict str, char **__restrict end, int base,
-	      int group, locale_t loc)
-{
-  return __strtoux_l (str, end, base, group, ULLONG_MAX, loc);
-}
-
-long
 strtol_l (const char *__restrict str, char **__restrict end, int base,
 	  locale_t loc)
 {
-  return __strtol_l (str, end, base, 0, loc);
+  return __strtox_l (str, end, base, 0, 0, LONG_MIN, LONG_MAX, loc);
 }
 
 unsigned long
 strtoul_l (const char *__restrict str, char **__restrict end, int base,
 	   locale_t loc)
 {
-  return __strtoul_l (str, end, base, 0, loc);
+  return __strtoux_l (str, end, base, 0, 0, ULONG_MAX, loc);
 }
 
 long long
 strtoll_l (const char *__restrict str, char **__restrict end, int base,
 	   locale_t loc)
 {
-  return __strtoll_l (str, end, base, 0, loc);
+  return __strtox_l (str, end, base, 0, 0, LLONG_MIN, LLONG_MAX, loc);
 }
 
 unsigned long long
 strtoull_l (const char *__restrict str, char **__restrict end, int base,
 	    locale_t loc)
 {
-  return __strtoull_l (str, end, base, 0, loc);
+  return __strtoux_l (str, end, base, 0, 0, ULLONG_MAX, loc);
 }

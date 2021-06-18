@@ -125,7 +125,7 @@ __fstrtox_l (FILE *__restrict stream, int *good, int base, int group,
 
  end:
   *ptr = '\0';
-  ret = __strtox_l (buffer, &end, base, group, min, max, loc);
+  ret = __strtox_l (buffer, &end, base, group, 0, min, max, loc);
   *good = *end == '\0';
   free (buffer);
   return ret;
@@ -217,7 +217,7 @@ __fstrtoux_l (FILE *__restrict stream, int *good, int base, int group,
 
  end:
   *ptr = '\0';
-  ret = __strtoux_l (buffer, &end, base, group, max, loc);
+  ret = __strtoux_l (buffer, &end, base, group, 0, max, loc);
   *good = *end == '\0';
   free (buffer);
   return ret;

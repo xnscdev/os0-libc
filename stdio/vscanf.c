@@ -320,7 +320,6 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, unsigned long width,
 	    buffer[count] = '\0';
 	  if (flags & MALLOC)
 	    *((wchar_t **) get_argument (ar, args, pos)) = buffer;
-	  return 1;
 	}
     }
   else
@@ -377,10 +376,67 @@ handle_fscanf_string (FILE *stream, int flags, int lenmod, unsigned long width,
 	    buffer[count] = '\0';
 	  if (flags & MALLOC)
 	    *((char **) get_argument (ar, args, pos)) = buffer;
-	  return 1;
 	}
     }
   return 0;
+}
+
+static const char *
+handle_sscanf_string (const char *str, int flags, int lenmod,
+		      unsigned long width, struct arguments *ar, va_list *args,
+		      unsigned long pos, int charmode)
+{
+  size_t bufsize = STRBUF_START_SIZE;
+  size_t count = 0;
+  char *buffer;
+  /* Only support byte characters in non-wide sscanf */
+  if (charmode && width == 0)
+    width = 1;
+  if (!(flags & NOASSIGN))
+    {
+      if (flags & MALLOC)
+	{
+	  buffer = malloc (bufsize);
+	  if (unlikely (buffer == NULL))
+	    {
+	      errno = ENOMEM;
+	      return NULL;
+	    }
+	}
+      else
+	buffer = get_argument (ar, args, pos);
+    }
+  while (isspace (*str))
+    str++;
+  while (*str != '\0' && !isspace (*str) && count < width)
+    {
+      if (!(flags & NOASSIGN))
+	{
+	  buffer[count++] = *str;
+	  if ((flags & MALLOC) && count == bufsize)
+	    {
+	      char *temp;
+	      bufsize *= 2;
+	      temp = realloc (buffer, bufsize);
+	      if (unlikely (temp == NULL))
+		{
+		  errno = ENOMEM;
+		  free (buffer);
+		  return NULL;
+		}
+	      buffer = temp;
+	    }
+	}
+      str++;
+    }
+  if (!(flags & NOASSIGN))
+    {
+      if (!charmode)
+	buffer[count] = '\0';
+      if (flags & MALLOC)
+	*((char **) get_argument (ar, args, pos)) = buffer;
+    }
+  return str;
 }
 
 int
@@ -507,5 +563,115 @@ vfscanf (FILE *__restrict stream, const char *__restrict fmt, va_list args)
 int
 vsscanf (const char *__restrict str, const char *__restrict fmt, va_list args)
 {
-  return -1;
+  struct arguments ar;
+  int amt = 0;
+  ar.args = NULL;
+  ar.len = 0;
+  ar.curr = 0;
+
+  while (*fmt != '\0')
+    {
+      char c;
+      if (isspace (*fmt))
+	{
+	  /* Whitespace character directive */
+	  while (isspace (*str))
+	    str++;
+	}
+      else if (*fmt == '%')
+	{
+	  int flags = 0;
+	  int lenmod = LEN_INT;
+	  unsigned long argpos = 0;
+	  unsigned long max_field_width;
+	  fmt++;
+
+	  /* Check for %% directive */
+	  if (*fmt == '%')
+	    {
+	      c = *str++;
+	      if (c != '%')
+		goto end;
+	      fmt++;
+	      continue;
+	    }
+
+	  /* Parse characters before conversion specifier */
+	  fmt = parse_preconvspec_chars (fmt, &flags, &argpos, &max_field_width,
+					 &lenmod);
+	  if (fmt == NULL)
+	    goto end;
+
+	  /* Read conversion specifier */
+	  switch (*fmt)
+	    {
+	    case 'd':
+	    case 'i':
+	      {
+		const char *endptr;
+	        long long value =
+		  __strtox_l (str, (char **) &endptr, (*fmt == 'd') * 10, 1,
+			      max_field_width, LLONG_MIN, LLONG_MAX,
+			      __libc_locale);
+		void *ptr;
+		str = endptr;
+		ptr = get_argument (&ar, &args, argpos);
+		if (!(flags & NOASSIGN))
+		  {
+		    truncate_assign_signed (value, lenmod, ptr);
+		    amt++;
+		  }
+		break;
+	      }
+	    case 'o':
+	    case 'u':
+	    case 'x':
+	      {
+		const char *endptr;
+		int base = *fmt == 'o' ? 8 : *fmt == 'u' ? 10 : 16;
+	        unsigned long long value =
+		  __strtoux_l (str, (char **) &endptr, base, 1, max_field_width,
+			       ULLONG_MAX, __libc_locale);
+		void *ptr;
+		str = endptr;
+		ptr = get_argument (&ar, &args, argpos);
+		if (!(flags & NOASSIGN))
+		  {
+		    truncate_assign_unsigned (value, lenmod, ptr);
+		    amt++;
+		  }
+		break;
+	      }
+	    case 's':
+	    case 'c':
+	      str = handle_sscanf_string (str, flags, lenmod, max_field_width,
+					  &ar, &args, argpos, *fmt == 'c');
+	      if (str == NULL)
+		goto end;
+	      break;
+	    case 'S':
+	    case 'C':
+	      /* Synonyms for %ls and %lc */
+	      str = handle_sscanf_string (str, flags, LEN_LONG, max_field_width,
+					  &ar, &args, argpos, *fmt == 'c');
+	      if (str == NULL)
+		goto end;
+	      break;
+	    default:
+	      goto end;
+	    }
+	}
+      else
+	{
+	  /* Ordinary character directive */
+	  c = *str++;
+	  if (c == '\0' || c != *fmt)
+	    goto end;
+	}
+      fmt++;
+    }
+
+ end:
+  free (ar.args);
+  return amt;
 }

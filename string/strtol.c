@@ -14,19 +14,19 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <libc-locale.h>
 #include <stdlib.h>
-#include <strtol.h>
 
 long
 strtol (const char *__restrict str, char **__restrict end, int base)
 {
-  return __strtol (str, end, base, 0);
+  return strtol_l (str, end, base, __libc_locale);
 }
 
 unsigned long
 strtoul (const char *__restrict str, char **__restrict end, int base)
 {
-  return __strtoul (str, end, base, 0);
+  return strtoul_l (str, end, base, __libc_locale);
 }
 
 long long
