@@ -41,7 +41,7 @@
 #define isspace_l(c, loc) iswspace_l (c, loc)
 #define isupper(c) iswupper (c)
 #define isupper_l(c, loc) iswupper_l (c, loc)
-#define isxdigit(c) isxdigit (c)
+#define isxdigit(c) iswxdigit (c)
 #define isxdigit_l(c, loc) iswxdigit_l (c, loc)
 
 #define tolower(c) towlower (c)

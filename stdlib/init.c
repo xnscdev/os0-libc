@@ -16,7 +16,7 @@
 
 #include <setup.h>
 
-__hidden void
+void
 __libc_init (void)
 {
   __libc_setup_env ();

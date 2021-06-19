@@ -179,15 +179,3 @@ localtime_r (const time_t *__restrict time, struct tm *__restrict tp)
 {
   return gmtime_r (time, tp);
 }
-
-unsigned int
-sleep (unsigned int seconds)
-{
-  struct timespec req;
-  struct timespec rem;
-  req.tv_sec = seconds;
-  req.tv_nsec = 0;
-  if (nanosleep (&req, &rem) == -1)
-    return rem.tv_sec;
-  return 0;
-}
