@@ -397,7 +397,7 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 #define FOOTERS 0
 #endif  /* FOOTERS */
 #ifndef ABORT
-#define ABORT  abort()
+#define ABORT
 #endif  /* ABORT */
 #ifndef ABORT_ON_ASSERT_FAILURE
 #define ABORT_ON_ASSERT_FAILURE 1
