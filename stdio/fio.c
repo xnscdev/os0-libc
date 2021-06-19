@@ -34,6 +34,13 @@ fread_unlocked (void *__restrict buffer, size_t size, size_t len,
 		FILE *__restrict stream)
 {
   size_t i;
+  if (size == 1 && len > 1)
+    {
+      /* Swap them for speed */
+      size_t temp = size;
+      size = len;
+      len = temp;
+    }
   for (i = 0; i < len; i++)
     {
       if (read (stream->_fd, buffer + i * size, size) == -1)
@@ -61,6 +68,13 @@ fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
 		 FILE *__restrict stream)
 {
   size_t i;
+  if (size == 1 && len > 1)
+    {
+      /* Swap them for speed */
+      size_t temp = size;
+      size = len;
+      len = temp;
+    }
   for (i = 0; i < len; i++)
     {
       size_t j;

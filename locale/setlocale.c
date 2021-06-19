@@ -177,6 +177,13 @@ setlocale (int category, const char *locale)
   if (category == LC_ALL)
     return __set_lc_all (locale);
 
+  if (locale == NULL)
+    {
+      strncpy (__libc_locale_buf, __libc_locale->__names[category],
+	       LOCALE_BUFFER_SIZE - 1);
+      __libc_locale_buf[LOCALE_BUFFER_SIZE - 1] = '\0';
+      return __libc_locale_buf;
+    }
   if (__set_locale (category, locale) == -1)
     return NULL;
 
