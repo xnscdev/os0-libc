@@ -168,12 +168,6 @@ libc_src = [
   'wchar/wctype.c'
 ]
 
-libm_src = [
-  'math/cos.S',
-  'math/sin.S',
-  'math/tan.S'
-]
-
 if get_option('shared')
   lib_targ = 'both_libraries'
 else
@@ -181,12 +175,11 @@ else
 endif
 lib_ldflags = ['-nostartfiles', '-nostdlib', '-lgcc']
 
-libc = build_target('c', libc_src, install: true, include_directories: libc_inc,
-		    target_type: lib_targ, version: '1', link_args: lib_ldflags)
+libc = build_target('c', libc_src, install: true,
+		    include_directories: libc_inc, target_type: lib_targ,
+		    version: '1', link_args: lib_ldflags)
 
 libc_dep = declare_dependency(include_directories: libc_inc, link_with: libc)
 
-build_target('m', libm_src, install: true, dependencies: libc_dep,
-	     target_type: lib_targ, version: '1', link_args: lib_ldflags)
-
+subdir('math')
 subdir('rt')

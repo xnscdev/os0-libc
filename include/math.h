@@ -21,17 +21,69 @@
 
 __BEGIN_DECLS
 
-double sin (double n);
-float sinf (float n);
-long double sinl (long double n);
+double acos (double x);
+double asin (double x);
+double atan (double x);
+double atan2 (double y, double x);
 
-double cos (double n);
-float cosf (float n);
-long double cosl (long double n);
+double acosh (double x);
+double asinh (double x);
+double atanh (double x);
 
-double tan (double n);
-float tanf (float n);
-long double tanl (long double n);
+double cos (double x);
+double sin (double x);
+double tan (double x);
+
+double cosh (double x);
+double sinh (double x);
+double tanh (double x);
+
+double exp (double x);
+double frexp (double x, int *exp);
+double ldexp (double x, int exp);
+
+double log (double x);
+double log10 (double x);
+double logb (double x);
+
+double modf (double x, double *iptr);
+double fmod (double x, double y);
+
+double pow (double x, double y);
+double sqrt (double x);
+double cbrt (double x);
+
+double ceil (double x);
+double fabs (double x);
+double floor (double x);
+
+double erf (double x);
+double erfc (double x);
+double gamma (double x);
+double lgamma (double x);
+double hypot (double x, double y);
+
+double isnan (double x);
+double finite (double x);
+
+double j0 (double x);
+double j1 (double x);
+double jn (int n, double x);
+double y0 (double x);
+double y1 (double x);
+double yn (int n, double x);
+
+double nextafter (double x, double y);
+double remainder (double x, double y);
+double scalb (double x, double exp);
+double scalbn (double x, int exp);
+double significand (double x);
+double copysign (double x, double y);
+double ilogb (double x);
+double rint (double x);
+
+double expm1 (double x);
+double log1p (double x);
 
 __END_DECLS
 
