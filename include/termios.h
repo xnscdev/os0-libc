@@ -35,6 +35,7 @@ int tcsetattr (int fd, int optacts, const struct termios *tp);
 
 int tcdrain (int fd);
 int tcflush (int fd, int action);
+int tcflow (int fd, int action);
 
 pid_t tcgetpgrp (int fd);
 int tcsetpgrp (int fd, pid_t pgid);

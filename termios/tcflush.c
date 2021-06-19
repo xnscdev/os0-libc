@@ -28,3 +28,9 @@ tcflush (int fd, int action)
 {
   return ioctl (fd, TCFLSH, action);
 }
+
+int
+tcflow (int fd, int action)
+{
+  return ioctl (fd, TCXONC, action);
+}
