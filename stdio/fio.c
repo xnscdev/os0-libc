@@ -36,10 +36,11 @@ fread_unlocked (void *__restrict buffer, size_t size, size_t len,
   size_t i;
   if (size == 1 && len > 1)
     {
-      /* Swap them for speed */
-      size_t temp = size;
-      size = len;
-      len = temp;
+      /* Read all elements at once for speed */
+      ssize_t ret = read (stream->_fd, buffer, len);
+      if (ret == -1)
+	stream->_flags |= __IO_err;
+      return ret;
     }
   for (i = 0; i < len; i++)
     {
@@ -67,21 +68,27 @@ size_t
 fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
 		 FILE *__restrict stream)
 {
+  const unsigned char *buf = buffer;
   size_t i;
   if (size == 1 && len > 1)
     {
-      /* Swap them for speed */
-      size_t temp = size;
-      size = len;
-      len = temp;
+      /* Write all elements at once for speed */
+      for (i = 0; i < len; i++)
+	{
+	  if (fputc (buf[i], stream) == EOF)
+	    {
+	      stream->_flags |= __IO_err;
+	      return i;
+	    }
+	}
+      return i;
     }
   for (i = 0; i < len; i++)
     {
       size_t j;
       for (j = 0; j < size; j++)
 	{
-	  unsigned char c = ((unsigned char *) buffer)[i * size + j];
-	  if (fputc (c, stream) == EOF)
+	  if (fputc (buf[i * size + j], stream) == EOF)
 	    {
 	      stream->_flags |= __IO_err;
 	      return i;
