@@ -158,7 +158,9 @@ typedef uint64_t uintmax_t;
 
 /* Maximum-width integer limits */
 
+#define INTMAX_MIN  INT64_MIN
 #define INTMAX_MAX  INT64_MAX
+#define UINTMAX_MIN UINT64_MIN
 #define UINTMAX_MAX UINT64_MAX
 
 /* Miscellaneous integer limits */
