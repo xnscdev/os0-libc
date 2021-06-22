@@ -17,6 +17,7 @@ if hostcpu == 'x86'
   libc_config.set('__UINT64_SUFFIX', 'ULL')
   libc_config.set('__INTPTR_T', 'int32_t')
   libc_config.set('__UINTPTR_T', 'uint32_t')
+  libc_config.set10('ARCH_I386', true)
 elif hostcpu == 'x86_64'
   libc_config.set('__INT32_T', 'int')
   libc_config.set('__UINT32_T', 'unsigned int')
@@ -28,9 +29,13 @@ elif hostcpu == 'x86_64'
   libc_config.set('__UINT64_SUFFIX', 'UL')
   libc_config.set('__INTPTR_T', 'int64_t')
   libc_config.set('__UINTPTR_T', 'uint64_t')
+  libc_config.set10('ARCH_X86_64', true)
 else
   error('Unsupported CPU type: ' + hostcpu)
 endif
+
+configure_file(input: 'config.h.in', output: 'config.h',
+	       configuration: libc_config)
 
 subdir('include')
 

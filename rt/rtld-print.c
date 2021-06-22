@@ -1,4 +1,4 @@
-/* rtld.c -- This file is part of OS/0 libc.
+/* rtld-print.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -15,14 +15,12 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
-#include <elf.h>
+#include <rtld.h>
 #include <stdint.h>
 #include <unistd.h>
 
-#define DIGITS \
+#define DIGITS								\
   "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"
-
-int __rtld_syscall (long num, ...) __hidden;
 
 static char *
 utoa (uintptr_t value, char *result, int base)
@@ -56,8 +54,8 @@ utoa (uintptr_t value, char *result, int base)
   return result;
 }
 
-static void
-print (const char *msg)
+void
+__rtld_print (const char *msg)
 {
   size_t len = 0;
   while (msg[len] != '\0')
@@ -65,20 +63,11 @@ print (const char *msg)
   __rtld_syscall (SYS_write, STDERR_FILENO, msg, len);
 }
 
-static void
-print_ptr (void *ptr)
+void
+__rtld_print_ptr (void *ptr)
 {
   char buffer[16];
-  print ("0x");
+  __rtld_print ("0x");
   utoa ((uintptr_t) ptr, buffer, 16);
-  print (buffer);
-}
-
-int
-__rtld_main (Elf32_Dyn *dyn_section)
-{
-  print ("Dynamic section address: ");
-  print_ptr (dyn_section);
-  print ("\n");
-  return 0;
+  __rtld_print (buffer);
 }
