@@ -14,12 +14,71 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/syscall.h>
 #include <elf.h>
-#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
+
+#define DIGITS \
+  "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"
+
+int __rtld_syscall (long num, ...) __hidden;
+
+static char *
+utoa (uintptr_t value, char *result, int base)
+{
+  char *ptr = result;
+  char *rev = result;
+  uintptr_t temp;
+  char c;
+
+  if (base < 2 || base > 36)
+    {
+      *result = '\0';
+      return result;
+    }
+
+  do
+    {
+      temp = value;
+      value /= base;
+      *ptr++ = DIGITS[35 + (temp - value * base)];
+    }
+  while (value != 0);
+
+  *ptr-- = '\0';
+  while (rev < ptr)
+    {
+      c = *ptr;
+      *ptr-- = *rev;
+      *rev++ = c;
+    }
+  return result;
+}
+
+static void
+print (const char *msg)
+{
+  size_t len = 0;
+  while (msg[len] != '\0')
+    len++;
+  __rtld_syscall (SYS_write, STDERR_FILENO, msg, len);
+}
+
+static void
+print_ptr (void *ptr)
+{
+  char buffer[16];
+  print ("0x");
+  utoa ((uintptr_t) ptr, buffer, 16);
+  print (buffer);
+}
 
 int
-rtld_main (Elf32_Dyn *dyn_section)
+__rtld_main (Elf32_Dyn *dyn_section)
 {
-  fprintf (stderr, "Dynamic section: %p\n", dyn_section);
+  print ("Dynamic section address: ");
+  print_ptr (dyn_section);
+  print ("\n");
   return 0;
 }
