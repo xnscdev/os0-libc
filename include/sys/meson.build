@@ -1,4 +1,5 @@
 install_headers('ioctl.h',
+		'mman.h',
 		'resource.h',
 		'stat.h',
 		'statfs.h',

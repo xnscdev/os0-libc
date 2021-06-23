@@ -143,6 +143,7 @@ libc_src = [
   'syscall/lseek.c',
   'syscall/mkdir.c',
   'syscall/mknod.c',
+  'syscall/mman.c',
   'syscall/nanosleep.c',
   'syscall/open.S',
   'syscall/pgid.c',
