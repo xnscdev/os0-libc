@@ -19,7 +19,9 @@
 
 #include <config.h>
 
+#include <bits/mman.h>
 #include <sys/cdefs.h>
+#include <sys/syscall.h>
 #include <elf.h>
 #include <stddef.h>
 
@@ -82,9 +84,17 @@ typedef struct
   PLTRelTable dl_pltrel;    /* Relocation table for PLT */
 } DynamicLinkInfo;
 
+#define mmap(addr, len, prot, flags, fd, offset)		\
+  __rtld_syscall (SYS_mmap, addr, len, prot, flags, fd, offset)
+#define munmap(addr, len) __rtld_syscall (SYS_munmap, addr, len)
+
 __BEGIN_DECLS
 
 int __rtld_load_dynamic (DynamicLinkInfo *dlinfo) __hidden;
+
+void *__rtld_memcpy (void *__restrict dest, const void *__restrict src,
+		     size_t len) __hidden;
+void *__rtld_memset (void *buffer, int c, size_t len) __hidden;
 
 void __rtld_print (const char *msg) __hidden;
 void __rtld_print_ptr (void *ptr) __hidden;

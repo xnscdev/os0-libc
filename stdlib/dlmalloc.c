@@ -412,7 +412,7 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 #define INSECURE 0
 #endif  /* INSECURE */
 #ifndef HAVE_MMAP
-#define HAVE_MMAP 0
+#define HAVE_MMAP 1
 #endif  /* HAVE_MMAP */
 #ifndef MMAP_CLEARS
 #define MMAP_CLEARS 1

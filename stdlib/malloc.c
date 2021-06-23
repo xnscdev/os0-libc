@@ -21,7 +21,7 @@
 void *dlmalloc (size_t size);
 void *dlcalloc (size_t size, size_t block);
 void *dlrealloc (void *ptr, size_t size);
-void *dlfree (void *ptr);
+void dlfree (void *ptr);
 
 void *
 __malloc (size_t size)
