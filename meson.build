@@ -39,7 +39,7 @@ configure_file(input: 'config.h.in', output: 'config.h',
 
 subdir('include')
 
-libc_inc = include_directories('include', 'private-include')
+libc_inc = include_directories('.', 'include', 'private-include')
 
 libc_src = [
   'locale/ctype.c',
@@ -186,5 +186,21 @@ libc = build_target('c', libc_src, install: true,
 
 libc_dep = declare_dependency(include_directories: libc_inc, link_with: libc)
 
+# Build libm
 subdir('math')
-subdir('rt')
+
+cc_cmd = meson.get_compiler('c').cmd_array()
+if get_option('debug')
+  cc_cmd += ['-g']
+endif
+
+# Build crt0.o
+custom_target('crt0.o', input: 'stdlib/crt0.S', output: 'crt0.o',
+	      command: [cc_cmd, '-c', '-o', '@OUTPUT@', '@INPUT@'],
+	      build_by_default: true, install: true,
+	      install_dir: get_option('libdir'))
+
+# Build dynamic linker if shared libc enabled
+if get_option('shared')
+  subdir('rtld')
+endif

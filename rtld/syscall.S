@@ -1,4 +1,4 @@
-/* rtld-main.c -- This file is part of OS/0 libc.
+/* syscall.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,18 +14,35 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <rtld.h>
+/* A minimal system call routine that does not set errno or use other
+   libc facilities, used by the dynamic linker */
 
-int
-__rtld_main (void *base, Elf32_Dyn *dynamic)
-{
-  DynamicLinkInfo dlinfo;
-  int ret;
-  __builtin_memset (&dlinfo, 0, sizeof (DynamicLinkInfo));
-  dlinfo.dl_loadbase = base;
-  dlinfo.dl_dynamic = dynamic;
-  ret = __rtld_load_dynamic (&dlinfo);
-  if (ret < 0)
-    return ret;
-  return 0;
-}
+	.section .text
+	.global __rtld_syscall
+	.hidden __rtld_syscall
+	.type __rtld_syscall, @function
+__rtld_syscall:
+	/* Save registers */
+	push	%ebx
+	push	%esi
+	push	%edi
+	push	%ebp
+
+	/* Setup syscall arguments and interrupt */
+	mov	20(%esp), %eax
+	mov	24(%esp), %ebx
+	mov	28(%esp), %ecx
+	mov	32(%esp), %edx
+	mov	36(%esp), %esi
+	mov	40(%esp), %edi
+	mov	44(%esp), %ebp
+	int	$0x80
+
+	/* Restore registers */
+	pop	%ebp
+	pop	%edi
+	pop	%esi
+	pop	%ebx
+	ret
+
+	.size __rtld_syscall, . - __rtld_syscall
