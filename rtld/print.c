@@ -22,7 +22,7 @@
   "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"
 
 static char *
-utoa (uintptr_t value, char *result, int base)
+__rtld_utoa (uintptr_t value, char *result, int base)
 {
   char *ptr = result;
   char *rev = result;
@@ -67,6 +67,6 @@ __rtld_print_ptr (void *ptr)
 {
   char buffer[16];
   __rtld_print ("0x");
-  utoa ((uintptr_t) ptr, buffer, 16);
+  __rtld_utoa ((uintptr_t) ptr, buffer, 16);
   __rtld_print (buffer);
 }

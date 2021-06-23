@@ -84,6 +84,15 @@ typedef struct
   PLTRelTable dl_pltrel;    /* Relocation table for PLT */
 } DynamicLinkInfo;
 
+struct _PriorityQueueNode
+{
+  void *q_data;
+  unsigned long q_priority;
+  struct _PriorityQueueNode *q_next;
+};
+
+typedef struct _PriorityQueueNode PriorityQueueNode;
+
 #define mmap(addr, len, prot, flags, fd, offset)		\
   __rtld_syscall (SYS_mmap, addr, len, prot, flags, fd, offset)
 #define munmap(addr, len) __rtld_syscall (SYS_munmap, addr, len)
@@ -96,8 +105,14 @@ void *__rtld_memcpy (void *__restrict dest, const void *__restrict src,
 		     size_t len) __hidden;
 void *__rtld_memset (void *buffer, int c, size_t len) __hidden;
 
+void *__rtld_malloc (size_t len) __hidden;
+
 void __rtld_print (const char *msg) __hidden;
 void __rtld_print_ptr (void *ptr) __hidden;
+
+void __rtld_queue_push (PriorityQueueNode **head, void *data,
+			int priority) __hidden;
+void *__rtld_queue_pop (PriorityQueueNode **head) __hidden;
 
 long __rtld_syscall (long num, ...) __hidden;
 
