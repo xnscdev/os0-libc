@@ -27,7 +27,7 @@ __rtld_queue_node_create (void *data, unsigned long priority)
 }
 
 void
-__rtld_queue_push (PriorityQueueNode **head, void *data, int priority)
+__rtld_queue_add (PriorityQueueNode **head, void *data, int priority)
 {
   PriorityQueueNode *start = *head;
   PriorityQueueNode *new = __rtld_queue_node_create (data, priority);
@@ -48,7 +48,7 @@ __rtld_queue_push (PriorityQueueNode **head, void *data, int priority)
 }
 
 void *
-__rtld_queue_pop (PriorityQueueNode **head)
+__rtld_queue_poll (PriorityQueueNode **head)
 {
   void *data = (*head)->q_data;
   *head = (*head)->q_next;

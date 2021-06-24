@@ -25,6 +25,8 @@
 #include <elf.h>
 #include <stddef.h>
 
+#define MAX_SHLIBS 64
+
 /* Macros for determining valid ELF header machine type */
 #if   defined ARCH_I386
 #define MACHTYPE EM_386
@@ -71,6 +73,7 @@ typedef struct
 
 typedef struct
 {
+  const char *dl_name;      /* Name of object */
   void *dl_loadbase;        /* Address of ELF header */
   Elf32_Dyn *dl_dynamic;    /* Address of ELF .dynamic section */
   void *dl_pltgot;          /* Address of PLT/GOT */
@@ -79,10 +82,10 @@ typedef struct
   ELFSymbolTable dl_symtab; /* Dynamic symbol table */
   ELFRelaTable dl_rela;     /* Relocations with explicit addends */
   ELFRelTable dl_rel;       /* Relocation table */
-  void *dl_init;            /* Address of initialization function */
-  void *dl_fini;            /* Address of termination function */
   PLTRelTable dl_pltrel;    /* Relocation table for PLT */
 } DynamicLinkInfo;
+
+/* Node for init/fini function queue */
 
 struct _PriorityQueueNode
 {
@@ -93,26 +96,38 @@ struct _PriorityQueueNode
 
 typedef struct _PriorityQueueNode PriorityQueueNode;
 
+/* Memory mapping syscalls */
+
 #define mmap(addr, len, prot, flags, fd, offset)		\
   __rtld_syscall (SYS_mmap, addr, len, prot, flags, fd, offset)
 #define munmap(addr, len) __rtld_syscall (SYS_munmap, addr, len)
 
 __BEGIN_DECLS
 
-int __rtld_load_dynamic (DynamicLinkInfo *dlinfo) __hidden;
+extern DynamicLinkInfo __rtld_shlibs[MAX_SHLIBS];
+extern PriorityQueueNode *__rtld_init_func;
 
-void *__rtld_memcpy (void *__restrict dest, const void *__restrict src,
-		     size_t len) __hidden;
-void *__rtld_memset (void *buffer, int c, size_t len) __hidden;
+void __rtld_load_dynamic (DynamicLinkInfo *dlinfo,
+			  unsigned long priority) __hidden;
+void __rtld_load_shlib (const char *name, unsigned long priority) __hidden;
 
-void *__rtld_malloc (size_t len) __hidden;
+/* Utility functions */
+
+void __rtld_fail (void) __attribute__ ((noreturn)) __hidden;
 
 void __rtld_print (const char *msg) __hidden;
 void __rtld_print_ptr (void *ptr) __hidden;
 
-void __rtld_queue_push (PriorityQueueNode **head, void *data,
-			int priority) __hidden;
-void *__rtld_queue_pop (PriorityQueueNode **head) __hidden;
+void __rtld_queue_add (PriorityQueueNode **head, void *data,
+		       int priority) __hidden;
+void *__rtld_queue_poll (PriorityQueueNode **head) __hidden;
+
+void *__rtld_memcpy (void *__restrict dest, const void *__restrict src,
+		     size_t len) __hidden;
+void *__rtld_memset (void *buffer, int c, size_t len) __hidden;
+int __rtld_strcmp (const char *a, const char *b) __hidden;
+
+void *__rtld_malloc (size_t len) __hidden;
 
 long __rtld_syscall (long num, ...) __hidden;
 

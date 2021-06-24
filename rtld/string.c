@@ -41,3 +41,21 @@ __rtld_memset (void *ptr, int c, size_t len)
     ((unsigned char *) ptr)[i] = c;
   return ptr;
 }
+
+int
+__rtld_strcmp (const char *a, const char *b)
+{
+  const unsigned char *ua = (const unsigned char *) a;
+  const unsigned char *ub = (const unsigned char *) b;
+  size_t i = 0;
+  while (1)
+    {
+      if (ua[i] > ub[i])
+	return 1;
+      if (ua[i] < ub[i])
+	return -1;
+      if (ua[i] == '\0' && ub[i] == '\0')
+	return 0;
+      i++;
+    }
+}

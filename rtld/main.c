@@ -14,18 +14,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <bits/signal.h>
 #include <rtld.h>
 
-int
+void
+__rtld_fail (void)
+{
+  __rtld_syscall (SYS_kill, __rtld_syscall (SYS_getpid), SIGABRT);
+  __builtin_unreachable ();
+}
+
+void
 __rtld_main (void *base, Elf32_Dyn *dynamic)
 {
-  DynamicLinkInfo dlinfo;
-  int ret;
-  __rtld_memset (&dlinfo, 0, sizeof (DynamicLinkInfo));
-  dlinfo.dl_loadbase = base;
-  dlinfo.dl_dynamic = dynamic;
-  ret = __rtld_load_dynamic (&dlinfo);
-  if (ret < 0)
-    return ret;
-  return 0;
+  __rtld_shlibs->dl_loadbase = base;
+  __rtld_shlibs->dl_dynamic = dynamic;
+  __rtld_load_dynamic (__rtld_shlibs, 0);
 }
