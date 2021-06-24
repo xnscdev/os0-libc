@@ -16,13 +16,16 @@
 
 #include <branch.h>
 #include <rtld.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-DynamicLinkInfo __rtld_shlibs[MAX_SHLIBS];
-PriorityQueueNode *__rtld_init_func;
-PriorityQueueNode *__rtld_fini_func;
+DynamicLinkInfo rtld_shlibs[MAX_SHLIBS];
+PriorityQueueNode *rtld_init_func;
+PriorityQueueNode *rtld_fini_func;
 
 void
-__rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
+rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 {
   Elf32_Dyn *entry;
   for (entry = dlinfo->dl_dynamic; entry->d_tag != DT_NULL; entry++)
@@ -60,11 +63,11 @@ __rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 	  dlinfo->dl_symtab.sym_entsize = entry->d_un.d_val;
 	  break;
 	case DT_INIT:
-	  __rtld_queue_add (&__rtld_init_func,
+	  rtld_queue_add (&rtld_init_func,
 			    dlinfo->dl_loadbase + entry->d_un.d_ptr, ~priority);
 	  break;
 	case DT_FINI:
-	  __rtld_queue_add (&__rtld_fini_func,
+	  rtld_queue_add (&rtld_fini_func,
 			    dlinfo->dl_loadbase + entry->d_un.d_ptr, priority);
 	  break;
 	case DT_REL:
@@ -84,8 +87,9 @@ __rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 	      dlinfo->dl_pltrel.pt_type = entry->d_un.d_val;
 	      break;
 	    default:
-	      __rtld_print ("Bad value for PLT relocation type\n");
-	      __rtld_fail ();
+	      fprintf (stderr, "ld.so: bad value %lu for PLT relocation type\n",
+		       entry->d_un.d_val);
+	      abort ();
 	    }
 	  break;
 	case DT_JMPREL:
@@ -96,18 +100,21 @@ __rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 
   if (dlinfo->dl_strtab.st_table == NULL)
     {
-      __rtld_print ("Object missing string table");
-      __rtld_fail ();
+      fprintf (stderr, "ld.so: %s: missing dynamic string table\n",
+	       dlinfo->dl_name);
+      abort ();
     }
   else if (dlinfo->dl_symtab.sym_table == NULL)
     {
-      __rtld_print ("Object missing dynamic symbol table");
-      __rtld_fail ();
+      fprintf (stderr, "ld.so: %s: missing dynamic symbol table\n",
+	       dlinfo->dl_name);
+      abort ();
     }
   else if (dlinfo->dl_hash == NULL)
     {
-      __rtld_print ("Object missing symbol hash table");
-      __rtld_fail ();
+      fprintf (stderr, "ld.so: %s: missing symbol hash table\n",
+	       dlinfo->dl_name);
+      abort ();
     }
 
   /* Load shared libraries */
@@ -118,29 +125,27 @@ __rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 	  const char *name = dlinfo->dl_strtab.st_table + entry->d_un.d_val;
 	  if (unlikely (*name == '\0'))
 	    continue;
-	  __rtld_load_shlib (name, priority + 1);
+	  rtld_load_shlib (name, priority + 1);
 	}
     }
 }
 
 void
-__rtld_load_shlib (const char *name, unsigned long priority)
+rtld_load_shlib (const char *name, unsigned long priority)
 {
   int i;
   /* Check if a library with the same name has already been loaded */
-  for (i = 0; i < MAX_SHLIBS && __rtld_shlibs[i].dl_name != NULL; i++)
+  for (i = 0; i < MAX_SHLIBS && rtld_shlibs[i].dl_name != NULL; i++)
     {
-      if (__rtld_strcmp (name, __rtld_shlibs[i].dl_name) == 0)
+      if (strcmp (name, rtld_shlibs[i].dl_name) == 0)
 	return; /* Already loaded */
     }
   if (i == MAX_SHLIBS)
     {
-      __rtld_print ("Failed to load ");
-      __rtld_print (name);
-      __rtld_print (": max shared object limit reached\n");
-      __rtld_fail ();
+      fprintf (stderr, "ld.so: %s: max shared object limit reached\n", name);
+      abort ();
     }
 
-  __rtld_shlibs[i].dl_name = name;
-  __rtld_load_dynamic (&__rtld_shlibs[i], priority);
+  rtld_shlibs[i].dl_name = name;
+  rtld_load_dynamic (&rtld_shlibs[i], priority);
 }

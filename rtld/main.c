@@ -18,16 +18,9 @@
 #include <rtld.h>
 
 void
-__rtld_fail (void)
+rtld_main (void *base, Elf32_Dyn *dynamic)
 {
-  __rtld_syscall (SYS_kill, __rtld_syscall (SYS_getpid), SIGABRT);
-  __builtin_unreachable ();
-}
-
-void
-__rtld_main (void *base, Elf32_Dyn *dynamic)
-{
-  __rtld_shlibs->dl_loadbase = base;
-  __rtld_shlibs->dl_dynamic = dynamic;
-  __rtld_load_dynamic (__rtld_shlibs, 0);
+  rtld_shlibs->dl_loadbase = base;
+  rtld_shlibs->dl_dynamic = dynamic;
+  rtld_load_dynamic (rtld_shlibs, 0);
 }

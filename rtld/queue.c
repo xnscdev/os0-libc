@@ -14,12 +14,20 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <branch.h>
 #include <rtld.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 static PriorityQueueNode *
-__rtld_queue_node_create (void *data, unsigned long priority)
+rtld_queue_node_create (void *data, unsigned long priority)
 {
-  PriorityQueueNode *node = __rtld_malloc (sizeof (PriorityQueueNode));
+  PriorityQueueNode *node = malloc (sizeof (PriorityQueueNode));
+  if (unlikely (node == NULL))
+    {
+      fprintf (stderr, "ld.so: couldn't allocate memory\n");
+      abort ();
+    }
   node->q_data = data;
   node->q_priority = priority;
   node->q_next = NULL;
@@ -27,10 +35,10 @@ __rtld_queue_node_create (void *data, unsigned long priority)
 }
 
 void
-__rtld_queue_add (PriorityQueueNode **head, void *data, int priority)
+rtld_queue_add (PriorityQueueNode **head, void *data, int priority)
 {
   PriorityQueueNode *start = *head;
-  PriorityQueueNode *new = __rtld_queue_node_create (data, priority);
+  PriorityQueueNode *new = rtld_queue_node_create (data, priority);
   if (*head == NULL)
     *head = new;
   else if ((*head)->q_priority > priority)
@@ -48,7 +56,7 @@ __rtld_queue_add (PriorityQueueNode **head, void *data, int priority)
 }
 
 void *
-__rtld_queue_poll (PriorityQueueNode **head)
+rtld_queue_poll (PriorityQueueNode **head)
 {
   void *data = (*head)->q_data;
   *head = (*head)->q_next;
