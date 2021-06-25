@@ -17,9 +17,12 @@
 #include <bits/signal.h>
 #include <rtld.h>
 
+void __libc_init (void);
+
 void
 rtld_main (void *base, Elf32_Dyn *dynamic)
 {
+  __libc_init ();
   rtld_shlibs->name = "";
   rtld_shlibs->loadbase = base;
   rtld_shlibs->offset = NULL;
