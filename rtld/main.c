@@ -20,7 +20,9 @@
 void
 rtld_main (void *base, Elf32_Dyn *dynamic)
 {
-  rtld_shlibs->dl_loadbase = base;
-  rtld_shlibs->dl_dynamic = dynamic;
+  rtld_shlibs->name = "";
+  rtld_shlibs->loadbase = base;
+  rtld_shlibs->offset = NULL;
+  rtld_shlibs->dynamic = dynamic;
   rtld_load_dynamic (rtld_shlibs, 0);
 }

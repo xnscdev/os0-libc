@@ -38,76 +38,75 @@
 
 /* Modified versions of the structures defined in kernel <sys/rtld.h> */
 
-typedef struct
+struct elf_strtab
 {
-  char *st_table;
-  size_t st_len;
-} ELFStringTable;
+  char *table;
+  size_t len;
+};
 
-typedef struct
+struct elf_symtab
 {
-  Elf32_Sym *sym_table;
-  size_t sym_entsize;
-} ELFSymbolTable;
+  Elf32_Sym *table;
+  size_t entsize;
+};
 
-typedef struct
+struct elf_relatab
 {
-  Elf32_Rela *ra_table;
-  size_t ra_size;
-  size_t ra_entsize;
-} ELFRelaTable;
+  Elf32_Rela *table;
+  size_t size;
+  size_t entsize;
+};
 
-typedef struct
+struct elf_reltab
 {
-  Elf32_Rel *r_table;
-  size_t r_size;
-  size_t r_entsize;
-} ELFRelTable;
+  Elf32_Rel *table;
+  size_t size;
+  size_t entsize;
+};
 
-typedef struct
+struct elf_pltrel
 {
-  Elf32_Word pt_type;
-  void *pt_table;
-  size_t pt_size;
-} PLTRelTable;
+  Elf32_Word type;
+  void *table;
+  size_t size;
+};
 
-typedef struct
+struct rtld_info
 {
-  const char *dl_name;      /* Name of object */
-  void *dl_loadbase;        /* Address of ELF header */
-  Elf32_Dyn *dl_dynamic;    /* Address of ELF .dynamic section */
-  void *dl_pltgot;          /* Address of PLT/GOT */
-  Elf32_Word *dl_hash;      /* Symbol hash table */
-  ELFStringTable dl_strtab; /* Symbol string table */
-  ELFSymbolTable dl_symtab; /* Dynamic symbol table */
-  ELFRelaTable dl_rela;     /* Relocations with explicit addends */
-  ELFRelTable dl_rel;       /* Relocation table */
-  PLTRelTable dl_pltrel;    /* Relocation table for PLT */
-} DynamicLinkInfo;
+  const char *name;         /* Name of object */
+  void *loadbase;           /* Address of ELF header */
+  void *offset;             /* Offset to add to relocations */
+  Elf32_Dyn *dynamic;       /* Address of ELF .dynamic section */
+  void *pltgot;             /* Address of PLT/GOT */
+  Elf32_Word *hash;         /* Symbol hash table */
+  struct elf_strtab strtab; /* Symbol string table */
+  struct elf_symtab symtab; /* Dynamic symbol table */
+  struct elf_relatab rela;  /* Relocations with explicit addends */
+  struct elf_reltab rel;    /* Relocation table */
+  struct elf_pltrel pltrel; /* Relocation table for PLT */
+};
 
 /* Node for init/fini function queue */
 
-struct _PriorityQueueNode
+struct queue_node
 {
   void *q_data;
   unsigned long q_priority;
-  struct _PriorityQueueNode *q_next;
+  struct queue_node *q_next;
 };
-
-typedef struct _PriorityQueueNode PriorityQueueNode;
 
 __BEGIN_DECLS
 
-extern DynamicLinkInfo rtld_shlibs[MAX_SHLIBS];
-extern PriorityQueueNode *rtld_init_func;
+extern struct rtld_info rtld_shlibs[MAX_SHLIBS];
+extern struct queue_node *rtld_init_func;
 
-void rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority);
+void rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority);
 void rtld_load_shlib (const char *name, unsigned long priority);
 
 /* Utility functions */
 
-void rtld_queue_add (PriorityQueueNode **head, void *data, int priority);
-void *rtld_queue_poll (PriorityQueueNode **head);
+void rtld_queue_add (struct queue_node **head, void *data, int priority);
+void *rtld_queue_poll (struct queue_node **head);
 
 __END_DECLS
 

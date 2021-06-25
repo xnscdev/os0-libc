@@ -19,10 +19,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static PriorityQueueNode *
+static struct queue_node *
 rtld_queue_node_create (void *data, unsigned long priority)
 {
-  PriorityQueueNode *node = malloc (sizeof (PriorityQueueNode));
+  struct queue_node *node = malloc (sizeof (struct queue_node));
   if (unlikely (node == NULL))
     {
       fprintf (stderr, "ld.so: couldn't allocate memory\n");
@@ -35,10 +35,10 @@ rtld_queue_node_create (void *data, unsigned long priority)
 }
 
 void
-rtld_queue_add (PriorityQueueNode **head, void *data, int priority)
+rtld_queue_add (struct queue_node **head, void *data, int priority)
 {
-  PriorityQueueNode *start = *head;
-  PriorityQueueNode *new = rtld_queue_node_create (data, priority);
+  struct queue_node *start = *head;
+  struct queue_node *new = rtld_queue_node_create (data, priority);
   if (*head == NULL)
     *head = new;
   else if ((*head)->q_priority > priority)
@@ -56,7 +56,7 @@ rtld_queue_add (PriorityQueueNode **head, void *data, int priority)
 }
 
 void *
-rtld_queue_poll (PriorityQueueNode **head)
+rtld_queue_poll (struct queue_node **head)
 {
   void *data = (*head)->q_data;
   *head = (*head)->q_next;

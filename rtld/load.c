@@ -20,71 +20,71 @@
 #include <stdlib.h>
 #include <string.h>
 
-DynamicLinkInfo rtld_shlibs[MAX_SHLIBS];
-PriorityQueueNode *rtld_init_func;
-PriorityQueueNode *rtld_fini_func;
+struct rtld_info rtld_shlibs[MAX_SHLIBS];
+struct queue_node *rtld_init_func;
+struct queue_node *rtld_fini_func;
 
 void
-rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
+rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
 {
   Elf32_Dyn *entry;
-  for (entry = dlinfo->dl_dynamic; entry->d_tag != DT_NULL; entry++)
+  for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
     {
       switch (entry->d_tag)
 	{
 	case DT_PLTRELSZ:
-	  dlinfo->dl_pltrel.pt_size = entry->d_un.d_val;
+	  dlinfo->pltrel.size = entry->d_un.d_val;
 	  break;
 	case DT_PLTGOT:
-	  dlinfo->dl_pltgot = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->pltgot = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	case DT_HASH:
-	  dlinfo->dl_hash = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->hash = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	case DT_STRTAB:
-	  dlinfo->dl_strtab.st_table = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->strtab.table = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	case DT_SYMTAB:
-	  dlinfo->dl_symtab.sym_table = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->symtab.table = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	case DT_RELA:
-	  dlinfo->dl_rela.ra_table = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->rela.table = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	case DT_RELASZ:
-	  dlinfo->dl_rela.ra_size = entry->d_un.d_val;
+	  dlinfo->rela.size = entry->d_un.d_val;
 	  break;
 	case DT_RELAENT:
-	  dlinfo->dl_rela.ra_entsize = entry->d_un.d_val;
+	  dlinfo->rela.entsize = entry->d_un.d_val;
 	  break;
 	case DT_STRSZ:
-	  dlinfo->dl_strtab.st_len = entry->d_un.d_val;
+	  dlinfo->strtab.len = entry->d_un.d_val;
 	  break;
 	case DT_SYMENT:
-	  dlinfo->dl_symtab.sym_entsize = entry->d_un.d_val;
+	  dlinfo->symtab.entsize = entry->d_un.d_val;
 	  break;
 	case DT_INIT:
 	  rtld_queue_add (&rtld_init_func,
-			  dlinfo->dl_loadbase + entry->d_un.d_ptr, priority);
+			  dlinfo->offset + entry->d_un.d_ptr, priority);
 	  break;
 	case DT_FINI:
 	  rtld_queue_add (&rtld_fini_func,
-			  dlinfo->dl_loadbase + entry->d_un.d_ptr, priority);
+			  dlinfo->offset + entry->d_un.d_ptr, priority);
 	  break;
 	case DT_REL:
-	  dlinfo->dl_rel.r_table = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->rel.table = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	case DT_RELSZ:
-	  dlinfo->dl_rel.r_size = entry->d_un.d_val;
+	  dlinfo->rel.size = entry->d_un.d_val;
 	  break;
 	case DT_RELENT:
-	  dlinfo->dl_rel.r_entsize = entry->d_un.d_val;
+	  dlinfo->rel.entsize = entry->d_un.d_val;
 	  break;
 	case DT_PLTREL:
 	  switch (entry->d_un.d_val)
 	    {
 	    case DT_REL:
 	    case DT_RELA:
-	      dlinfo->dl_pltrel.pt_type = entry->d_un.d_val;
+	      dlinfo->pltrel.type = entry->d_un.d_val;
 	      break;
 	    default:
 	      fprintf (stderr, "ld.so: bad value %lu for PLT relocation type\n",
@@ -93,36 +93,35 @@ rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 	    }
 	  break;
 	case DT_JMPREL:
-	  dlinfo->dl_pltrel.pt_table = dlinfo->dl_loadbase + entry->d_un.d_ptr;
+	  dlinfo->pltrel.table = dlinfo->offset + entry->d_un.d_ptr;
 	  break;
 	}
     }
 
-  if (dlinfo->dl_strtab.st_table == NULL)
+  if (dlinfo->strtab.table == NULL)
     {
       fprintf (stderr, "ld.so: %s: missing dynamic string table\n",
-	       dlinfo->dl_name);
+	       dlinfo->name);
       abort ();
     }
-  else if (dlinfo->dl_symtab.sym_table == NULL)
+  else if (dlinfo->symtab.table == NULL)
     {
       fprintf (stderr, "ld.so: %s: missing dynamic symbol table\n",
-	       dlinfo->dl_name);
+	       dlinfo->name);
       abort ();
     }
-  else if (dlinfo->dl_hash == NULL)
+  else if (dlinfo->hash == NULL)
     {
-      fprintf (stderr, "ld.so: %s: missing symbol hash table\n",
-	       dlinfo->dl_name);
+      fprintf (stderr, "ld.so: %s: missing symbol hash table\n", dlinfo->name);
       abort ();
     }
 
   /* Load shared libraries */
-  for (entry = dlinfo->dl_dynamic; entry->d_tag != DT_NULL; entry++)
+  for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
     {
       if (entry->d_tag == DT_NEEDED)
 	{
-	  const char *name = dlinfo->dl_strtab.st_table + entry->d_un.d_val;
+	  const char *name = dlinfo->strtab.table + entry->d_un.d_val;
 	  if (unlikely (*name == '\0'))
 	    continue;
 	  rtld_load_shlib (name, priority + 1);
@@ -135,9 +134,9 @@ rtld_load_shlib (const char *name, unsigned long priority)
 {
   int i;
   /* Check if a library with the same name has already been loaded */
-  for (i = 0; i < MAX_SHLIBS && rtld_shlibs[i].dl_name != NULL; i++)
+  for (i = 0; i < MAX_SHLIBS && rtld_shlibs[i].name != NULL; i++)
     {
-      if (strcmp (name, rtld_shlibs[i].dl_name) == 0)
+      if (strcmp (name, rtld_shlibs[i].name) == 0)
 	return; /* Already loaded */
     }
   if (i == MAX_SHLIBS)
@@ -146,6 +145,6 @@ rtld_load_shlib (const char *name, unsigned long priority)
       abort ();
     }
 
-  rtld_shlibs[i].dl_name = name;
+  rtld_shlibs[i].name = name;
   rtld_load_dynamic (&rtld_shlibs[i], priority);
 }
