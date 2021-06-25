@@ -28,9 +28,9 @@ rtld_queue_node_create (void *data, unsigned long priority)
       fprintf (stderr, "ld.so: couldn't allocate memory\n");
       abort ();
     }
-  node->q_data = data;
-  node->q_priority = priority;
-  node->q_next = NULL;
+  node->data = data;
+  node->priority = priority;
+  node->next = NULL;
   return node;
 }
 
@@ -41,24 +41,24 @@ rtld_queue_add (struct queue_node **head, void *data, int priority)
   struct queue_node *new = rtld_queue_node_create (data, priority);
   if (*head == NULL)
     *head = new;
-  else if ((*head)->q_priority > priority)
+  else if ((*head)->priority > priority)
     {
-      new->q_next = *head;
+      new->next = *head;
       *head = new;
     }
   else
     {
-      while (start->q_next != NULL && start->q_next->q_priority < priority)
-	start = start->q_next;
-      new->q_next = start->q_next;
-      start->q_next = new;
+      while (start->next != NULL && start->next->priority < priority)
+	start = start->next;
+      new->next = start->next;
+      start->next = new;
     }
 }
 
 void *
 rtld_queue_poll (struct queue_node **head)
 {
-  void *data = (*head)->q_data;
-  *head = (*head)->q_next;
+  void *data = (*head)->data;
+  *head = (*head)->next;
   return data;
 }

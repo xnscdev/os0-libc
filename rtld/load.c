@@ -14,15 +14,83 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/mman.h>
 #include <branch.h>
+#include <errno.h>
 #include <rtld.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 struct rtld_info rtld_shlibs[MAX_SHLIBS];
 struct queue_node *rtld_init_func;
 struct queue_node *rtld_fini_func;
+
+static inline void
+rtld_check_offset (struct rtld_info *dlinfo)
+{
+  if (unlikely (dlinfo->offset == NULL))
+    {
+      fprintf (stderr, "ld.so: %s: load offset requested before object was "
+	       "loaded\n", strerror (errno));
+      abort ();
+    }
+}
+
+int
+rtld_open_shlib (const char *name)
+{
+  FILE *cache;
+  int fd;
+
+  /* Try to lookup the library name in the runtime cache */
+  cache = fopen (RTLD_CACHE_FILE, "r");
+  if (unlikely (cache != NULL))
+    {
+      fd = rtld_cache_lookup (cache, name);
+      fclose (cache);
+      if (fd != -1)
+	return fd;
+    }
+
+  /* No cache file or library name not found in cache, search each library
+     path for a file matching the requested name */
+  return rtld_search_lib (name);
+}
+
+void
+rtld_map_elf (int fd, struct rtld_info *dlinfo)
+{
+  Elf32_Ehdr *ehdr = malloc (sizeof (Elf32_Ehdr));
+  int ret;
+  if (unlikely (ehdr == NULL))
+    RTLD_NO_MEMORY (dlinfo->name);
+  ret = read (fd, ehdr, sizeof (Elf32_Ehdr));
+  if (ret != sizeof (Elf32_Ehdr))
+    {
+      fprintf (stderr, "ld.so: %s: bad ELF header\n", dlinfo->name);
+      abort ();
+    }
+  if (ehdr->e_ident[EI_MAG0] != ELFMAG0
+      || ehdr->e_ident[EI_MAG1] != ELFMAG1
+      || ehdr->e_ident[EI_MAG2] != ELFMAG2
+      || ehdr->e_ident[EI_MAG3] != ELFMAG3)
+    {
+      fprintf (stderr, "ld.so: %s: bad ELF magic number\n", dlinfo->name);
+      abort ();
+    }
+  if (ehdr->e_ident[EI_CLASS] != ELFCLASS32
+      || ehdr->e_ident[EI_DATA] != ELFDATA2LSB
+      || ehdr->e_type != ET_DYN
+      || ehdr->e_machine != MACHTYPE)
+    {
+      fprintf (stderr, "ld.so: %s: bad ELF object/machine type\n",
+	       dlinfo->name);
+      abort ();
+    }
+  rtld_load_phdrs (fd, ehdr, dlinfo);
+}
 
 void
 rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
@@ -130,8 +198,101 @@ rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
 }
 
 void
+rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo)
+{
+  struct segment_node *segment;
+  void *addr;
+  int prot = 0;
+
+  /* Map memory region to contain contents of program header*/
+  if (phdr->p_offset == 0)
+    {
+      addr = mmap (NULL, phdr->p_memsz, PROT_READ | PROT_WRITE,
+		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+      dlinfo->loadbase = addr;
+      dlinfo->offset = addr;
+    }
+  else
+    {
+      rtld_check_offset (dlinfo);
+      addr = mmap (dlinfo->offset + phdr->p_vaddr, phdr->p_memsz,
+		   PROT_READ | PROT_WRITE,
+		   MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+    }
+  if (unlikely (addr == MAP_FAILED))
+    {
+      fprintf (stderr, "ld.so: %s: failed to map memory: %s\n",
+	       dlinfo->name, strerror (errno));
+      abort ();
+    }
+
+  /* Read contents into memory */
+  if (unlikely (pread (fd, dlinfo->offset + phdr->p_vaddr, phdr->p_filesz,
+		       phdr->p_offset) != phdr->p_filesz))
+    {
+      fprintf (stderr, "ld.so: %s: failed to load segment\n", dlinfo->name);
+      abort ();
+    }
+  memset (dlinfo->offset + phdr->p_vaddr + phdr->p_filesz, 0,
+	  phdr->p_memsz - phdr->p_filesz);
+
+  if (phdr->p_flags & PF_R)
+    prot |= PROT_READ;
+  if (phdr->p_flags & PF_W)
+    prot |= PROT_WRITE;
+  if (phdr->p_flags & PF_X)
+    prot |= PROT_EXEC;
+  segment = malloc (sizeof (struct segment_node));
+  segment->addr = addr;
+  segment->prot = prot;
+  segment->next = NULL;
+  if (dlinfo->segments.tail == NULL)
+    dlinfo->segments.head = segment;
+  else
+    dlinfo->segments.tail->next = segment;
+  dlinfo->segments.tail = segment;
+}
+
+void
+rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo)
+{
+  Elf32_Phdr *phdr = malloc (sizeof (Elf32_Phdr));
+  Elf32_Dyn *dynamic = NULL;
+  int i;
+  if (unlikely (phdr == NULL))
+    RTLD_NO_MEMORY (dlinfo->name);
+
+  for (i = 0; i < ehdr->e_phnum; i++)
+    {
+      if (pread (fd, phdr, sizeof (Elf32_Phdr),
+		 ehdr->e_phoff + ehdr->e_phentsize * i) != sizeof (Elf32_Phdr))
+	{
+	  fprintf (stderr, "ld.so: %s: failed to read program header\n",
+		   dlinfo->name);
+	  abort ();
+	}
+      if (phdr->p_type == PT_LOAD)
+	rtld_load_segment (fd, phdr, dlinfo);
+      else if (phdr->p_type == PT_DYNAMIC)
+	{
+	  rtld_check_offset (dlinfo);
+	  dynamic = dlinfo->offset + phdr->p_vaddr;
+	}
+    }
+
+  if (unlikely (dynamic == NULL))
+    {
+      fprintf (stderr, "ld.so: %s: missing dynamic section\n", dlinfo->name);
+      abort ();
+    }
+  dlinfo->dynamic = dynamic;
+  free (phdr);
+}
+
+void
 rtld_load_shlib (const char *name, unsigned long priority)
 {
+  int fd;
   int i;
   /* Check if a library with the same name has already been loaded */
   for (i = 0; i < MAX_SHLIBS && rtld_shlibs[i].name != NULL; i++)
@@ -146,5 +307,14 @@ rtld_load_shlib (const char *name, unsigned long priority)
     }
 
   rtld_shlibs[i].name = name;
+  fd = rtld_open_shlib (name);
+  if (fd == -1)
+    {
+      fprintf (stderr, "ld.so: %s: failed to open: %s\n", name,
+	       strerror (errno));
+      abort ();
+    }
+  rtld_map_elf (fd, &rtld_shlibs[i]);
   rtld_load_dynamic (&rtld_shlibs[i], priority);
+  rtld_relocate (&rtld_shlibs[i]);
 }

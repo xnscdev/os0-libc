@@ -25,7 +25,8 @@
 #include <elf.h>
 #include <stddef.h>
 
-#define MAX_SHLIBS 64
+#define RTLD_CACHE_FILE "/var/cache/ld.so.cache"
+#define MAX_SHLIBS      64
 
 /* Macros for determining valid ELF header machine type */
 #if   defined ARCH_I386
@@ -36,7 +37,31 @@
 #error "No ELF machine type supported for architecture"
 #endif
 
-/* Modified versions of the structures defined in kernel <sys/rtld.h> */
+/* Node for init/fini function queue */
+
+struct queue_node
+{
+  void *data;
+  unsigned long priority;
+  struct queue_node *next;
+};
+
+/* Node for segment linked list */
+
+struct segment_node
+{
+  void *addr;
+  int prot;
+  struct segment_node *next;
+};
+
+struct rtld_segments
+{
+  struct segment_node *head;
+  struct segment_node *tail;
+};
+
+/* ELF wrapper structures */
 
 struct elf_strtab
 {
@@ -71,42 +96,55 @@ struct elf_pltrel
   size_t size;
 };
 
+/* Info about a loaded shared object */
+
 struct rtld_info
 {
-  const char *name;         /* Name of object */
-  void *loadbase;           /* Address of ELF header */
-  void *offset;             /* Offset to add to relocations */
-  Elf32_Dyn *dynamic;       /* Address of ELF .dynamic section */
-  void *pltgot;             /* Address of PLT/GOT */
-  Elf32_Word *hash;         /* Symbol hash table */
-  struct elf_strtab strtab; /* Symbol string table */
-  struct elf_symtab symtab; /* Dynamic symbol table */
-  struct elf_relatab rela;  /* Relocations with explicit addends */
-  struct elf_reltab rel;    /* Relocation table */
-  struct elf_pltrel pltrel; /* Relocation table for PLT */
+  const char *name;              /* Name of object */
+  void *loadbase;                /* Address of ELF header */
+  void *offset;                  /* Offset to add to relocations */
+  Elf32_Dyn *dynamic;            /* Address of ELF .dynamic section */
+  void *pltgot;                  /* Address of PLT/GOT */
+  Elf32_Word *hash;              /* Symbol hash table */
+  struct elf_strtab strtab;      /* Symbol string table */
+  struct elf_symtab symtab;      /* Dynamic symbol table */
+  struct elf_relatab rela;       /* Relocations with explicit addends */
+  struct elf_reltab rel;         /* Relocation table */
+  struct elf_pltrel pltrel;      /* Relocation table for PLT */
+  struct rtld_segments segments; /* Linked list of loaded segments */
 };
 
-/* Node for init/fini function queue */
+#ifndef __FILE_defined
+typedef struct __FILE FILE;
+#define __FILE_defined
+#endif
 
-struct queue_node
-{
-  void *q_data;
-  unsigned long q_priority;
-  struct queue_node *q_next;
-};
+#define RTLD_NO_MEMORY(name) do						\
+    {									\
+      fprintf (stderr, "ld.so: %s: couldn't allocate memory\n", name);	\
+      abort ();								\
+    }									\
+  while (0)
 
 __BEGIN_DECLS
 
 extern struct rtld_info rtld_shlibs[MAX_SHLIBS];
 extern struct queue_node *rtld_init_func;
 
+int rtld_open_shlib (const char *name);
+void rtld_map_elf (int fd, struct rtld_info *dlinfo);
 void rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority);
+void rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo);
+void rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo);
 void rtld_load_shlib (const char *name, unsigned long priority);
 
-/* Utility functions */
+int rtld_cache_lookup (FILE *cache, const char *name);
+int rtld_search_lib (const char *name);
 
 void rtld_queue_add (struct queue_node **head, void *data, int priority);
 void *rtld_queue_poll (struct queue_node **head);
+
+void rtld_relocate (struct rtld_info *dlinfo);
 
 __END_DECLS
 
