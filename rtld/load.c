@@ -64,11 +64,11 @@ rtld_load_dynamic (DynamicLinkInfo *dlinfo, unsigned long priority)
 	  break;
 	case DT_INIT:
 	  rtld_queue_add (&rtld_init_func,
-			    dlinfo->dl_loadbase + entry->d_un.d_ptr, ~priority);
+			  dlinfo->dl_loadbase + entry->d_un.d_ptr, priority);
 	  break;
 	case DT_FINI:
 	  rtld_queue_add (&rtld_fini_func,
-			    dlinfo->dl_loadbase + entry->d_un.d_ptr, priority);
+			  dlinfo->dl_loadbase + entry->d_un.d_ptr, priority);
 	  break;
 	case DT_REL:
 	  dlinfo->dl_rel.r_table = dlinfo->dl_loadbase + entry->d_un.d_ptr;
