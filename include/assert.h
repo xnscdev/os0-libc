@@ -22,7 +22,7 @@
 #ifdef NDEBUG
 #define assert(x) (void) 0
 #else
-#define assert(x) (x) ? (void) 0 :			\
+#define assert(x) (__builtin_expect ((x), 1)) ? (void) 0 :	\
     _assert_fail (#x, __FILE__, __LINE__, __func__)
 #endif
 

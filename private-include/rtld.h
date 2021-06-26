@@ -153,8 +153,6 @@ unsigned int rtld_load_shlib (const char *name, unsigned long priority);
 int rtld_cache_lookup (FILE *cache, const char *name);
 int rtld_search_lib (const char *name);
 
-void rtld_exec_initfini_funcs (void);
-
 void rtld_queue_add (struct queue_node **head, void *data, int priority);
 void *rtld_queue_poll (struct queue_node **head);
 

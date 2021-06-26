@@ -15,22 +15,29 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syslimits.h>
+#include <assert.h>
 #include <errno.h>
+#include <locks.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 static void (*__atexit_funcs[ATEXIT_MAX]) (void);
 static int __atexit_ptr;
 
+__lock_t __atexit_lock __hidden;
+
 int
 atexit (void (*func) (void))
 {
+  assert (func != NULL);
   if (__atexit_ptr >= ATEXIT_MAX)
     {
       errno = ENOMEM;
       return -1;
     }
+  __libc_lock (&__atexit_lock);
   __atexit_funcs[__atexit_ptr++] = func;
+  __libc_unlock (&__atexit_lock);
   return 0;
 }
 
