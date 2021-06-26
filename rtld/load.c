@@ -214,8 +214,10 @@ rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo)
     }
   else
     {
+      uintptr_t vaddr;
       rtld_check_offset (dlinfo);
-      addr = mmap (dlinfo->offset + phdr->p_vaddr, phdr->p_memsz,
+      vaddr = (uintptr_t) dlinfo->offset + phdr->p_vaddr;
+      addr = mmap ((void *) (vaddr & 0xfffff000), phdr->p_memsz,
 		   PROT_READ | PROT_WRITE,
 		   MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
     }
