@@ -58,7 +58,13 @@ rtld_queue_add (struct queue_node **head, void *data, int priority)
 void *
 rtld_queue_poll (struct queue_node **head)
 {
-  void *data = (*head)->data;
-  *head = (*head)->next;
+  void *data;
+  struct queue_node *temp;
+  if (*head == NULL)
+    return NULL;
+  data = (*head)->data;
+  temp = (*head)->next;
+  free (*head);
+  *head = temp;
   return data;
 }

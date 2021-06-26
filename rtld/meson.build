@@ -3,7 +3,8 @@ rtld_src = [
   'lookup.c',
   'main.c',
   'queue.c',
-  'reloc.c'
+  'reloc.c',
+  'remap.c'
 ]
 
 rtld = static_library('rtld', rtld_src, include_directories: libc_inc)

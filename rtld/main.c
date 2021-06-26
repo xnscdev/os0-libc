@@ -14,18 +14,43 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <bits/signal.h>
 #include <rtld.h>
+#include <stdlib.h>
 
 void __libc_init (void);
 
+extern char **environ;
+
 void
-rtld_main (void *base, Elf32_Dyn *dynamic)
+rtld_exec_initfini_funcs (void)
 {
+  while (1)
+    {
+      void (*func) (void) = rtld_queue_poll (&rtld_init_func);
+      if (func == NULL)
+	break;
+      func ();
+    }
+  while (1)
+    {
+      void (*func) (void) = rtld_queue_poll (&rtld_fini_func);
+      if (func == NULL)
+	break;
+      atexit (func);
+    }
+}
+
+void
+rtld_main (void *base, Elf32_Dyn *dynamic, char **env)
+{
+  environ = env;
   __libc_init ();
   rtld_shlibs->name = "";
   rtld_shlibs->loadbase = base;
   rtld_shlibs->offset = NULL;
   rtld_shlibs->dynamic = dynamic;
   rtld_load_dynamic (rtld_shlibs, 0);
+  rtld_relocate (rtld_shlibs);
+  rtld_remap_memory ();
+  rtld_exec_initfini_funcs ();
 }

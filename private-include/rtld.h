@@ -51,6 +51,7 @@ struct queue_node
 struct segment_node
 {
   void *addr;
+  size_t len;
   int prot;
   struct segment_node *next;
 };
@@ -96,11 +97,21 @@ struct elf_pltrel
   size_t size;
 };
 
+/* Info about needed objects */
+
+struct obj_deps
+{
+  size_t count;
+  unsigned int *deps;
+};
+
 /* Info about a loaded shared object */
 
 struct rtld_info
 {
+  struct obj_deps deps;          /* Needed shared objects */
   const char *name;              /* Name of object */
+  int fd;                        /* File descriptor of object */
   void *loadbase;                /* Address of ELF header */
   void *offset;                  /* Offset to add to relocations */
   Elf32_Dyn *dynamic;            /* Address of ELF .dynamic section */
@@ -130,21 +141,31 @@ __BEGIN_DECLS
 
 extern struct rtld_info rtld_shlibs[MAX_SHLIBS];
 extern struct queue_node *rtld_init_func;
+extern struct queue_node *rtld_fini_func;
 
 int rtld_open_shlib (const char *name);
 void rtld_map_elf (int fd, struct rtld_info *dlinfo);
 void rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority);
 void rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo);
 void rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo);
-void rtld_load_shlib (const char *name, unsigned long priority);
+unsigned int rtld_load_shlib (const char *name, unsigned long priority);
 
 int rtld_cache_lookup (FILE *cache, const char *name);
 int rtld_search_lib (const char *name);
 
+void rtld_exec_initfini_funcs (void);
+
 void rtld_queue_add (struct queue_node **head, void *data, int priority);
 void *rtld_queue_poll (struct queue_node **head);
 
+unsigned long rtld_symbol_hash (const char *name);
+void *rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo);
+void rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
+		       Elf32_Sword addend);
 void rtld_relocate (struct rtld_info *dlinfo);
+
+void rtld_remap_exec (void);
+void rtld_remap_memory (void);
 
 __END_DECLS
 

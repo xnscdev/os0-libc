@@ -190,9 +190,17 @@ rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
       if (entry->d_tag == DT_NEEDED)
 	{
 	  const char *name = dlinfo->strtab.table + entry->d_un.d_val;
+	  unsigned int *temp;
+	  unsigned int obj;
 	  if (unlikely (*name == '\0'))
 	    continue;
-	  rtld_load_shlib (name, priority + 1);
+	  obj = rtld_load_shlib (name, priority + 1);
+	  temp = realloc (dlinfo->deps.deps,
+			  sizeof (unsigned int) * ++dlinfo->deps.count);
+	  if (unlikely (temp == NULL))
+	    RTLD_NO_MEMORY (name);
+	  dlinfo->deps.deps = temp;
+	  dlinfo->deps.deps[dlinfo->deps.count - 1] = obj;
 	}
     }
 }
@@ -246,6 +254,7 @@ rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo)
     prot |= PROT_EXEC;
   segment = malloc (sizeof (struct segment_node));
   segment->addr = addr;
+  segment->len = phdr->p_memsz;
   segment->prot = prot;
   segment->next = NULL;
   if (dlinfo->segments.tail == NULL)
@@ -291,16 +300,16 @@ rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo)
   free (phdr);
 }
 
-void
+unsigned int
 rtld_load_shlib (const char *name, unsigned long priority)
 {
   int fd;
-  int i;
+  unsigned int i;
   /* Check if a library with the same name has already been loaded */
   for (i = 0; i < MAX_SHLIBS && rtld_shlibs[i].name != NULL; i++)
     {
       if (strcmp (name, rtld_shlibs[i].name) == 0)
-	return; /* Already loaded */
+	return i; /* Already loaded */
     }
   if (i == MAX_SHLIBS)
     {
@@ -316,7 +325,9 @@ rtld_load_shlib (const char *name, unsigned long priority)
 	       strerror (errno));
       abort ();
     }
+  rtld_shlibs[i].fd = fd;
   rtld_map_elf (fd, &rtld_shlibs[i]);
   rtld_load_dynamic (&rtld_shlibs[i], priority);
   rtld_relocate (&rtld_shlibs[i]);
+  return i;
 }
