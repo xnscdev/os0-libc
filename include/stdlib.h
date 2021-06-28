@@ -50,6 +50,8 @@ void abort (void) __attribute__ ((noreturn));
 
 int system (const char *cmd);
 
+char *realpath (const char *__restrict path, char *__restrict resolved);
+
 int abs (int n);
 div_t div (int num, int denom);
 ldiv_t ldiv (long num, long denom);

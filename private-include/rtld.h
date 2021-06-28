@@ -25,8 +25,11 @@
 #include <elf.h>
 #include <stddef.h>
 
-#define RTLD_CACHE_FILE "/var/cache/ld.so.cache"
-#define MAX_SHLIBS      64
+#define RTLD_CACHE_FILE  "/var/cache/ld.so.cache"
+#define RTLD_CONFIG_FILE "/etc/ld.so.conf"
+#define MAX_SHLIBS       64
+
+#define __DL_ERR_BUFSIZ 64
 
 /* Macros for determining valid ELF header machine type */
 #if   defined ARCH_I386
@@ -112,6 +115,9 @@ struct rtld_info
   struct obj_deps deps;          /* Needed shared objects */
   const char *name;              /* Name of object */
   int fd;                        /* File descriptor of object */
+  int dlopened;                  /* If object was loaded by dlopen(3) */
+  void (*init) (void);           /* Initializer function */
+  void (*fini) (void);           /* Finalizer function */
   void *loadbase;                /* Address of ELF header */
   void *offset;                  /* Offset to add to relocations */
   Elf32_Dyn *dynamic;            /* Address of ELF .dynamic section */
@@ -143,15 +149,13 @@ extern struct rtld_info rtld_shlibs[MAX_SHLIBS];
 extern struct queue_node *rtld_init_func;
 extern struct queue_node *rtld_fini_func;
 
-int rtld_open_shlib (const char *name);
 void rtld_map_elf (int fd, struct rtld_info *dlinfo);
 void rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority);
 void rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo);
 void rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo);
 unsigned int rtld_load_shlib (const char *name, unsigned long priority);
 
-int rtld_cache_lookup (FILE *cache, const char *name);
-int rtld_search_lib (const char *name);
+int rtld_open_shlib (const char *name);
 
 void rtld_queue_add (struct queue_node **head, void *data, int priority);
 void *rtld_queue_poll (struct queue_node **head);

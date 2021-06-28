@@ -1,4 +1,4 @@
-/* config.h -- This file is part of OS/0 libc.
+/* dlfcn.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,12 +14,24 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
+#ifndef _DLFCN_H
+#define _DLFCN_H
 
-#mesondefine LIBC_VERSION
+#include <sys/cdefs.h>
 
-#mesondefine ARCH_I386
-#mesondefine ARCH_X86_64
+#define RTLD_LAZY 1
+#define RTLD_NOW  2
+
+#define RTLD_GLOBAL 1
+#define RTLD_LOCAL  2
+
+__BEGIN_DECLS
+
+void *dlopen (const char *path, int mode);
+void *dlsym (void *handle, const char *symbol);
+char *dlerror (void);
+int dlclose (void *handle);
+
+__END_DECLS
 
 #endif

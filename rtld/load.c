@@ -33,30 +33,9 @@ rtld_check_offset (struct rtld_info *dlinfo)
   if (unlikely (dlinfo->offset == NULL))
     {
       fprintf (stderr, "ld.so: %s: load offset requested before object was "
-	       "loaded\n", strerror (errno));
+	       "loaded\n", dlinfo->name);
       abort ();
     }
-}
-
-int
-rtld_open_shlib (const char *name)
-{
-  FILE *cache;
-  int fd;
-
-  /* Try to lookup the library name in the runtime cache */
-  cache = fopen (RTLD_CACHE_FILE, "r");
-  if (unlikely (cache != NULL))
-    {
-      fd = rtld_cache_lookup (cache, name);
-      fclose (cache);
-      if (fd != -1)
-	return fd;
-    }
-
-  /* No cache file or library name not found in cache, search each library
-     path for a file matching the requested name */
-  return rtld_search_lib (name);
 }
 
 void
@@ -253,6 +232,8 @@ rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo)
   if (phdr->p_flags & PF_X)
     prot |= PROT_EXEC;
   segment = malloc (sizeof (struct segment_node));
+  if (unlikely (segment == NULL))
+    RTLD_NO_MEMORY (dlinfo->name);
   segment->addr = addr;
   segment->len = phdr->p_memsz;
   segment->prot = prot;

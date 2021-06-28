@@ -83,4 +83,4 @@ libm_src = [
 
 build_target('m', libm_src, install: true, dependencies: libc_dep,
 	     target_type: lib_targ, version: '1',
-	     c_args: ['-D_IEEE_LIBM', '-w'], link_args: lib_ldflags)
+	     c_args: ['-D_IEEE_LIBM', '-w'])

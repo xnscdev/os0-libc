@@ -184,8 +184,13 @@ unsetenv (const char *name)
 int
 clearenv (void)
 {
+  size_t i;
+  __libc_lock (&__libc_env_lock);
+  for (i = 0; environ[i] != NULL; i++)
+    free (environ[i]);
   free (environ);
   environ = NULL;
+  __libc_unlock (&__libc_env_lock);
   return 0;
 }
 

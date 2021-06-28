@@ -3,10 +3,23 @@ project('os0-libc', 'c', version: '0.0.1', default_options: ['c_std=gnu99'],
 add_project_arguments('-fno-common', language: 'c')
 
 libc_config = configuration_data()
-cc = meson.get_compiler('c')
+libc_config.set_quoted('LIBC_VERSION', meson.project_version())
 
+cc = meson.get_compiler('c')
 hostcpu = host_machine.cpu_family()
+
 if hostcpu == 'x86'
+  bits = 32
+  libc_config.set10('ARCH_I386', true)
+elif hostcpu == 'x86_64'
+  bits = 64
+  libc_config.set10('ARCH_X86_64', true)
+else
+  error('Unsupported CPU type: ' + hostcpu)
+endif
+
+if bits == 32
+  # stdint.h macros
   libc_config.set('__INT32_T', 'long')
   libc_config.set('__UINT32_T', 'unsigned long')
   libc_config.set('__INT32_SUFFIX', 'L')
@@ -17,8 +30,12 @@ if hostcpu == 'x86'
   libc_config.set('__UINT64_SUFFIX', 'ULL')
   libc_config.set('__INTPTR_T', 'int32_t')
   libc_config.set('__UINTPTR_T', 'uint32_t')
-  libc_config.set10('ARCH_I386', true)
-elif hostcpu == 'x86_64'
+
+  # inttypes.h macros
+  libc_config.set('__FMT32', 'l')
+  libc_config.set('__FMT64', 'll')
+else
+  # stdint.h macros
   libc_config.set('__INT32_T', 'int')
   libc_config.set('__UINT32_T', 'unsigned int')
   libc_config.set('__INT32_SUFFIX', '')
@@ -29,9 +46,10 @@ elif hostcpu == 'x86_64'
   libc_config.set('__UINT64_SUFFIX', 'UL')
   libc_config.set('__INTPTR_T', 'int64_t')
   libc_config.set('__UINTPTR_T', 'uint64_t')
-  libc_config.set10('ARCH_X86_64', true)
-else
-  error('Unsupported CPU type: ' + hostcpu)
+
+  # inttypes.h macros
+  libc_config.set('__FMT32', '')
+  libc_config.set('__FMT64', 'l')
 endif
 
 configure_file(input: 'config.h.in', output: 'config.h',
@@ -91,6 +109,7 @@ libc_src = [
   'stdlib/passwd.c',
   'stdlib/qsort.c',
   'stdlib/rand.c',
+  'stdlib/realpath.c',
   'stdlib/setjmp.c',
   'stdlib/signal.c',
   'stdlib/sigset.c',

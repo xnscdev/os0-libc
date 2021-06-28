@@ -27,18 +27,6 @@ rtld_get_symbol (struct rtld_info *dlinfo, Elf32_Word index)
 			index * dlinfo->symtab.entsize);
 }
 
-static void
-rtld_reloc_fail_no_symbol (const char *name)
-{
-  if (*name == '\0')
-    fprintf (stderr, "ld.so: attempted to apply non-relative relocation with "
-	     "unspecified symbol\n");
-  else
-    fprintf (stderr, "ld.so: %s: attempted to apply non-relative relocation "
-	     "with unspecified symbol\n", name);
-  abort ();
-}
-
 unsigned long
 rtld_symbol_hash (const char *name)
 {
@@ -118,22 +106,14 @@ rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
   switch (ELF32_R_TYPE (entry->r_info))
     {
 #define REL_OFFSET ((Elf32_Addr *) (dlinfo->offset + entry->r_offset))
-#define SYM_CHECK do							\
-	{								\
-	  if (symbol == NULL)						\
-	    rtld_reloc_fail_no_symbol (dlinfo->name);			\
-	}								\
-      while (0)
     case R_386_COPY:
     case R_386_GLOB_DAT:
     case R_386_JMP_SLOT:
       addend = 0;
     case R_386_32:
-      SYM_CHECK;
       *REL_OFFSET = (uintptr_t) symaddr + addend;
       break;
     case R_386_PC32:
-      SYM_CHECK;
       *REL_OFFSET = (uintptr_t) symaddr - (uintptr_t) dlinfo->offset -
 	entry->r_offset - 4 + addend;
       break;
@@ -141,15 +121,12 @@ rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
       *REL_OFFSET += (uintptr_t) dlinfo->offset + addend;
       break;
     case R_386_GOTOFF:
-      SYM_CHECK;
       *REL_OFFSET = (uintptr_t) symaddr - (uintptr_t) dlinfo->pltgot + addend;
       break;
     case R_386_GOTPC:
-      SYM_CHECK;
       *REL_OFFSET = (uintptr_t) dlinfo->pltgot - entry->r_offset - 4 + addend;
       break;
 #undef REL_OFFSET
-#undef SYM_CHECK
     }
 }
 
