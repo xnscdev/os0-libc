@@ -82,6 +82,8 @@ int openat (int fd, const char *path, int flags, ...);
 int creat (const char *path, mode_t mode);
 int close (int fd);
 
+int pipe (int fd[2]);
+
 int dup (int fd);
 int dup2 (int fd1, int fd2);
 

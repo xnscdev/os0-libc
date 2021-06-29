@@ -178,6 +178,9 @@ void setlinebuf (FILE *stream);
 int setvbuf (FILE *__restrict stream, char *__restrict buffer, int mode,
 	     size_t size);
 
+FILE *popen (const char *cmd, const char *mode);
+int pclose (FILE *stream);
+
 ssize_t getdelim (char **__restrict line, size_t *__restrict len, int delim,
 		  FILE *__restrict stream);
 ssize_t getline (char **__restrict line, size_t *__restrict len,

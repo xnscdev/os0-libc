@@ -17,7 +17,7 @@
 #ifndef _WCTYPE_H
 #define _WCTYPE_H
 
-#include <bits/wctype.h>
+#include <ctype.h>
 
 __BEGIN_DECLS
 
