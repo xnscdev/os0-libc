@@ -200,7 +200,7 @@ if get_option('shared')
 else
   lib_targ = 'static_library'
 endif
-lib_ldflags = ['-nostartfiles', '-nostdlib', '-lgcc']
+lib_ldflags = ['-nostdlib', '-lgcc']
 
 libc = build_target('c', libc_src, install: true,
 		    include_directories: libc_inc, target_type: lib_targ,

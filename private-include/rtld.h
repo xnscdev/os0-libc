@@ -161,7 +161,8 @@ void rtld_queue_add (struct queue_node **head, void *data, int priority);
 void *rtld_queue_poll (struct queue_node **head);
 
 unsigned long rtld_symbol_hash (const char *name);
-void *rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo);
+void *rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo,
+			  int local);
 void rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
 		       Elf32_Sword addend);
 void rtld_relocate (struct rtld_info *dlinfo);

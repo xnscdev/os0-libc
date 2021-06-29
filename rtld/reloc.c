@@ -45,7 +45,7 @@ rtld_symbol_hash (const char *name)
 }
 
 void *
-rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo)
+rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo, int local)
 {
   Elf32_Word nbucket = dlinfo->hash[0];
   Elf32_Word nchain = dlinfo->hash[1];
@@ -61,7 +61,7 @@ rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo)
       if (strcmp (dlinfo->strtab.table + symbol->st_name, name) == 0)
 	{
 	  if (symbol->st_shndx == STN_UNDEF
-	      || ELF32_ST_BIND (symbol->st_info) == STB_LOCAL)
+	      || (!local && ELF32_ST_BIND (symbol->st_info) == STB_LOCAL))
 	    goto depsearch;
 	  return dlinfo->offset + symbol->st_value;
 	}
@@ -74,7 +74,7 @@ rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo)
   for (i = 0; i < dlinfo->deps.count; i++)
     {
       struct rtld_info *info = &rtld_shlibs[dlinfo->deps.deps[i]];
-      void *addr = rtld_lookup_symbol (name, info);
+      void *addr = rtld_lookup_symbol (name, info, 0);
       if (addr != NULL)
         return addr;
     }
@@ -94,9 +94,11 @@ rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
       const char *name;
       symbol = rtld_get_symbol (dlinfo, ELF32_R_SYM (entry->r_info));
       name = dlinfo->strtab.table + symbol->st_name;
-      symaddr = rtld_lookup_symbol (name, dlinfo);
+      symaddr = rtld_lookup_symbol (name, dlinfo, 1);
       if (unlikely (symaddr == NULL))
 	{
+	  if (ELF32_ST_BIND (symbol->st_info) == STB_WEAK)
+	    return; /* Weak symbols are optionally defined */
 	  fprintf (stderr, "ld.so: %s: couldn't resolve undefined symbol: %s\n",
 		   dlinfo->name, name);
 	  abort ();

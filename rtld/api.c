@@ -404,7 +404,7 @@ rtld_dlsym (void *handle, const char *name, char *err)
     {
       if (rtld_shlibs[i].loadbase == handle)
 	{
-	  void *addr = rtld_lookup_symbol (name, &rtld_shlibs[i]);
+	  void *addr = rtld_lookup_symbol (name, &rtld_shlibs[i], 1);
 	  if (unlikely (addr == NULL))
 	    {
 	      strcpy (err, "symbol not found");
