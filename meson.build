@@ -189,6 +189,7 @@ libc_src = [
   'termios/tcpgrp.c',
   'termios/ttyname.c',
   'wchar/btowc.c',
+  'wchar/ctype.c',
   'wchar/mbrtowc.c',
   'wchar/wcrtomb.c',
   'wchar/wctob.c',

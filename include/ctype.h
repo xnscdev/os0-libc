@@ -19,40 +19,41 @@
 
 #include <bits/wctype.h>
 
-#define isalnum(c) iswalnum (c)
-#define isalnum_l(c, loc) iswalnum_l (c, loc)
-#define isalpha(c) iswalpha (c)
-#define isalpha_l(c, loc) iswalpha_l (c, loc)
-#define isblank(c) iswblank (c)
-#define isblank_l(c, loc) iswblank_l (c, loc)
-#define iscntrl(c) iswcntrl (c)
-#define iscntrl_l(c, loc) iswcntrl_l (c, loc)
-#define isdigit(c) iswdigit (c)
-#define isdigit_l(c, loc) iswdigit_l (c, loc)
-#define isgraph(c) iswgraph (c)
-#define isgraph_l(c, loc) iswgraph_l (c, loc)
-#define islower(c) iswlower (c)
-#define islower_l(c, loc) iswlower_l (c, loc)
-#define isprint(c) iswprint (c)
-#define isprint_l(c, loc) iswprint_l (c, loc)
-#define ispunct(c) iswpunct (c)
-#define ispunct_l(c, loc) iswpunct_l (c, loc)
-#define isspace(c) iswspace (c)
-#define isspace_l(c, loc) iswspace_l (c, loc)
-#define isupper(c) iswupper (c)
-#define isupper_l(c, loc) iswupper_l (c, loc)
-#define isxdigit(c) iswxdigit (c)
-#define isxdigit_l(c, loc) iswxdigit_l (c, loc)
+__BEGIN_DECLS
 
-#define tolower(c) towlower (c)
-#define tolower_l(c, loc) towlower_l (c, loc)
-#define toupper(c) towupper (c)
-#define toupper_l(c, loc) towupper_l (c, loc)
+int isalnum (int c);
+int isalnum_l (int c, locale_t loc);
+int isalpha (int c);
+int isalpha_l (int c, locale_t loc);
+int isblank (int c);
+int isblank_l (int c, locale_t loc);
+int iscntrl (int c);
+int iscntrl_l (int c, locale_t loc);
+int isdigit (int c);
+int isdigit_l (int c, locale_t loc);
+int isgraph (int c);
+int isgraph_l (int c, locale_t loc);
+int islower (int c);
+int islower_l (int c, locale_t loc);
+int isprint (int c);
+int isprint_l (int c, locale_t loc);
+int ispunct (int c);
+int ispunct_l (int c, locale_t loc);
+int isspace (int c);
+int isspace_l (int c, locale_t loc);
+int isupper (int c);
+int isupper_l (int c, locale_t loc);
+int isxdigit (int c);
+int isxdigit_l (int c, locale_t loc);
 
-#define isascii(c) ({				\
-      int _c = c;				\
-      _c >= 0 && _c < 0x80;			\
-    })
-#define toascii(c) (c & 0x7f)
+int tolower (int c);
+int tolower_l (int c, locale_t loc);
+int toupper (int c);
+int toupper_l (int c, locale_t loc);
+
+int isascii (int c);
+int toascii (int c);
+
+__END_DECLS
 
 #endif
