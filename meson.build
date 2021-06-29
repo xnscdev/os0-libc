@@ -181,6 +181,7 @@ libc_src = [
   'syscall/time.c',
   'syscall/truncate.c',
   'syscall/ugid.c',
+  'syscall/umask.c',
   'syscall/unlink.c',
   'syscall/wait.c',
   'syscall/xattr.c',

@@ -25,6 +25,7 @@
 __BEGIN_DECLS
 
 int fork (void);
+int vfork (void);
 pid_t getpid (void);
 pid_t getppid (void);
 
@@ -87,6 +88,7 @@ int pipe (int fd[2]);
 int dup (int fd);
 int dup2 (int fd1, int fd2);
 
+mode_t umask (mode_t mask);
 int access (const char *path, int mode);
 int faccessat (int fd, const char *path, int mode, int flags);
 

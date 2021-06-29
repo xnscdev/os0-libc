@@ -1,4 +1,4 @@
-/* fork.c -- This file is part of OS/0 libc.
+/* umask.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,26 +17,8 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-int
-fork (void)
+mode_t
+umask (mode_t mask)
 {
-  return syscall (SYS_fork);
-}
-
-int
-vfork (void)
-{
-  return syscall (SYS_vfork);
-}
-
-pid_t
-getpid (void)
-{
-  return syscall (SYS_getpid);
-}
-
-pid_t
-getppid (void)
-{
-  return syscall (SYS_getppid);
+  return syscall (SYS_umask, mask);
 }
