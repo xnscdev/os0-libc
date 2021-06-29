@@ -117,12 +117,12 @@ const char *const sys_errlist[] = {
   [EDQUOT] = "Disk quota exceeded"
 };
 
-const int sys_nerr = sizeof (sys_errlist) / sizeof (sys_errlist[0]);
+const int sys_nerr = __NR_errno;
 
 char *
 strerror (int err)
 {
-  if (err < 0 || err > sys_nerr)
+  if (err < 0 || err >= sys_nerr)
     return NULL;
   return (char *) sys_errlist[err];
 }

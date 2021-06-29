@@ -35,7 +35,7 @@ sigfillset (sigset_t *set)
 int
 sigaddset (sigset_t *set, int sig)
 {
-  if (sig < 0 || sig >= NR_signals)
+  if (sig < 0 || sig >= NSIG)
     {
       errno = EINVAL;
       return -1;
@@ -47,7 +47,7 @@ sigaddset (sigset_t *set, int sig)
 int
 sigdelset (sigset_t *set, int sig)
 {
-  if (sig < 0 || sig >= NR_signals)
+  if (sig < 0 || sig >= NSIG)
     {
       errno = EINVAL;
       return -1;
@@ -59,7 +59,7 @@ sigdelset (sigset_t *set, int sig)
 int
 sigismember (const sigset_t *set, int sig)
 {
-  if (sig < 0 || sig >= NR_signals)
+  if (sig < 0 || sig >= NSIG)
     {
       errno = EINVAL;
       return -1;

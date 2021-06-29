@@ -56,6 +56,7 @@ char *strtok_r (char *__restrict s, const char *__restrict delims,
 
 char *strerror (int err);
 char *strerror_r (int err, char *buffer, size_t len);
+char *strsignal (int sig);
 
 __END_DECLS
 
