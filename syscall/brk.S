@@ -47,10 +47,6 @@ brk:
 	.type sbrk, @function
 sbrk:
 	push	%ebx
-	/* Determine current program break */
-	mov	$SYS_brk, %eax
-	xor	%ebx, %ebx
-	int	$0x80
 
 	mov	8(%esp), %ecx
 	/* If increment is negative, error out */
@@ -66,10 +62,17 @@ sbrk:
 	ret
 
 2:
+	/* Determine current program break */
+	mov	$SYS_brk, %eax
+	xor	%ebx, %ebx
+	int	$0x80
+	push	%eax
+
 	lea	(%eax,%ecx,1), %ebx
 	mov	$SYS_brk, %eax
 	int	$0x80
 	cmp	%eax, %ebx
+	pop	%eax
 	jne	1b
 
 	pop	%ebx

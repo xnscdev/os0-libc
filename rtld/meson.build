@@ -2,6 +2,7 @@ rtld_src = [
   'api.c',
   'load.c',
   'lookup.c',
+  'plt.S',
   'main.c',
   'queue.c',
   'reloc.c',

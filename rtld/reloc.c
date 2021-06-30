@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <branch.h>
+#include <dlfcn.h>
 #include <rtld.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,8 +46,9 @@ rtld_symbol_hash (const char *name)
 }
 
 void *
-rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo, int local)
+rtld_lookup_symbol (const char *name, int obj, int local)
 {
+  struct rtld_info *dlinfo = &rtld_shlibs[obj];
   Elf32_Word nbucket = dlinfo->hash[0];
   Elf32_Word nchain = dlinfo->hash[1];
   Elf32_Word *bucket = &dlinfo->hash[2];
@@ -73,8 +75,8 @@ rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo, int local)
      its dependencies */
   for (i = 0; i < dlinfo->deps.count; i++)
     {
-      struct rtld_info *info = &rtld_shlibs[dlinfo->deps.deps[i]];
-      void *addr = rtld_lookup_symbol (name, info, 0);
+      int lib = dlinfo->deps.deps[i];
+      void *addr = rtld_lookup_symbol (name, lib, 0);
       if (addr != NULL)
         return addr;
     }
@@ -82,11 +84,18 @@ rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo, int local)
 }
 
 void
-rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
-		  Elf32_Sword addend)
+rtld_perform_rel (Elf32_Rel *entry, int obj, Elf32_Sword addend, int mode)
 {
+#define REL_OFFSET ((Elf32_Addr *) (dlinfo->offset + entry->r_offset))
+  struct rtld_info *dlinfo = &rtld_shlibs[obj];
   Elf32_Sym *symbol = NULL;
   void *symaddr;
+
+  if ((mode & RTLD_LAZY) && ELF32_R_TYPE (entry->r_info) == R_386_JMP_SLOT)
+    {
+      *REL_OFFSET += (uintptr_t) dlinfo->offset;
+      return;
+    }
 
   /* Lookup the symbol if there is one specified */
   if (ELF32_R_SYM (entry->r_info) != STN_UNDEF)
@@ -94,7 +103,7 @@ rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
       const char *name;
       symbol = rtld_get_symbol (dlinfo, ELF32_R_SYM (entry->r_info));
       name = dlinfo->strtab.table + symbol->st_name;
-      symaddr = rtld_lookup_symbol (name, dlinfo, 1);
+      symaddr = rtld_lookup_symbol (name, obj, 1);
       if (unlikely (symaddr == NULL))
 	{
 	  if (ELF32_ST_BIND (symbol->st_info) == STB_WEAK)
@@ -107,7 +116,6 @@ rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
 
   switch (ELF32_R_TYPE (entry->r_info))
     {
-#define REL_OFFSET ((Elf32_Addr *) (dlinfo->offset + entry->r_offset))
     case R_386_COPY:
     case R_386_GLOB_DAT:
     case R_386_JMP_SLOT:
@@ -122,19 +130,14 @@ rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
     case R_386_RELATIVE:
       *REL_OFFSET += (uintptr_t) dlinfo->offset + addend;
       break;
-    case R_386_GOTOFF:
-      *REL_OFFSET = (uintptr_t) symaddr - (uintptr_t) dlinfo->pltgot + addend;
-      break;
-    case R_386_GOTPC:
-      *REL_OFFSET = (uintptr_t) dlinfo->pltgot - entry->r_offset - 4 + addend;
-      break;
 #undef REL_OFFSET
     }
 }
 
 void
-rtld_relocate (struct rtld_info *dlinfo)
+rtld_relocate (int obj, int mode)
 {
+  struct rtld_info *dlinfo = &rtld_shlibs[obj];
   size_t size;
   if (dlinfo->rel.table != NULL)
     {
@@ -142,7 +145,7 @@ rtld_relocate (struct rtld_info *dlinfo)
 	{
 	  Elf32_Rel *entry =
 	    (Elf32_Rel *) ((uintptr_t) dlinfo->rel.table + size);
-	  rtld_perform_rel (entry, dlinfo, 0);
+	  rtld_perform_rel (entry, obj, 0, mode);
 	}
     }
   if (dlinfo->rela.table != NULL)
@@ -151,7 +154,7 @@ rtld_relocate (struct rtld_info *dlinfo)
 	{
 	  Elf32_Rela *entry =
 	    (Elf32_Rela *) ((uintptr_t) dlinfo->rela.table + size);
-	  rtld_perform_rel ((Elf32_Rel *) entry, dlinfo, entry->r_addend);
+	  rtld_perform_rel ((Elf32_Rel *) entry, obj, entry->r_addend, mode);
 	}
     }
 
@@ -160,7 +163,7 @@ rtld_relocate (struct rtld_info *dlinfo)
       for (size = 0; size < dlinfo->pltrel.size / sizeof (Elf32_Rel); size++)
 	{
 	  Elf32_Rel *entry = (Elf32_Rel *) dlinfo->pltrel.table + size;
-	  rtld_perform_rel (entry, dlinfo, 0);
+	  rtld_perform_rel (entry, obj, 0, mode);
 	}
     }
   else
@@ -168,7 +171,53 @@ rtld_relocate (struct rtld_info *dlinfo)
       for (size = 0; size < dlinfo->pltrel.size / sizeof (Elf32_Rela); size++)
 	{
 	  Elf32_Rela *entry = (Elf32_Rela *) dlinfo->pltrel.table + size;
-	  rtld_perform_rel ((Elf32_Rel *) entry, dlinfo, entry->r_addend);
+	  rtld_perform_rel ((Elf32_Rel *) entry, obj, entry->r_addend, mode);
 	}
     }
+}
+
+void *
+rtld_lazy_get_got_offset (unsigned long symbol, int obj)
+{
+  return rtld_shlibs[obj].pltgot + 3 + (symbol >> 3);
+}
+
+const char *
+rtld_lazy_get_symbol_name (void *got_addr, int obj)
+{
+  struct rtld_info *dlinfo = &rtld_shlibs[obj];
+  int rela = dlinfo->pltrel.type == DT_RELA;
+  size_t first = 0;
+  size_t last = dlinfo->pltrel.size /
+    (rela ? sizeof (Elf32_Rela) : sizeof (Elf32_Rel)) - 1;
+  while (first <= last)
+    {
+      size_t mid = (first + last) / 2;
+      Elf32_Rel *entry;
+      void *addr;
+      if (rela)
+	entry = (Elf32_Rel *) ((Elf32_Rela *) dlinfo->pltrel.table + mid);
+      else
+	entry = (Elf32_Rel *) dlinfo->pltrel.table + mid;
+      addr = dlinfo->offset + entry->r_offset;
+      if (addr == got_addr)
+	{
+	  Elf32_Sym *symbol =
+	    rtld_get_symbol (dlinfo, ELF32_R_SYM (entry->r_info));
+	  return dlinfo->strtab.table + symbol->st_name;
+	}
+      else if (addr > got_addr)
+	last = mid - 1;
+      else
+	first = mid + 1;
+    }
+  return NULL;
+}
+
+void
+rtld_lazy_bind_fail (const char *name, int obj)
+{
+  fprintf (stderr, "ld.so: %s: failed to bind symbol: %s\n",
+	   rtld_shlibs[obj].name, name);
+  abort ();
 }

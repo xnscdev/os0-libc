@@ -20,10 +20,8 @@
 _start:
 	/* Kernel places argv in ESI and envp in EDI */
 	push	%edi
+	call	__libc_set_environ /* Set environ variable */
 	push	%esi
-
-	/* Set environ variable */
-	mov	%edi, environ
 
 	/* Calculate argc */
 	xor	%eax, %eax

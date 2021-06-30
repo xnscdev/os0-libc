@@ -46,10 +46,10 @@
     }									\
   while (0)
 
-static int rtld_dlopen_shlib (const char *name, char *err);
+static int rtld_dlopen_shlib (const char *name, char *err, int mode);
 
 static int
-rtld_dlopen_load_dynamic (struct rtld_info *dlinfo, char *err)
+rtld_dlopen_load_dynamic (struct rtld_info *dlinfo, char *err, int mode)
 {
   Elf32_Dyn *entry;
   for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
@@ -145,7 +145,7 @@ rtld_dlopen_load_dynamic (struct rtld_info *dlinfo, char *err)
 	  int obj;
 	  if (unlikely (*name == '\0'))
 	    continue;
-	  obj = rtld_dlopen_shlib (name, err);
+	  obj = rtld_dlopen_shlib (name, err, mode);
 	  if (unlikely (obj == -1))
 	    return -1;
 	  temp = realloc (dlinfo->deps.deps,
@@ -311,7 +311,7 @@ rtld_dlopen_map_elf (int fd, struct rtld_info *dlinfo, char *err)
 }
 
 static int
-rtld_dlopen_shlib (const char *name, char *err)
+rtld_dlopen_shlib (const char *name, char *err, int mode)
 {
   int fd = -1;
   unsigned int i;
@@ -343,9 +343,11 @@ rtld_dlopen_shlib (const char *name, char *err)
   rtld_shlibs[i].fd = fd;
   if (rtld_dlopen_map_elf (fd, &rtld_shlibs[i], err) == -1)
     goto err;
-  if (rtld_dlopen_load_dynamic (&rtld_shlibs[i], err) == -1)
+  if (rtld_dlopen_load_dynamic (&rtld_shlibs[i], err, mode) == -1)
     goto err;
-  rtld_relocate (&rtld_shlibs[i]);
+  rtld_relocate (i, mode);
+  if (rtld_shlibs[i].init != NULL)
+    rtld_shlibs[i].init ();
   return i;
 
  err:
@@ -372,17 +374,20 @@ rtld_closelib (unsigned int obj, char *err)
       temp = segment->next;
       free (segment);
     }
+  if (rtld_shlibs[obj].fini != NULL)
+    rtld_shlibs[obj].fini ();
   for (i = 0; i < rtld_shlibs[obj].deps.count; i++)
     {
       if (rtld_closelib (rtld_shlibs[obj].deps.deps[i], err) == -1)
 	return -1;
     }
-  memset (&rtld_shlibs[i], 0, sizeof (struct rtld_info));
+  free (rtld_shlibs[obj].deps.deps);
+  memset (&rtld_shlibs[obj], 0, sizeof (struct rtld_info));
   return 0;
 }
 
 void *
-rtld_dlopen (const char *name, char *err)
+rtld_dlopen (const char *name, char *err, int mode)
 {
   int obj;
   if (unlikely (*name == '\0'))
@@ -390,7 +395,7 @@ rtld_dlopen (const char *name, char *err)
       strcpy (err, "bad object name");
       return NULL;
     }
-  obj = rtld_dlopen_shlib (name, err);
+  obj = rtld_dlopen_shlib (name, err, mode);
   if (unlikely (obj == -1))
     return NULL;
   return rtld_shlibs[obj].loadbase;
@@ -404,7 +409,7 @@ rtld_dlsym (void *handle, const char *name, char *err)
     {
       if (rtld_shlibs[i].loadbase == handle)
 	{
-	  void *addr = rtld_lookup_symbol (name, &rtld_shlibs[i], 1);
+	  void *addr = rtld_lookup_symbol (name, i, 1);
 	  if (unlikely (addr == NULL))
 	    {
 	      strcpy (err, "symbol not found");

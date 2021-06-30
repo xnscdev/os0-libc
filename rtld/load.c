@@ -72,9 +72,10 @@ rtld_map_elf (int fd, struct rtld_info *dlinfo)
 }
 
 void
-rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
+rtld_load_dynamic (int obj, unsigned long priority, int mode)
 {
   Elf32_Dyn *entry;
+  struct rtld_info *dlinfo = &rtld_shlibs[obj];
   for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
     {
       switch (entry->d_tag)
@@ -163,6 +164,12 @@ rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
       abort ();
     }
 
+  if (likely (dlinfo->pltgot != NULL))
+    {
+      dlinfo->pltgot[1] = obj;
+      dlinfo->pltgot[2] = (uintptr_t) rtld_lazy_lookup_symbol;
+    }
+
   /* Load shared libraries */
   for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
     {
@@ -170,16 +177,16 @@ rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority)
 	{
 	  const char *name = dlinfo->strtab.table + entry->d_un.d_val;
 	  unsigned int *temp;
-	  unsigned int obj;
+	  unsigned int lib;
 	  if (unlikely (*name == '\0'))
 	    continue;
-	  obj = rtld_load_shlib (name, priority + 1);
+	  lib = rtld_load_shlib (name, priority + 1, mode);
 	  temp = realloc (dlinfo->deps.deps,
-			  sizeof (unsigned int) * ++dlinfo->deps.count);
+			  sizeof (unsigned int) * (dlinfo->deps.count + 1));
 	  if (unlikely (temp == NULL))
 	    RTLD_NO_MEMORY (name);
 	  dlinfo->deps.deps = temp;
-	  dlinfo->deps.deps[dlinfo->deps.count - 1] = obj;
+	  dlinfo->deps.deps[dlinfo->deps.count++] = lib;
 	}
     }
 }
@@ -282,12 +289,12 @@ rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo)
 }
 
 unsigned int
-rtld_load_shlib (const char *name, unsigned long priority)
+rtld_load_shlib (const char *name, unsigned long priority, int mode)
 {
   int fd;
   unsigned int i;
   /* Check if a library with the same name has already been loaded */
-  for (i = 0; i < MAX_SHLIBS && rtld_shlibs[i].name != NULL; i++)
+  for (i = 1; i < MAX_SHLIBS && rtld_shlibs[i].name != NULL; i++)
     {
       if (strcmp (name, rtld_shlibs[i].name) == 0)
 	return i; /* Already loaded */
@@ -308,7 +315,7 @@ rtld_load_shlib (const char *name, unsigned long priority)
     }
   rtld_shlibs[i].fd = fd;
   rtld_map_elf (fd, &rtld_shlibs[i]);
-  rtld_load_dynamic (&rtld_shlibs[i], priority);
-  rtld_relocate (&rtld_shlibs[i]);
+  rtld_load_dynamic (i, priority, mode);
+  rtld_relocate (i, mode);
   return i;
 }

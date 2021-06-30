@@ -30,7 +30,7 @@ static char *__dl_strtab;
 static uintptr_t __dl_symtab;
 static size_t __dl_symsize;
 static Elf32_Word *__dl_hash;
-static void *(*__dl_open_func) (const char *, char *);
+static void *(*__dl_open_func) (const char *, char *, int);
 static void *(*__dl_sym_func) (void *, const char *, char *);
 static int (*__dl_close_func) (void *, char *);
 
@@ -124,7 +124,9 @@ dlopen (const char *path, int mode)
 {
   if (unlikely (__dl_open_func == NULL))
     __dl_open_func = __dl_lookup_rtld_sym (__DL_OPEN_FUNC_NAME);
-  return __dl_open_func (path, __dl_err_str);
+  if (!(mode & (RTLD_LAZY | RTLD_NOW)))
+    mode |= RTLD_LAZY;
+  return __dl_open_func (path, __dl_err_str, mode);
 }
 
 void *

@@ -215,3 +215,9 @@ __libc_setup_env (void)
   buffer[len] = NULL;
   environ = buffer;
 }
+
+void
+__libc_set_environ (char **env)
+{
+  environ = env;
+}

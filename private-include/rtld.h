@@ -121,7 +121,7 @@ struct rtld_info
   void *loadbase;                /* Address of ELF header */
   void *offset;                  /* Offset to add to relocations */
   Elf32_Dyn *dynamic;            /* Address of ELF .dynamic section */
-  void *pltgot;                  /* Address of PLT/GOT */
+  Elf32_Addr *pltgot;            /* Address of PLT/GOT */
   Elf32_Word *hash;              /* Symbol hash table */
   struct elf_strtab strtab;      /* Symbol string table */
   struct elf_symtab symtab;      /* Dynamic symbol table */
@@ -150,10 +150,11 @@ extern struct queue_node *rtld_init_func;
 extern struct queue_node *rtld_fini_func;
 
 void rtld_map_elf (int fd, struct rtld_info *dlinfo);
-void rtld_load_dynamic (struct rtld_info *dlinfo, unsigned long priority);
+void rtld_load_dynamic (int obj, unsigned long priority, int mode);
 void rtld_load_segment (int fd, Elf32_Phdr *phdr, struct rtld_info *dlinfo);
 void rtld_load_phdrs (int fd, Elf32_Ehdr *ehdr, struct rtld_info *dlinfo);
-unsigned int rtld_load_shlib (const char *name, unsigned long priority);
+unsigned int rtld_load_shlib (const char *name, unsigned long priority,
+			      int mode);
 
 int rtld_open_shlib (const char *name);
 
@@ -161,11 +162,13 @@ void rtld_queue_add (struct queue_node **head, void *data, int priority);
 void *rtld_queue_poll (struct queue_node **head);
 
 unsigned long rtld_symbol_hash (const char *name);
-void *rtld_lookup_symbol (const char *name, struct rtld_info *dlinfo,
-			  int local);
-void rtld_perform_rel (Elf32_Rel *entry, struct rtld_info *dlinfo,
-		       Elf32_Sword addend);
-void rtld_relocate (struct rtld_info *dlinfo);
+void *rtld_lookup_symbol (const char *name, int obj, int local);
+void rtld_lazy_lookup_symbol (void);
+void rtld_perform_rel (Elf32_Rel *entry, int obj, Elf32_Sword addend, int mode);
+void rtld_relocate (int obj, int mode);
+void *rtld_lazy_get_got_offset (unsigned long symbol, int obj);
+const char *rtld_lazy_get_symbol_name (void *got_addr, int obj);
+void rtld_lazy_bind_fail (const char *name, int obj) __attribute__ ((noreturn));
 
 void rtld_remap_exec (void);
 void rtld_remap_memory (void);

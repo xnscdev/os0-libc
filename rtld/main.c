@@ -16,13 +16,13 @@
 
 #include <sys/stat.h>
 #include <branch.h>
+#include <dlfcn.h>
 #include <fcntl.h>
 #include <rtld.h>
+#include <setup.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-void __libc_init (void);
 
 extern char **environ;
 
@@ -53,19 +53,23 @@ rtld_exec_fini_funcs (void)
 void *
 rtld_main (void *base, Elf32_Dyn *dynamic, char **env)
 {
+  int mode;
+
   /* Initialize libc */
   environ = env;
-  __libc_init ();
+  __libc_setup_stdstr ();
 
   /* Initialize executable object info */
-  rtld_shlibs->name = "";
+  rtld_shlibs->name = "(executable)";
+  rtld_shlibs->fd = -1;
   rtld_shlibs->loadbase = base;
   rtld_shlibs->offset = NULL;
   rtld_shlibs->dynamic = dynamic;
 
   /* Load, relocate, and remap segments */
-  rtld_load_dynamic (rtld_shlibs, 0);
-  rtld_relocate (rtld_shlibs);
+  mode = getenv ("LD_BIND_NOW") == NULL ? RTLD_LAZY : RTLD_NOW;
+  rtld_load_dynamic (0, 0, mode);
+  rtld_relocate (0, mode);
   rtld_remap_memory ();
 
   rtld_exec_init_funcs ();
