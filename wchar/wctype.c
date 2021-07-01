@@ -37,6 +37,8 @@
 #define WCTRANS_TOLOWER 0
 #define WCTRANS_TOUPPER 1
 
+mbstate_t __libc_mbstate;
+
 static const char *const wctype_props[__LC_wctype_max] = {
   "alnum",
   "alpha",

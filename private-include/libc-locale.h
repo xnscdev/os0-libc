@@ -35,22 +35,6 @@ extern mbstate_t __libc_mbstate __hidden;
 
 /* POSIX C locale functions */
 
-int __libc_posix_iswalnum (wint_t wc) __hidden;
-int __libc_posix_iswalpha (wint_t wc) __hidden;
-int __libc_posix_iswblank (wint_t wc) __hidden;
-int __libc_posix_iswcntrl (wint_t wc) __hidden;
-int __libc_posix_iswdigit (wint_t wc) __hidden;
-int __libc_posix_iswgraph (wint_t wc) __hidden;
-int __libc_posix_iswlower (wint_t wc) __hidden;
-int __libc_posix_iswprint (wint_t wc) __hidden;
-int __libc_posix_iswpunct (wint_t wc) __hidden;
-int __libc_posix_iswspace (wint_t wc) __hidden;
-int __libc_posix_iswupper (wint_t wc) __hidden;
-int __libc_posix_iswxdigit (wint_t wc) __hidden;
-
-wint_t __libc_posix_towlower (wint_t wc) __hidden;
-wint_t __libc_posix_towupper (wint_t wc) __hidden;
-
 size_t __libc_posix_mbrtowc (wchar_t *__restrict pwc,
 			     const char *__restrict str, size_t len,
 			     mbstate_t *__restrict ps) __hidden;

@@ -39,7 +39,7 @@ size_t
 strcspn (const char *str, const char *reject)
 {
   const char *ptr = str;
-  while (*ptr != '\0')
+  while (*str != '\0')
     {
       const char *c;
       for (c = reject; *c != '\0'; c++)

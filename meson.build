@@ -60,7 +60,6 @@ subdir('include')
 libc_inc = include_directories('.', 'include', 'private-include')
 
 libc_src = [
-  'locale/ctype.c',
   'locale/localeconv.c',
   'locale/posix.c',
   'locale/setlocale.c',
