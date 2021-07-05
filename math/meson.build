@@ -78,7 +78,8 @@ libm_src = [
   'w_remainder.c',
   'w_scalb.c',
   'w_sinh.c',
-  'w_sqrt.c'
+  'w_sqrt.c',
+  'wrapper.c'
 ]
 
 build_target('m', libm_src, install: true, dependencies: libc_dep,

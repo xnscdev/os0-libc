@@ -7,6 +7,7 @@ configure_file(input: 'inttypes.h.in', output: 'inttypes.h',
 
 install_headers('alloca.h',
 		'assert.h',
+		'complex.h',
 		'ctype.h',
 		'dirent.h',
 		'errno.h',
