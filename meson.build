@@ -184,6 +184,7 @@ libc_src = [
   'syscall/unlink.c',
   'syscall/wait.c',
   'syscall/xattr.c',
+  'termios/cfmakeraw.c',
   'termios/cfspeed.c',
   'termios/tcattr.c',
   'termios/tcflush.c',
