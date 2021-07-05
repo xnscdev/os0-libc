@@ -128,6 +128,8 @@ ssize_t readlinkat (int fd, const char *__restrict path,
 int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
 
+void sync (void);
+
 unsigned int sleep (unsigned int seconds);
 unsigned int alarm (unsigned int seconds);
 int pause (void);

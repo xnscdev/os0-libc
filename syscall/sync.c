@@ -1,4 +1,4 @@
-/* signal.h -- This file is part of OS/0 libc.
+/* sync.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,25 +14,11 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SIGNAL_H
-#define _SIGNAL_H
+#include <sys/syscall.h>
+#include <unistd.h>
 
-#include <sys/signal.h>
-
-__BEGIN_DECLS
-
-int kill (pid_t pid, int sig);
-int raise (int sig);
-int killpg (pid_t pgid, int sig);
-
-int sigaction (int sig, const struct sigaction *__restrict act,
-	       struct sigaction *__restrict old);
-sig_t signal (int sig, sig_t func);
-int sigprocmask (int how, const sigset_t *__restrict set,
-		 sigset_t *__restrict old);
-int sigsuspend (const sigset_t *mask);
-int sigpending (sigset_t *set);
-
-__END_DECLS
-
-#endif
+void
+sync (void)
+{
+  syscall (SYS_sync);
+}
