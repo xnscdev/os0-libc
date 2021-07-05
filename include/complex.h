@@ -17,6 +17,13 @@
 #ifndef _COMPLEX_H
 #define _COMPLEX_H
 
+#define complex _Complex
+#define imaginary _Imaginary
+
+#define _Complex_I ((float complex) 1i)
+#define _Imaginary_I ((float imaginary) 1i)
+#define I _Imaginary_I
+
 __BEGIN_DECLS
 
 __END_DECLS

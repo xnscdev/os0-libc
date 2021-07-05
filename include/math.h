@@ -19,6 +19,32 @@
 
 #include <sys/cdefs.h>
 
+#define M_E        2.718281828459045235360287471352662498
+#define M_LOG2E    1.442695040888963407359924681001892137
+#define M_LOG10E   0.434294481903251827651128918916605082
+#define M_LN2      0.693147180559945309417232121458176568
+#define M_LN10     2.302585092994045684017991454684364208
+#define M_PI       3.141592653589793238462643383279502884
+#define M_PI_2     1.570796326794896619231321691639751442
+#define M_PI_4     0.785398163397448309615660845819875721
+#define M_1_PI     0.318309886183790671537767526745028724
+#define M_2_PI     0.636619772367581343075535053490057448
+#define M_2_SQRTPI 1.128379167095512573896158903121545172
+#define M_SQRT2    1.414213562373095048801688724209698079
+#define M_SQRT1_2  0.707106781186547524400844362104849039
+
+#define FP_INFINITE  1
+#define FP_NAN       2
+#define FP_NORMAL    3
+#define FP_SUBNORMAL 4
+#define FP_ZERO      5
+
+#define HUGE_VAL  __builtin_huge_val ()
+#define HUGE_VALF __builtin_huge_valf ()
+#define HUGE_VALL __builtin_huge_vall ()
+#define INFINITY  __builtin_inff ()
+#define NAN       __builtin_nanf ("")
+
 __BEGIN_DECLS
 
 double acos (double x);
@@ -152,8 +178,21 @@ double hypot (double x, double y);
 float hypotf (float x, float y);
 long double hypotl (long double x, long double y);
 
-double isnan (double x);
 double finite (double x);
+
+#define fpclassify(x) __builtin_fpclassify (FP_NAN, FP_INFINITE, FP_NORMAL, \
+					    FP_SUBNORMAL, FP_ZERO, (x))
+#define isfinite(x) __builtin_isfinite (x)
+#define isgreater(x, y) (x > y)
+#define isgreaterequal(x, y) (x >= y)
+#define isinf(x) __builtin_isinf_sign (x)
+#define isless(x, y) (x < y)
+#define islessequal(x, y) (x <= y)
+#define islessgreater(x, y) (x != y)
+#define isnan(x) __builtin_isnan (x)
+#define isnormal(x) __builtin_isnormal (x)
+#define isunordered(x, y) __builtin_isunordered (x, y)
+#define signbit(x) __builtin_signbit (x)
 
 double j0 (double x);
 double j1 (double x);
