@@ -99,6 +99,7 @@ libc_src = [
   'stdlib/exec.c',
   'stdlib/exit.c',
   'stdlib/getopt.c',
+  'stdlib/grp.c',
   'stdlib/init.c',
   'stdlib/isatty.c',
   'stdlib/locks.c',

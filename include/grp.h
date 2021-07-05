@@ -1,4 +1,4 @@
-/* pwd.h -- This file is part of OS/0 libc.
+/* grp.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,37 +14,36 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _PWD_H
-#define _PWD_H
+#ifndef _GRP_H
+#define _GRP_H
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <stddef.h>
 
-struct passwd
+#define __gr_mem_limit 16
+
+struct group
 {
-  char *pw_name;
-  char *pw_passwd;
-  uid_t pw_uid;
-  gid_t pw_gid;
-  char *pw_gecos;
-  char *pw_dir;
-  char *pw_shell;
+  char *gr_name;
+  gid_t gr_gid;
+  char **gr_mem;
+  char *__gr_memv[__gr_mem_limit];
 };
 
 __BEGIN_DECLS
 
-struct passwd *getpwnam (const char *name);
-struct passwd *getpwuid (uid_t uid);
-int getpwnam_r (const char *__restrict name, struct passwd *__restrict pwd,
+struct group *getgrgid (gid_t gid);
+struct group *getgrnam (const char *name);
+int getgrgid_r (gid_t gid, struct group *__restrict grp,
 		char *__restrict buffer, size_t len,
-		struct passwd **__restrict result);
-int getpwuid_r (uid_t uid, struct passwd *__restrict pwd,
+		struct group **__restrict result);
+int getgrnam_r (const char *__restrict name, struct group *__restrict grp,
 		char *__restrict buffer, size_t len,
-		struct passwd **__restrict result);
-void setpwent (void);
-struct passwd *getpwent (void);
-void endpwent (void);
+		struct group **__restrict result);
+void setgrent (void);
+struct group *getgrent (void);
+void endgrent (void);
 
 __END_DECLS
 

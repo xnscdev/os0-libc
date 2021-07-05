@@ -24,7 +24,63 @@
 #define PASSWD_BUFSIZ 512
 
 static struct passwd __libc_passwd;
+static FILE *__libc_getpwent_stream;
 static char __libc_pwbuf[PASSWD_BUFSIZ];
+
+static struct passwd *
+__getpwent (struct passwd *__restrict result, FILE *__restrict stream,
+	    char *__restrict buffer, size_t len)
+{
+  char *ptr;
+  if (fgets (buffer, len, stream) == NULL)
+    return NULL;
+  if (buffer[strlen (buffer) - 1] != '\n')
+    {
+      /* Not enough space in buffer to read entire line */
+      errno = ERANGE;
+      return NULL;
+    }
+  else
+    buffer[strlen (buffer) - 1] = '\0';
+
+  result->pw_name = buffer;
+  ptr = strchr (buffer, ':');
+  if (ptr == NULL)
+    return NULL;
+  *ptr = '\0';
+
+  result->pw_passwd = ptr + 1;
+  ptr = strchr (ptr + 1, ':');
+  if (ptr == NULL)
+    return NULL;
+  *ptr = '\0';
+
+  result->pw_uid = atoi (ptr + 1);
+  ptr = strchr (ptr + 1, ':');
+  if (ptr == NULL)
+    return NULL;
+  *ptr = '\0';
+
+  result->pw_gid = atoi (ptr + 1);
+  ptr = strchr (ptr + 1, ':');
+  if (ptr == NULL)
+    return NULL;
+  *ptr = '\0';
+
+  result->pw_gecos = ptr + 1;
+  ptr = strchr (ptr + 1, ':');
+  if (ptr == NULL)
+    return NULL;
+  *ptr = '\0';
+
+  result->pw_dir = ptr + 1;
+  ptr = strchr (ptr + 1, ':');
+  if (ptr == NULL)
+    return NULL;
+  *ptr = '\0';
+  result->pw_shell = ptr + 1;
+  return result;
+}
 
 struct passwd *
 getpwnam (const char *name)
@@ -58,60 +114,12 @@ getpwnam_r (const char *__restrict name, struct passwd *__restrict pwd,
       *result = NULL;
       return -1;
     }
-  while (fgets (buffer, len, file) != NULL)
+  while (1)
     {
-      char *ptr;
-      if (buffer[strlen (buffer) - 1] != '\n')
-	{
-	  /* Not enough space in buffer to read entire line */
-	  errno = ERANGE;
-	  fclose (file);
-	  *result = NULL;
-	  return -1;
-	}
-
-      pwd->pw_name = buffer;
-      ptr = strchr (buffer, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-      if (strcmp (buffer, name) != 0)
-	continue;
-
-      pwd->pw_passwd = ptr + 1;
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_uid = atoi (ptr + 1);
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_gid = atoi (ptr + 1);
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_gecos = ptr + 1;
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_dir = ptr + 1;
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-      pwd->pw_shell = ptr + 1;
-
-      fclose (file);
-      *result = pwd;
-      return 0;
+      if (__getpwent (*result, file, buffer, len) == NULL)
+	break;
+      if (strcmp ((*result)->pw_name, name) == 0)
+	break;
     }
   if (ferror (file))
     {
@@ -120,6 +128,7 @@ getpwnam_r (const char *__restrict name, struct passwd *__restrict pwd,
       return -1;
     }
   fclose (file);
+  memcpy (pwd, *result, sizeof (struct passwd));
   return 0;
 }
 
@@ -134,60 +143,12 @@ getpwuid_r (uid_t uid, struct passwd *__restrict pwd, char *__restrict buffer,
       *result = NULL;
       return -1;
     }
-  while (fgets (buffer, len, file) != NULL)
+  while (1)
     {
-      char *ptr;
-      if (buffer[strlen (buffer) - 1] != '\n')
-	{
-	  /* Not enough space in buffer to read entire line */
-	  errno = ERANGE;
-	  fclose (file);
-	  *result = NULL;
-	  return -1;
-	}
-
-      pwd->pw_name = buffer;
-      ptr = strchr (buffer, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_passwd = ptr + 1;
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_uid = atoi (ptr + 1);
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-      if (pwd->pw_uid != uid)
-	continue;
-
-      pwd->pw_gid = atoi (ptr + 1);
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_gecos = ptr + 1;
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-
-      pwd->pw_dir = ptr + 1;
-      ptr = strchr (ptr + 1, ':');
-      if (ptr == NULL)
-	continue;
-      *ptr = '\0';
-      pwd->pw_shell = ptr + 1;
-
-      fclose (file);
-      *result = pwd;
-      return 0;
+      if (__getpwent (*result, file, buffer, len) == NULL)
+	break;
+      if ((*result)->pw_uid == uid)
+	break;
     }
   if (ferror (file))
     {
@@ -196,5 +157,39 @@ getpwuid_r (uid_t uid, struct passwd *__restrict pwd, char *__restrict buffer,
       return -1;
     }
   fclose (file);
+  memcpy (pwd, *result, sizeof (struct passwd));
   return 0;
+}
+
+void
+setpwent (void)
+{
+  if (__libc_getpwent_stream != NULL)
+    rewind (__libc_getpwent_stream);
+}
+
+struct passwd *
+getpwent (void)
+{
+  if (__libc_getpwent_stream == NULL)
+    {
+      __libc_getpwent_stream = fopen (PASSWD_FILE, "r");
+      if (__libc_getpwent_stream == NULL)
+	{
+	  errno = ENOENT;
+	  return NULL;
+	}
+    }
+  return __getpwent (&__libc_passwd, __libc_getpwent_stream, __libc_pwbuf,
+		     PASSWD_BUFSIZ);
+}
+
+void
+endpwent (void)
+{
+  if (__libc_getpwent_stream != NULL)
+    {
+      fclose (__libc_getpwent_stream);
+      __libc_getpwent_stream = NULL;
+    }
 }
