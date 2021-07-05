@@ -18,6 +18,7 @@
 #define _STRINGS_H
 
 #include <sys/cdefs.h>
+#include <stddef.h>
 
 __BEGIN_DECLS
 
@@ -27,6 +28,9 @@ int ffsll (long long value);
 int fls (int value);
 int flsl (long value);
 int flsll (long long value);
+
+void bcopy (const void *src, void *dest, size_t len);
+void bzero (void *ptr, size_t len);
 
 __END_DECLS
 

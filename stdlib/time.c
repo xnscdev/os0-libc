@@ -61,6 +61,8 @@ static char __time_buf[26];
 static struct tm __tm_buf;
 
 char *tzname[2] = {"GMT", "GMT"};
+long timezone;
+int daylight;
 
 static int
 __time_calc (time_t time, long offset, struct tm *tp)
@@ -178,4 +180,13 @@ struct tm *
 localtime_r (const time_t *__restrict time, struct tm *__restrict tp)
 {
   return gmtime_r (time, tp);
+}
+
+void
+tzset (void)
+{
+  tzname[0] = "GMT";
+  tzname[1] = "GMT";
+  timezone = 0;
+  daylight = 0;
 }

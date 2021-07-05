@@ -19,10 +19,13 @@
 
 #include <sys/cdefs.h>
 #include <sys/time.h>
+#include <stddef.h>
 
 __BEGIN_DECLS
 
 extern char *tzname[2];
+extern long timezone;
+extern int daylight;
 
 char *asctime (const struct tm *tp);
 char *asctime_r (const struct tm *__restrict tp, char *__restrict buffer);
@@ -38,10 +41,15 @@ time_t timegm (struct tm *tp);
 time_t timelocal (struct tm *tp);
 #define mktime(tp) timelocal (tp)
 
+void tzset (void);
+
 time_t time (time_t *t);
 
 int nanosleep (const struct timespec *req, struct timespec *rem);
 unsigned int sleep (unsigned int seconds);
+
+size_t strftime (char *__restrict str, size_t len, const char *__restrict fmt,
+		 const struct tm *__restrict tp);
 
 __END_DECLS
 

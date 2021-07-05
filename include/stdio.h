@@ -19,6 +19,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
+#include <sys/unistd.h>
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -188,6 +189,7 @@ ssize_t getline (char **__restrict line, size_t *__restrict len,
 
 char *tmpnam (char *str);
 char *tmpnam_r (char *str);
+FILE *tmpfile (void);
 
 __END_DECLS
 

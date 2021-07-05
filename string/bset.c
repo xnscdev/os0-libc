@@ -1,4 +1,4 @@
-/* tmpnam.c -- This file is part of OS/0 libc.
+/* bset.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,38 +14,17 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <errno.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
+#include <strings.h>
 
-static char __libc_tmpnam_buf[L_tmpnam];
-
-char *
-tmpnam (char *str)
+void
+bcopy (const void *src, void *dest, size_t len)
 {
-  if (str == NULL)
-    str = __libc_tmpnam_buf;
-  return tmpnam_r (str);
+  memmove (dest, src, len);
 }
 
-char *
-tmpnam_r (char *str)
+void
+bzero (void *ptr, size_t len)
 {
-  unsigned int seed;
-  char name[7] = {0};
-  int i;
-  if (str == NULL)
-    return NULL;
-  seed = time (NULL);
-  while (1)
-    {
-      for (i = 0; i < 6; i++)
-	name[i] = 'A' + rand_r (&seed) % 26;
-      snprintf (str, L_tmpnam, "%s/file%s", P_tmpdir, name);
-      if (access (str, F_OK) == -1 && errno == ENOENT)
-	break;
-    }
-  return str;
+  memset (ptr, 0, len);
 }
