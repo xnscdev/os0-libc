@@ -28,7 +28,6 @@ int lstat (const char *__restrict path, struct stat *__restrict st);
 int fstat (int fd, struct stat *st);
 int fstatat (int fd, const char *__restrict path, struct stat *__restrict st,
 	     int flags);
-
 int stat64 (const char *__restrict path, struct stat64 *__restrict st);
 int lstat64 (const char *__restrict path, struct stat64 *__restrict st);
 int fstat64 (int fd, struct stat64 *st);

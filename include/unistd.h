@@ -77,6 +77,7 @@ ssize_t pwrite (int fd, const void *buffer, size_t len, off_t offset);
 ssize_t write (int fd, const void *buffer, size_t len);
 
 off_t lseek (int fd, off_t offset, int whence);
+off64_t lseek64 (int fd, off64_t offset, int whence);
 
 int open (const char *path, int flags, ...);
 int openat (int fd, const char *path, int flags, ...);
@@ -127,6 +128,8 @@ ssize_t readlinkat (int fd, const char *__restrict path,
 
 int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
+int truncate64 (const char *path, off64_t len);
+int ftruncate64 (int fd, off64_t len);
 
 void sync (void);
 
@@ -137,6 +140,12 @@ int pause (void);
 long syscall (long num, ...);
 
 long sysconf (int name);
+
+#if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
+#define lseek(fd, offset, whence) lseek64 (fd, offset, whence)
+#define truncate(path, len) truncate64 (path, len)
+#define ftruncate(fd, len) ftruncate64 (fd, len)
+#endif
 
 __END_DECLS
 

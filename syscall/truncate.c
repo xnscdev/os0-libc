@@ -28,3 +28,15 @@ ftruncate (int fd, off_t len)
 {
   return syscall (SYS_ftruncate, fd, len);
 }
+
+int
+truncate64 (const char *path, off64_t len)
+{
+  return syscall (SYS_truncate64, path, len);
+}
+
+int
+ftruncate64 (int fd, off64_t len)
+{
+  return syscall (SYS_ftruncate64, fd, len);
+}
