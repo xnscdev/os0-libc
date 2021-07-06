@@ -17,7 +17,6 @@
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H
 
-#include <bits/types/tm.h>
 #include <bits/time.h>
 #include <sys/cdefs.h>
 

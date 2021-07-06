@@ -23,11 +23,24 @@
 
 __BEGIN_DECLS
 
-int fstat (int fd, struct stat *st);
-int lstat (const char *__restrict path, struct stat *__restrict st);
 int stat (const char *__restrict path, struct stat *__restrict st);
+int lstat (const char *__restrict path, struct stat *__restrict st);
+int fstat (int fd, struct stat *st);
 int fstatat (int fd, const char *__restrict path, struct stat *__restrict st,
 	     int flags);
+
+int stat64 (const char *__restrict path, struct stat64 *__restrict st);
+int lstat64 (const char *__restrict path, struct stat64 *__restrict st);
+int fstat64 (int fd, struct stat64 *st);
+int fstatat64 (int fd, const char *__restrict path,
+	       struct stat64 *__restrict st, int flags);
+
+#if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
+#define stat(path, st) stat64 (path, st)
+#define lstat(path, st) lstat64 (path, st)
+#define fstat(fd, st) fstat64 (fd, st)
+#define fstatat(fd, path, st, flags) fstatat64 (fd, path, st, flags)
+#endif
 
 __END_DECLS
 

@@ -19,9 +19,9 @@
 #include <unistd.h>
 
 int
-fstat (int fd, struct stat *st)
+stat (const char *__restrict path, struct stat *__restrict st)
 {
-  return syscall (SYS_fstat, fd, st);
+  return syscall (SYS_stat, path, st);
 }
 
 int
@@ -31,7 +31,25 @@ lstat (const char *__restrict path, struct stat *__restrict st)
 }
 
 int
-stat (const char *__restrict path, struct stat *__restrict st)
+fstat (int fd, struct stat *st)
 {
-  return syscall (SYS_stat, path, st);
+  return syscall (SYS_fstat, fd, st);
+}
+
+int
+stat64 (const char *__restrict path, struct stat64 *__restrict st)
+{
+  return syscall (SYS_stat64, path, st);
+}
+
+int
+lstat64 (const char *__restrict path, struct stat64 *__restrict st)
+{
+  return syscall (SYS_lstat64, path, st);
+}
+
+int
+fstat64 (int fd, struct stat64 *st)
+{
+  return syscall (SYS_fstat64, fd, st);
 }
