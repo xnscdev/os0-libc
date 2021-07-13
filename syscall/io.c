@@ -20,9 +20,13 @@
 ssize_t
 pread (int fd, void *buffer, size_t len, off_t offset)
 {
-  if (lseek (fd, offset, SEEK_SET) == -1)
-    return -1;
-  return read (fd, buffer, len);
+  return pread64 (fd, buffer, len, offset);
+}
+
+ssize_t
+pread64 (int fd, void *buffer, size_t len, off64_t offset)
+{
+  return syscall (SYS_pread64, fd, buffer, len, offset);
 }
 
 ssize_t
@@ -34,9 +38,13 @@ read (int fd, void *buffer, size_t len)
 ssize_t
 pwrite (int fd, const void *buffer, size_t len, off_t offset)
 {
-  if (lseek (fd, offset, SEEK_SET) == -1)
-    return -1;
-  return write (fd, buffer, len);
+  return pwrite64 (fd, buffer, len, offset);
+}
+
+ssize_t
+pwrite64 (int fd, const void *buffer, size_t len, off64_t offset)
+{
+  return syscall (SYS_pwrite64, fd, buffer, len, offset);
 }
 
 ssize_t

@@ -71,9 +71,11 @@ int brk (void *ptr);
 void *sbrk (int inc);
 
 ssize_t pread (int fd, void *buffer, size_t len, off_t offset);
+ssize_t pread64 (int fd, void *buffer, size_t len, off64_t offset);
 ssize_t read (int fd, void *buffer, size_t len);
 
 ssize_t pwrite (int fd, const void *buffer, size_t len, off_t offset);
+ssize_t pwrite64 (int fd, const void *buffer, size_t len, off64_t offset);
 ssize_t write (int fd, const void *buffer, size_t len);
 
 off_t lseek (int fd, off_t offset, int whence);
@@ -142,6 +144,8 @@ long syscall (long num, ...);
 long sysconf (int name);
 
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
+#define pread(fd, buffer, len, offset) pread64 (fd, buffer, len, offset)
+#define pwrite(fd, buffer, len, offset) pwrite64 (fd, buffer, len, offset)
 #define lseek(fd, offset, whence) lseek64 (fd, offset, whence)
 #define truncate(path, len) truncate64 (path, len)
 #define ftruncate(fd, len) ftruncate64 (fd, len)
