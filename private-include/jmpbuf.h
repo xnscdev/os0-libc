@@ -1,4 +1,4 @@
-/* longjmp.S -- This file is part of OS/0 libc.
+/* jmpbuf.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,26 +14,14 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <jmpbuf.h>
+#ifndef _JMPBUF_H
+#define _JMPBUF_H
 
-	.section .text
-	.global longjmp
-	.type longjmp, @function
-longjmp:
-	mov	4(%esp), %edx
+#define EBX_OFFSET 0
+#define ESI_OFFSET 4
+#define EDI_OFFSET 8
+#define EBP_OFFSET 12
+#define ESP_OFFSET 16
+#define EIP_OFFSET 20
 
-	/* Get return value and make sure it is nonzero */
-	mov	8(%esp), %eax
-	test	%eax, %eax
-	jnz	1f
-	inc	%eax
-
-1:
-	mov	EBX_OFFSET(%edx), %ebx
-	mov	ESI_OFFSET(%edx), %esi
-	mov	EDI_OFFSET(%edx), %edi
-	mov	EBP_OFFSET(%edx), %ebp
-	mov	ESP_OFFSET(%edx), %esp
-	jmp	*EIP_OFFSET(%edx)
-
-	.size longjmp, . - longjmp
+#endif

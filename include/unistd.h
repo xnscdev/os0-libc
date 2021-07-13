@@ -25,7 +25,7 @@
 __BEGIN_DECLS
 
 int fork (void);
-int vfork (void);
+int vfork (void) __attribute__ ((returns_twice));
 pid_t getpid (void);
 pid_t getppid (void);
 

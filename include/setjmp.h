@@ -22,7 +22,7 @@
 
 struct __jmp_buf
 {
-  int __env[6];
+  unsigned long __env[6];
   int __mask_saved;
   sigset_t __mask;
 };
@@ -32,12 +32,13 @@ typedef struct __jmp_buf sigjmp_buf[1];
 
 __BEGIN_DECLS
 
-void _longjmp (jmp_buf env, int val) __attribute__ ((noreturn));
-int _setjmp (jmp_buf env) __attribute__ ((returns_twice));
-void longjmp (jmp_buf env, int val) __attribute__ ((noreturn));
-int setjmp (jmp_buf env) __attribute__ ((returns_twice));
+void longjmp (sigjmp_buf env, int val) __attribute__ ((noreturn));
 void siglongjmp (sigjmp_buf env, int val) __attribute__ ((noreturn));
 int sigsetjmp (sigjmp_buf env, int save_mask) __attribute__ ((returns_twice));
+
+#define _longjmp(env, val) longjmp (env, val)
+#define _setjmp(env) sigsetjmp (env, 0)
+#define setjmp(env) sigsetjmp (env, 1)
 
 __END_DECLS
 

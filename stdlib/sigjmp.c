@@ -1,4 +1,4 @@
-/* setjmp.c -- This file is part of OS/0 libc.
+/* sigjmp.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,24 +17,6 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <stddef.h>
-
-void
-_longjmp (jmp_buf env, int val)
-{
-  longjmp (env, val);
-}
-
-int
-_setjmp (jmp_buf env)
-{
-  return sigsetjmp (env, 0);
-}
-
-int
-setjmp (jmp_buf env)
-{
-  return sigsetjmp (env, 1);
-}
 
 void
 siglongjmp (sigjmp_buf env, int val)
