@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/syscall.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 ssize_t
@@ -36,6 +37,12 @@ read (int fd, void *buffer, size_t len)
 }
 
 ssize_t
+readv (int fd, const struct iovec *vec, int vlen)
+{
+  return syscall (SYS_readv, fd, vec, vlen);
+}
+
+ssize_t
 pwrite (int fd, const void *buffer, size_t len, off_t offset)
 {
   return pwrite64 (fd, buffer, len, offset);
@@ -51,4 +58,10 @@ ssize_t
 write (int fd, const void *buffer, size_t len)
 {
   return syscall (SYS_write, fd, buffer, len);
+}
+
+ssize_t
+writev (int fd, const struct iovec *vec, int vlen)
+{
+  return syscall (SYS_writev, fd, vec, vlen);
 }
