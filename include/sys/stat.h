@@ -35,7 +35,7 @@ int fstatat64 (int fd, const char *__restrict path,
 	       struct stat64 *__restrict st, int flags);
 
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
-#define stat(path, st) stat64 (path, st)
+#define stat stat64
 #define lstat(path, st) lstat64 (path, st)
 #define fstat(fd, st) fstat64 (fd, st)
 #define fstatat(fd, path, st, flags) fstatat64 (fd, path, st, flags)
