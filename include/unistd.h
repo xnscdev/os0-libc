@@ -103,6 +103,7 @@ int unlinkat (int fd, const char *path, int flags);
 
 int mknod (const char *path, mode_t mode, dev_t dev);
 int mknodat (int fd, const char *path, mode_t mode, dev_t dev);
+int mkfifo (const char *path, mode_t mode);
 
 int chmod (const char *path, mode_t mode);
 int fchmod (int fd, mode_t mode);

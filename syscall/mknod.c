@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -27,4 +28,10 @@ int
 mknodat (int fd, const char *path, mode_t mode, dev_t dev)
 {
   return syscall (SYS_mknodat, fd, path, mode, dev);
+}
+
+int
+mkfifo (const char *path, mode_t mode)
+{
+  return mknod (path, mode | S_IFIFO, 0);
 }
