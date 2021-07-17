@@ -34,6 +34,17 @@ int fstat64 (int fd, struct stat64 *st);
 int fstatat64 (int fd, const char *__restrict path,
 	       struct stat64 *__restrict st, int flags);
 
+mode_t umask (mode_t mask);
+int chmod (const char *path, mode_t mode);
+int fchmod (int fd, mode_t mode);
+int fchmodat (int fd, const char *path, mode_t mode, int flags);
+
+int mkdir (const char *path, mode_t mode);
+int mkdirat (int fd, const char *path, mode_t mode);
+int mknod (const char *path, mode_t mode, dev_t dev);
+int mknodat (int fd, const char *path, mode_t mode, dev_t dev);
+int mkfifo (const char *path, mode_t mode);
+
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
 #define stat stat64
 #define lstat(path, st) lstat64 (path, st)

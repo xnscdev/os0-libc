@@ -91,7 +91,6 @@ int pipe (int fd[2]);
 int dup (int fd);
 int dup2 (int fd1, int fd2);
 
-mode_t umask (mode_t mask);
 int access (const char *path, int mode);
 int faccessat (int fd, const char *path, int mode, int flags);
 
@@ -100,14 +99,7 @@ int linkat (int oldfd, const char *old, int newfd, const char *new, int flags);
 
 int unlink (const char *path);
 int unlinkat (int fd, const char *path, int flags);
-
-int mknod (const char *path, mode_t mode, dev_t dev);
-int mknodat (int fd, const char *path, mode_t mode, dev_t dev);
-int mkfifo (const char *path, mode_t mode);
-
-int chmod (const char *path, mode_t mode);
-int fchmod (int fd, mode_t mode);
-int fchmodat (int fd, const char *path, mode_t mode, int flags);
+int rmdir (const char *path);
 
 int chown (const char *path, uid_t uid, gid_t gid);
 int fchown (int fd, uid_t uid, gid_t gid);
@@ -116,10 +108,6 @@ int fchownat (int fd, const char *path, uid_t uid, gid_t gid, int flags);
 
 int rename (const char *old, const char *new);
 int renameat (int oldfd, const char *old, int newfd, const char *new);
-
-int mkdir (const char *path, mode_t mode);
-int mkdirat (int fd, const char *path, mode_t mode);
-int rmdir (const char *path);
 
 int symlink (const char *old, const char *new);
 int symlinkat (const char *old, int fd, const char *new);
