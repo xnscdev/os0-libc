@@ -1,4 +1,4 @@
-/* errno.c -- This file is part of OS/0 libc.
+/* utsname.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,33 +14,16 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <errno.h>
-#include <libgen.h>
-#include <string.h>
-#include <symbol.h>
+#ifndef _SYS_UTSNAME_H
+#define _SYS_UTSNAME_H
 
-static int __libc_errno;
+#include <bits/utsname.h>
+#include <sys/cdefs.h>
 
-char *program_invocation_name;
-char *program_invocation_short_name;
+__BEGIN_DECLS
 
-weak_alias (program_invocation_short_name, __progname);
+int uname (struct utsname *name);
 
-int *
-__errno (void)
-{
-  return &__libc_errno;
-}
+__END_DECLS
 
-void
-__libc_set_errno (int err)
-{
-  errno = err;
-}
-
-void
-__libc_set_program_names (char *arg)
-{
-  program_invocation_name = arg;
-  program_invocation_short_name = basename (arg);
-}
+#endif

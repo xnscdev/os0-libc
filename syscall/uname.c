@@ -1,4 +1,4 @@
-/* errno.c -- This file is part of OS/0 libc.
+/* uname.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,33 +14,12 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <errno.h>
-#include <libgen.h>
-#include <string.h>
-#include <symbol.h>
+#include <sys/syscall.h>
+#include <sys/utsname.h>
+#include <unistd.h>
 
-static int __libc_errno;
-
-char *program_invocation_name;
-char *program_invocation_short_name;
-
-weak_alias (program_invocation_short_name, __progname);
-
-int *
-__errno (void)
+int
+uname (struct utsname *name)
 {
-  return &__libc_errno;
-}
-
-void
-__libc_set_errno (int err)
-{
-  errno = err;
-}
-
-void
-__libc_set_program_names (char *arg)
-{
-  program_invocation_name = arg;
-  program_invocation_short_name = basename (arg);
+  return syscall (SYS_uname, name);
 }
