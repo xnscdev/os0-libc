@@ -40,6 +40,12 @@ fseek (FILE *stream, long offset, int whence)
   return fseeko (stream, offset, whence);
 }
 
+long
+ftell (FILE *stream)
+{
+  return (long) ftello (stream);
+}
+
 int
 fseeko (FILE *stream, off_t offset, int whence)
 {
@@ -49,12 +55,6 @@ fseeko (FILE *stream, off_t offset, int whence)
   stream->_flags &= ~__IO_eof;
   stream->_read_buf_len = 0;
   return 0;
-}
-
-long
-ftell (FILE *stream)
-{
-  return (long) ftello (stream);
 }
 
 off_t
@@ -67,4 +67,21 @@ void
 rewind (FILE *stream)
 {
   fseek (stream, 0, SEEK_SET);
+}
+
+int
+fseeko64 (FILE *stream, off64_t offset, int whence)
+{
+  off_t ret = lseek64 (stream->_fd, offset, whence);
+  if (ret == -1)
+    return -1;
+  stream->_flags &= ~__IO_eof;
+  stream->_read_buf_len = 0;
+  return 0;
+}
+
+off64_t
+ftello64 (FILE *stream)
+{
+  return lseek64 (stream->_fd, 0, SEEK_CUR);
 }

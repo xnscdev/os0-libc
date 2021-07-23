@@ -53,6 +53,8 @@ int system (const char *cmd);
 char *realpath (const char *__restrict path, char *__restrict resolved);
 
 int abs (int n);
+long labs (long n);
+long long llabs (long long n);
 div_t div (int num, int denom);
 ldiv_t ldiv (long num, long denom);
 lldiv_t lldiv (long long num, long long denom);

@@ -15,8 +15,13 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <errno.h>
+#include <libgen.h>
+#include <string.h>
 
 static int __libc_errno;
+
+char *program_invocation_name;
+char *program_invocation_short_name;
 
 int *
 __errno (void)
@@ -28,4 +33,11 @@ void
 __libc_set_errno (int err)
 {
   errno = err;
+}
+
+void
+__libc_set_program_names (char *arg)
+{
+  program_invocation_name = arg;
+  program_invocation_short_name = basename (arg);
 }

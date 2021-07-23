@@ -43,3 +43,16 @@ memchr (const void *str, int c, size_t len)
     }
   return NULL;
 }
+
+void *
+memrchr (const void *str, int c, size_t len)
+{
+  size_t i;
+  const unsigned char *ptr = (const unsigned char *) str + len - 1;
+  for (i = 0; i < len; ptr--, i++)
+    {
+      if (*ptr == c)
+	return (void *) ptr;
+    }
+  return NULL;
+}

@@ -34,7 +34,7 @@ _start:
 
 2:
 	/* Setup argc on stack */
-	push	%eax
+	push	%eax	
 
 	/* Initialize C library */
 	call	_init
@@ -42,6 +42,11 @@ _start:
 	call	atexit
 	add	$4, %esp
 	call	__libc_init
+
+	/* Initialize program invocation names */
+	pushl	(%esi)
+	call	__libc_set_program_names
+	add	$4, %esp
 
 	/* Call C entry point and exit */
 	call	main

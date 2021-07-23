@@ -17,6 +17,7 @@
 #ifndef _STREAM_H
 #define _STREAM_H
 
+#include <bits/types/file.h>
 #include <locks.h>
 
 #define __IO_buf_mask   0x0003 /* Mask for stream mode */
@@ -27,21 +28,6 @@
 #define __IO_stt_alloc  0x0040 /* If the FILE structure itself was allocated */
 #define __IO_orient     0x0080 /* If stream orientation has been determined */
 #define __IO_wide       0x0100 /* If stream orientation is wide */
-
-struct __FILE
-{
-  int _flags;
-  int _fd;
-  __lock_t _lock;
-  char *_read_buf;
-  int _read_buf_len;
-  int _read_ptr_len;
-  char *_write_buf;
-  int _write_buf_len;
-  int _write_ptr_len;
-};
-
-typedef struct __FILE FILE;
 
 __BEGIN_DECLS
 

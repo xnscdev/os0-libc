@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/stat.h>
 #include <sys/syscall.h>
 #include <branch.h>
 #include <errno.h>
@@ -104,4 +105,54 @@ long
 telldir (DIR *dir)
 {
   return lseek (dir->_fd, 0, SEEK_CUR);
+}
+
+int
+dirfd (DIR *dir)
+{
+  return dir->_fd;
+}
+
+int
+IFTODT (mode_t mode)
+{
+  if (S_ISFIFO (mode))
+    return DT_FIFO;
+  if (S_ISCHR (mode))
+    return DT_CHR;
+  if (S_ISDIR (mode))
+    return DT_DIR;
+  if (S_ISBLK (mode))
+    return DT_BLK;
+  if (S_ISREG (mode))
+    return DT_REG;
+  if (S_ISLNK (mode))
+    return DT_LNK;
+  if (S_ISSOCK (mode))
+    return DT_SOCK;
+  return DT_UNKNOWN;
+}
+
+mode_t
+DTTOIF (int type)
+{
+  switch (type)
+    {
+    case DT_FIFO:
+      return S_IFIFO;
+    case DT_CHR:
+      return S_IFCHR;
+    case DT_DIR:
+      return S_IFDIR;
+    case DT_BLK:
+      return S_IFBLK;
+    case DT_REG:
+      return S_IFREG;
+    case DT_LNK:
+      return S_IFLNK;
+    case DT_SOCK:
+      return S_IFSOCK;
+    default:
+      return 0;
+    }
 }

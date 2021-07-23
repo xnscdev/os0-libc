@@ -159,10 +159,19 @@ int fileno (FILE *stream);
 int fgetpos (FILE *__restrict stream, fpos_t *__restrict pos);
 int fsetpos (FILE *__restrict stream, const fpos_t *__restrict pos);
 int fseek (FILE *stream, long offset, int whence);
-int fseeko (FILE *stream, off_t offset, int whence);
 long ftell (FILE *stream);
-off_t ftello (FILE *stream);
 void rewind (FILE *stream);
+
+int fseeko (FILE *stream, off_t offset, int whence);
+off_t ftello (FILE *stream);
+
+int fseeko64 (FILE *stream, off64_t offset, int whence);
+off64_t ftello64 (FILE *stream);
+
+#if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
+#define fseeko(stream, offset, whence) fseeko64 (stream, offset, whence)
+#define ftello(stream) ftello64 (stream)
+#endif
 
 int fflush (FILE *stream);
 int fpurge (FILE *stream);

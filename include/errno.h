@@ -24,6 +24,9 @@
 
 __BEGIN_DECLS
 
+extern char *program_invocation_name;
+extern char *program_invocation_short_name;
+
 int *__errno (void);
 
 __END_DECLS
