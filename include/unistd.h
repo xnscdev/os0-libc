@@ -125,6 +125,7 @@ int ftruncate64 (int fd, off64_t len);
 
 int nice (int inc);
 
+int fsync (int fd);
 void sync (void);
 
 unsigned int sleep (unsigned int seconds);
