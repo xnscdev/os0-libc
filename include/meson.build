@@ -31,6 +31,7 @@ install_headers('alloca.h',
 		'termios.h',
 		'time.h',
 		'unistd.h',
+		'utime.h',
 		'utmp.h',
 		'wchar.h',
 		'wctype.h')

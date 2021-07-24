@@ -194,6 +194,7 @@ libc_src = [
   'syscall/umask.c',
   'syscall/uname.c',
   'syscall/unlink.c',
+  'syscall/utimes.c',
   'syscall/wait.c',
   'syscall/xattr.c',
   'termios/cfmakeraw.c',

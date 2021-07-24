@@ -1,4 +1,4 @@
-/* time.h -- This file is part of OS/0 libc.
+/* utime.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,23 +14,14 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _SYS_TIME_H
-#define _SYS_TIME_H
+#ifndef _UTIME_H
+#define _UTIME_H
 
-#include <bits/time.h>
-#include <sys/cdefs.h>
+#include <bits/utime.h>
 
 __BEGIN_DECLS
 
-int gettimeofday (struct timeval *__restrict tv,
-		  struct timezone *__restrict tz);
-
-int setitimer (int which, const struct itimerval *__restrict new,
-	       struct itimerval *__restrict old);
-int getitimer (int which, struct itimerval *curr);
-
-int utimes (const char *path, const struct timeval times[2]);
-int futimesat (int dir, const char *path, const struct timeval times[2]);
+int utime (const char *path, const struct utimbuf *times);
 
 __END_DECLS
 

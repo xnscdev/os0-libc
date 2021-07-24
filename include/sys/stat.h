@@ -45,6 +45,10 @@ int mknod (const char *path, mode_t mode, dev_t dev);
 int mknodat (int fd, const char *path, mode_t mode, dev_t dev);
 int mkfifo (const char *path, mode_t mode);
 
+int utimensat (int fd, const char *path, const struct timespec times[2],
+	       int flags);
+int futimens (int fd, const struct timespec times[2]);
+
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
 #define stat stat64
 #define lstat(path, st) lstat64 (path, st)
