@@ -67,6 +67,7 @@ int fprintf (FILE *__restrict stream, const char *__restrict fmt, ...);
 int sprintf (char *__restrict str, const char *__restrict fmt, ...);
 int snprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 	      ...);
+int dprintf (int fd, const char *__restrict fmt, ...);
 
 int vprintf (const char *__restrict fmt, va_list args);
 int vfprintf (FILE *__restrict stream, const char *__restrict fmt,
@@ -74,6 +75,7 @@ int vfprintf (FILE *__restrict stream, const char *__restrict fmt,
 int vsprintf (char *__restrict str, const char *__restrict fmt, va_list args);
 int vsnprintf (char *__restrict str, size_t size, const char *__restrict fmt,
 	       va_list args);
+int vdprintf (int fd, const char *__restrict fmt, va_list args);
 
 void perror (const char *str);
 

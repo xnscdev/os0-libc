@@ -51,6 +51,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define PRINTF_NTOA_BUFFER_SIZE        32
 #define PRINTF_FTOA_BUFFER_SIZE        32
@@ -106,6 +107,13 @@ _out_char (char character, void *buffer, size_t idx, size_t maxlen)
 {
   if (character)
     fputc_unlocked (character, buffer);
+}
+
+static inline void
+_out_fd (char character, void *buffer, size_t idx, size_t maxlen)
+{
+  if (character)
+    write ((int) buffer, &character, 1);
 }
 
 // internal output function wrapper
@@ -1082,6 +1090,17 @@ snprintf (char *buffer, size_t count, const char *format, ...)
 }
 
 int
+dprintf (int fd, const char *format, ...)
+{
+  va_list va;
+  int ret;
+  va_start (va, format);
+  ret = _vsnprintf (_out_fd, (void *) fd, (size_t) -1, format, va);
+  va_end (va);
+  return ret;
+}
+
+int
 vprintf (const char *format, va_list va)
 {
   return vfprintf (stdout, format, va);
@@ -1098,7 +1117,19 @@ vfprintf (FILE *__restrict stream, const char *__restrict format, va_list va)
 }
 
 int
+vsprintf (char *buffer, const char *format, va_list va)
+{
+  return _vsnprintf (_out_buffer, buffer, (size_t) -1, format, va);
+}
+
+int
 vsnprintf (char *buffer, size_t count, const char *format, va_list va)
 {
   return _vsnprintf (_out_buffer, buffer, count, format, va);
+}
+
+int
+vdprintf (int fd, const char *__restrict format, va_list va)
+{
+  return _vsnprintf (_out_fd, (void *) fd, (size_t) -1, format, va);
 }
