@@ -28,8 +28,6 @@ typedef struct __FILE FILE;
 #define __FILE_defined
 #endif
 
-#define MB_CUR_MAX MB_LEN_MAX
-
 #include <bits/types/mbstate.h>
 
 struct tm;
@@ -39,10 +37,8 @@ __BEGIN_DECLS
 wint_t btowc (int c);
 int wctob (wint_t wc);
 
-size_t mblen (const char *str, size_t len);
 size_t mbrlen (const char *__restrict str, size_t len,
 	       mbstate_t *__restrict ps);
-
 size_t mbrtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len,
 		mbstate_t *__restrict ps);
 size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);

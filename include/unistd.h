@@ -123,6 +123,8 @@ int ftruncate (int fd, off_t len);
 int truncate64 (const char *path, off64_t len);
 int ftruncate64 (int fd, off64_t len);
 
+int nice (int inc);
+
 void sync (void);
 
 unsigned int sleep (unsigned int seconds);

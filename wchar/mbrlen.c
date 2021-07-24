@@ -1,4 +1,4 @@
-/* mbstate.h -- This file is part of OS/0 libc.
+/* mbrlen.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,24 +14,26 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _BITS_TYPES_MBSTATE_H
-#define _BITS_TYPES_MBSTATE_H
+#include <libc-locale.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
 
-#define MB_CUR_MAX MB_LEN_MAX
-
-#ifndef __wint_defined
-typedef int wint_t;
-#define __wint_defined
-#endif
-
-typedef struct
+size_t
+mblen (const char *str, size_t len)
 {
-  int _count;
-  union
-  {
-    wint_t _wch;
-    char _wchb[4];
-  } _value;
-} mbstate_t;
+  int ret = mbtowc (NULL, str, len);
+  if (ret < 0)
+    {
+      __libc_mbstate._count = 0;
+      return -1;
+    }
+  else
+    return ret;
+}
 
-#endif
+size_t
+mbrlen (const char *__restrict str, size_t len, mbstate_t *__restrict ps)
+{
+  return mbrtowc (NULL, str, len, ps);
+}

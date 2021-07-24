@@ -1,4 +1,4 @@
-/* mbstate.h -- This file is part of OS/0 libc.
+/* strsep.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,24 +14,22 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _BITS_TYPES_MBSTATE_H
-#define _BITS_TYPES_MBSTATE_H
+#include <string.h>
 
-#define MB_CUR_MAX MB_LEN_MAX
-
-#ifndef __wint_defined
-typedef int wint_t;
-#define __wint_defined
-#endif
-
-typedef struct
+char *
+strsep (char **str, const char *delims)
 {
-  int _count;
-  union
-  {
-    wint_t _wch;
-    char _wchb[4];
-  } _value;
-} mbstate_t;
-
-#endif
+  char *save = *str;
+  char *ptr;
+  if (save == NULL)
+    return NULL;
+  ptr = strpbrk (save, delims);
+  if (ptr == NULL)
+    {
+      *str = NULL;
+      return save;
+    }
+  *ptr++ = '\0';
+  *str = ptr;
+  return save;
+}

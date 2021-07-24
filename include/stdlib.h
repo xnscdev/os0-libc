@@ -90,6 +90,7 @@ long double strtold (const char *__restrict str, char **__restrict end);
 long double strtold_l (const char *__restrict str, char **__restrict end,
 		       locale_t loc);
 
+size_t mblen (const char *str, size_t len);
 int mbtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len);
 int wctomb (char *str, wchar_t wc);
 

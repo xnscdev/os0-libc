@@ -1,4 +1,4 @@
-/* mbstate.h -- This file is part of OS/0 libc.
+/* priority.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,24 +14,37 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _BITS_TYPES_MBSTATE_H
-#define _BITS_TYPES_MBSTATE_H
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <errno.h>
+#include <unistd.h>
 
-#define MB_CUR_MAX MB_LEN_MAX
-
-#ifndef __wint_defined
-typedef int wint_t;
-#define __wint_defined
-#endif
-
-typedef struct
+int
+nice (int inc)
 {
-  int _count;
-  union
-  {
-    wint_t _wch;
-    char _wchb[4];
-  } _value;
-} mbstate_t;
+  int ret = syscall (SYS_nice, inc);
+  if (ret < 20)
+    {
+      errno = -ret - 20;
+      return -1;
+    }
+  return ret;
+}
 
-#endif
+int
+getpriority (int which, id_t who)
+{
+  int ret = syscall (SYS_getpriority, which, who);
+  if (ret < 20)
+    {
+      errno = -ret - 20;
+      return -1;
+    }
+  return ret;
+}
+
+int
+setpriority (int which, id_t who, int prio)
+{
+  return syscall (SYS_setpriority, which, who, prio);
+}
