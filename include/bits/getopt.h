@@ -14,29 +14,23 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _GETOPT_H
-#define _GETOPT_H
+#ifndef _BITS_GETOPT_H
+#define _BITS_GETOPT_H
 
-#include <bits/getopt.h>
+#if !defined _GETOPT_H && !defined _UNISTD_H
+#error "<bits/getopt.h> should not be included directly"
+#endif
 
-#define no_argument       0
-#define required_argument 1
-#define optional_argument 2
-
-struct option
-{
-  const char *name;
-  int has_arg;
-  int *flag;
-  int val;
-};
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
-int getopt_long (int argc, char *const *argv, const char *shortopts,
-		 const struct option *longopts, int *index);
-int getopt_long_only (int argc, char *const *argv, const char *shortopts,
-		      const struct option *longopts, int *index);
+extern char *optarg;
+extern int optind;
+extern int opterr;
+extern int optopt;
+
+int getopt (int argc, char *const *argv, const char *shortopts);
 
 __END_DECLS
 

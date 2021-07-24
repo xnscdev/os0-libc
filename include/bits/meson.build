@@ -1,4 +1,5 @@
-install_headers('wctype.h',
+install_headers('getopt.h',
+		'wctype.h',
 		subdir: 'bits')
 
 

@@ -17,6 +17,7 @@
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
+#include <bits/getopt.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/unistd.h>
