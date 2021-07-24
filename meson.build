@@ -156,6 +156,7 @@ libc_src = [
   'syscall/chdir.c',
   'syscall/chmod.c',
   'syscall/chown.c',
+  'syscall/clock.c',
   'syscall/close.c',
   'syscall/creat.c',
   'syscall/dup.c',
