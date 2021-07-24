@@ -99,6 +99,8 @@ libc_src = [
   'stdlib/errno.c',
   'stdlib/exec.c',
   'stdlib/exit.c',
+  'stdlib/fts.c',
+  'stdlib/fts64.c',
   'stdlib/getopt.c',
   'stdlib/grp.c',
   'stdlib/init.c',
