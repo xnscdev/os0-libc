@@ -90,6 +90,12 @@ strncasecmp (const char *a, const char *b, size_t len)
   return 0;
 }
 
+int
+strcoll (const char *a, const char *b)
+{
+  return strcmp (a, b); /* Works for POSIX locale */
+}
+
 char *
 strchr (const char *s, int c)
 {
