@@ -22,13 +22,7 @@
 void *
 mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
-  uintptr_t ret = syscall (SYS_mmap, addr, len, prot, flags, fd, offset);
-  if (ret >= UINTPTR_MAX - __NR_errno)
-    {
-      errno = UINTPTR_MAX - ret + 1;
-      return MAP_FAILED;
-    }
-  return (void *) ret;
+  return (void *) syscall (SYS_mmap, addr, len, prot, flags, fd, offset);
 }
 
 int

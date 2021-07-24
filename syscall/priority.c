@@ -22,25 +22,13 @@
 int
 nice (int inc)
 {
-  int ret = syscall (SYS_nice, inc);
-  if (ret < 20)
-    {
-      errno = -ret - 20;
-      return -1;
-    }
-  return ret;
+  return syscall (SYS_nice, inc);
 }
 
 int
 getpriority (int which, id_t who)
 {
-  int ret = syscall (SYS_getpriority, which, who);
-  if (ret < 20)
-    {
-      errno = -ret - 20;
-      return -1;
-    }
-  return ret;
+  return syscall (SYS_getpriority, which, who);
 }
 
 int

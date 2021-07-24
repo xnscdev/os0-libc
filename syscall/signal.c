@@ -18,6 +18,12 @@
 #include <signal.h>
 #include <unistd.h>
 
+sig_t
+signal (int sig, sig_t func)
+{
+  return (sig_t) syscall (SYS_signal, sig, func);
+}
+
 int
 sigprocmask (int how, const sigset_t *__restrict set, sigset_t *__restrict old)
 {

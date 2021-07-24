@@ -46,17 +46,10 @@ syscall:
 	.global syscall_asm_ret
 	.hidden syscall_asm_ret
 syscall_asm_ret:
-	test	%eax, %eax
-	js	1f
-	ret
-
-1:
-	/* Set errno and return -1 */
-	neg	%eax
 	push	%eax
-	call	__libc_set_errno
-	add	$4, %esp
-	mov	$-1, %eax
+	pushl	24(%esp)
+	call	__syscall_handle_err
+	add	$8, %esp
 	ret
 
 	.size syscall_asm_ret, . - syscall_asm_ret
