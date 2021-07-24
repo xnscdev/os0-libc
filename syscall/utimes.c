@@ -17,6 +17,8 @@
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <utime.h>
 
@@ -30,6 +32,38 @@ int
 utimes (const char *path, const struct timeval times[2])
 {
   return syscall (SYS_utimes, path, times);
+}
+
+int
+lutimes (const char *path, const struct timeval times[2])
+{
+  struct timespec timespecs[2];
+  if (times[0].tv_usec >= 1000000 || times[1].tv_usec >= 1000000)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  timespecs[0].tv_sec = times[0].tv_sec;
+  timespecs[0].tv_nsec = times[0].tv_usec;
+  timespecs[1].tv_sec = times[1].tv_sec;
+  timespecs[1].tv_nsec = times[1].tv_usec;
+  return utimensat (AT_FDCWD, path, timespecs, AT_SYMLINK_NOFOLLOW);
+}
+
+int
+futimes (int fd, const struct timeval times[2])
+{
+  struct timespec timespecs[2];
+  if (times[0].tv_usec >= 1000000 || times[1].tv_usec >= 1000000)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  timespecs[0].tv_sec = times[0].tv_sec;
+  timespecs[0].tv_nsec = times[0].tv_usec;
+  timespecs[1].tv_sec = times[1].tv_sec;
+  timespecs[1].tv_nsec = times[1].tv_usec;
+  return utimensat (fd, NULL, timespecs, 0);
 }
 
 int

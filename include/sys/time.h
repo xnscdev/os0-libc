@@ -30,6 +30,8 @@ int setitimer (int which, const struct itimerval *__restrict new,
 int getitimer (int which, struct itimerval *curr);
 
 int utimes (const char *path, const struct timeval times[2]);
+int lutimes (const char *path, const struct timeval times[2]);
+int futimes (int fd, const struct timeval times[2]);
 int futimesat (int dir, const char *path, const struct timeval times[2]);
 
 __END_DECLS
