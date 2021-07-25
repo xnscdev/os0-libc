@@ -32,7 +32,7 @@
 #include <bits/types/lconv.h>
 #include <bits/types/mbstate.h>
 
-#define __LC_wctype_max  12
+#define __LC_wctype_max  13
 #define __LC_wctrans_max 8
 
 #ifndef __wint_defined

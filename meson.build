@@ -118,6 +118,7 @@ libc_src = [
   'stdlib/qsort.c',
   'stdlib/rand.c',
   'stdlib/realpath.c',
+  'stdlib/regex.c',
   'stdlib/sigjmp.c',
   'stdlib/signal.c',
   'stdlib/sigset.c',

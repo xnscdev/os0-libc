@@ -51,6 +51,9 @@ unsigned int sleep (unsigned int seconds);
 size_t strftime (char *__restrict str, size_t len, const char *__restrict fmt,
 		 const struct tm *__restrict tp);
 
+int clock_getres (clockid_t id, struct timespec *tp);
+int clock_gettime (clockid_t id, struct timespec *tp);
+
 __END_DECLS
 
 #endif

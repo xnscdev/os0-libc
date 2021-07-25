@@ -20,18 +20,18 @@
 #include <string.h>
 #include <wctype.h>
 
-#define WCTYPE_ALNUM  0
-#define WCTYPE_ALPHA  1
-#define WCTYPE_BLANK  2
-#define WCTYPE_CNTRL  3
-#define WCTYPE_DIGIT  4
-#define WCTYPE_GRAPH  5
-#define WCTYPE_LOWER  6
-#define WCTYPE_PRINT  7
-#define WCTYPE_PUNCT  8
-#define WCTYPE_SPACE  9
-#define WCTYPE_UPPER  10
-#define WCTYPE_XDIGIT 11
+#define WCTYPE_ALNUM  1
+#define WCTYPE_ALPHA  2
+#define WCTYPE_BLANK  3
+#define WCTYPE_CNTRL  4
+#define WCTYPE_DIGIT  5
+#define WCTYPE_GRAPH  6
+#define WCTYPE_LOWER  7
+#define WCTYPE_PRINT  8
+#define WCTYPE_PUNCT  9
+#define WCTYPE_SPACE  10
+#define WCTYPE_UPPER  11
+#define WCTYPE_XDIGIT 12
 #define WCTYPE_ASCII __LC_wctype_max
 
 #define WCTRANS_TOLOWER 0
@@ -40,6 +40,7 @@
 mbstate_t __libc_mbstate;
 
 static const char *const wctype_props[__LC_wctype_max] = {
+  NULL,
   "alnum",
   "alpha",
   "blank",
@@ -281,7 +282,7 @@ iswctype (wint_t wc, wctype_t type)
 int
 iswctype_l (wint_t wc, wctype_t type, locale_t loc)
 {
-  if (type < 0 || type > __LC_wctype_max)
+  if (type <= 0 || type > __LC_wctype_max)
     {
       errno = EINVAL;
       return 0;
@@ -303,7 +304,7 @@ wctype_l (const char *property, locale_t loc)
   int i;
   if (strcmp (property, "ascii") == 0)
     return WCTYPE_ASCII;
-  for (i = 0; i < __LC_wctype_max; i++)
+  for (i = 1; i < __LC_wctype_max; i++)
     {
       if (strcmp (wctype_props[i], property) == 0)
 	return i;
