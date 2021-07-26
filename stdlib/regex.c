@@ -34,14 +34,48 @@
     }						\
   while (0)
 
+/* Used for reading name of character class or collation element */
+
+#define RE_BK_SCOPE do							\
+    {									\
+      /* If we expected a normal entry, add the - entry first */	\
+      if (linking)							\
+	{								\
+	  n->chars[n->nitems].wctype = 0;				\
+	  n->chars[n->nitems].min = '-';				\
+	  n->chars[n->nitems].max = '-';				\
+	  if (++n->nitems == alloc)					\
+	    {								\
+	      alloc += 4;						\
+	      chars = realloc (n->chars, sizeof (struct __re_chars) * alloc); \
+	      RE_MEMCHECK (chars);					\
+	      n->chars = chars;						\
+	    }								\
+	}								\
+      									\
+      /* Search for the end of the character class name */		\
+      while (isalpha (*p))						\
+	p++;								\
+    }									\
+  while (0)
+
 static void __re_free_regex (struct __re_regex *re);
+static int __re_compile_expr (struct __re_regex *re, const char *pattern,
+			      int cflags, size_t *nsub, int subexpr,
+			      const char **end);
 
 static void
 __re_free_node (struct __re_node *node)
 {
+  size_t i;
   switch (node->type)
     {
     case __RE_CHARS:
+      for (i = 0; i < node->nitems; i++)
+	{
+	  if (node->chars[i].collate != NULL)
+	    free (node->chars[i].collate);
+	}
       free (node->chars);
       break;
     case __RE_SUBEXPR:
@@ -68,6 +102,7 @@ __re_new_node (struct __re_regex *re)
   struct __re_node *nodes =
     realloc (re->nodes, sizeof (struct __re_node) * ++re->count);
   RE_MEMCHECK (nodes);
+  memset (&nodes[re->count - 1], 0, sizeof (struct __re_node));
   re->nodes = nodes;
   return 0;
 }
@@ -102,6 +137,8 @@ __re_compile_bracket (struct __re_regex *re, const char **str)
       chars = malloc (sizeof (struct __re_chars) * alloc);
       RE_MEMCHECK (chars);
       n->chars = chars;
+      n->chars[0].collate = NULL;
+      n->chars[0].wctype = 0;
       n->chars[0].min = ']';
       n->chars[0].max = ']';
       n->nitems++;
@@ -136,34 +173,17 @@ __re_compile_bracket (struct __re_regex *re, const char **str)
 		const char *p = ++ptr;
 		char *s;
 		size_t len;
-
-		/* If we expected a normal entry, add the - entry first */
-		if (linking)
-		  {
-		    n->chars[n->nitems].wctype = 0;
-		    n->chars[n->nitems].min = '-';
-		    n->chars[n->nitems].max = '-';
-		    if (++n->nitems == alloc)
-		      {
-			alloc += 4;
-			chars = realloc (n->chars, sizeof (struct __re_chars) *
-					 alloc);
-			RE_MEMCHECK (chars);
-			n->chars = chars;
-		      }
-		  }
-
-		/* Search for the end of the character class name */
-		while (isalpha (*p))
-		  p++;
+		RE_BK_SCOPE;
 		if (p[0] != ':' || p[1] != ']')
 		  break; /* Doesn't match form [:class:], just parse normally */
 
 		/* Determine the character class */
 		len = p - ptr;
 		s = malloc (len + 1);
+		RE_MEMCHECK (s);
 		strncpy (s, ptr, len);
 		s[len] = '\0';
+		n->chars[n->nitems].collate = NULL;
 		n->chars[n->nitems].wctype = wctype (s);
 		free (s);
 		if (n->chars[n->nitems].wctype == 0)
@@ -173,10 +193,27 @@ __re_compile_bracket (struct __re_regex *re, const char **str)
 		n->nitems++;
 		goto next;
 	      }
-	    case '=':
 	    case '.':
-	      /* Equivalence classes and collating elements are not supported */
-	      return REG_ENOSYS;
+	      {
+		const char *p = ++ptr;
+		char *s;
+		size_t len;
+		RE_BK_SCOPE;
+		if (p[0] != '.' || p[1] != ']')
+		  break; /* Doesn't match form [.class.], just parse normally */
+
+		/* Copy collating element to new buffer */
+		len = p - ptr;
+		s = malloc (len + 1);
+		RE_MEMCHECK (s);
+		strncpy (s, ptr, len);
+		s[len] = '\0';
+		n->chars[n->nitems].collate = s;
+		n->chars[n->nitems].wctype = 0;
+		ptr = p + 1;
+		n->nitems++;
+		goto next;
+	      }
 	    }
 	  ptr--;
 	}
@@ -192,6 +229,7 @@ __re_compile_bracket (struct __re_regex *re, const char **str)
 	}
       else
 	{
+	  n->chars[n->nitems].collate = NULL;
 	  n->chars[n->nitems].wctype = 0;
 	  n->chars[n->nitems].min = *ptr;
 	  n->chars[n->nitems].max = *ptr;
@@ -214,8 +252,11 @@ __re_compile_bracket (struct __re_regex *re, const char **str)
 	  RE_MEMCHECK (chars);
 	  n->chars = chars;
 	}
-      n->chars[n->nitems - 1].min = '-';
-      n->chars[n->nitems - 1].max = '-';
+      n->chars[n->nitems].collate = NULL;
+      n->chars[n->nitems].wctype = 0;
+      n->chars[n->nitems].min = '-';
+      n->chars[n->nitems].max = '-';
+      n->nitems++;
     }
 
   n->min_rep = 1;
@@ -228,9 +269,10 @@ __re_compile_bracket (struct __re_regex *re, const char **str)
 static int
 __re_compile_fixed (struct __re_regex *re, __re_node_type type)
 {
-  struct __re_node *n = &re->nodes[re->count - 1];
+  struct __re_node *n;
   int rep = type == __RE_ANY;
   RE_RETCHECK (__re_new_node (re));
+  n = &re->nodes[re->count - 1];
   n->type = type;
   n->min_rep = 1;
   n->max_rep = 1;
@@ -249,6 +291,8 @@ __re_compile_literal (struct __re_regex *re, char c)
   n->exclude = 0;
   n->chars = malloc (sizeof (struct __re_chars));
   RE_MEMCHECK (n->chars);
+  n->chars[0].collate = NULL;
+  n->chars[0].wctype = 0;
   n->chars[0].min = c;
   n->chars[0].max = c;
   n->min_rep = 1;
@@ -258,57 +302,187 @@ __re_compile_literal (struct __re_regex *re, char c)
 }
 
 static int
-__re_compile_expr (struct __re_regex *__restrict re,
-		   const char *__restrict pattern)
+__re_compile_subexpr (struct __re_regex *re, const char **str, int cflags,
+		      size_t *nsub)
+{
+  struct __re_node *n;
+  RE_RETCHECK (__re_new_node (re));
+  n = &re->nodes[re->count - 1];
+  n->type = __RE_SUBEXPR;
+  n->nitems = (*nsub)++;
+  n->subexpr = calloc (sizeof (struct __re_regex), 1);
+  RE_MEMCHECK (n->subexpr);
+  RE_RETCHECK (__re_compile_expr (n->subexpr, *str + 1, cflags, nsub, 1, str));
+  n->min_rep = 1;
+  n->max_rep = 1;
+  n->can_rep = 1;
+  return 0;
+}
+
+static int
+__re_compile_range (struct __re_regex *re, const char **str, int basic)
+{
+  const char *ptr = *str + 1;
+  struct __re_node *n;
+  size_t num = 0;
+  if (re->count == 0)
+    return REG_BADRPT;
+  n = &re->nodes[re->count - 1];
+  if (!n->can_rep)
+    return REG_BADRPT;
+
+  /* Parse first number */
+  while (isdigit (*ptr))
+    {
+      num *= 10;
+      num += *ptr++ - '0';
+    }
+  n->min_rep = num;
+  n->max_rep = num;
+
+  if (*ptr == ',')
+    {
+      /* Parse second number */
+      if (isdigit (*++ptr))
+	{
+	  num = 0;
+	  while (isdigit (*ptr))
+	    {
+	      num *= 10;
+	      num += *ptr++ - '0';
+	    }
+	  n->max_rep = num;
+	  if (n->min_rep > n->max_rep)
+	    return REG_ERANGE;
+	}
+      else
+	n->max_rep = (size_t) -1;
+    }
+
+  if (basic)
+    {
+      if (ptr[0] != '\\' || ptr[1] != '}')
+	return REG_BADPAT;
+      ptr++;
+    }
+  else if (*ptr != '}')
+    return REG_BADPAT;
+  n->can_rep = 0;
+  *str = ptr;
+  return 0;
+}
+
+static int
+__re_compile_backref (struct __re_regex *re, size_t nsub, int ref)
+{
+  struct __re_node *n;
+  RE_RETCHECK (__re_new_node (re));
+  if (ref == 0 || ref > nsub)
+    return REG_ESUBREG;
+  n = &re->nodes[re->count - 1];
+  n->type = __RE_BACKREF;
+  n->nitems = ref - 1;
+  n->min_rep = 1;
+  n->max_rep = 1;
+  n->can_rep = 1;
+  return 0;
+}
+
+static int
+__re_compile_expr (struct __re_regex *re, const char *pattern, int cflags,
+		   size_t *nsub, int subexpr, const char **end)
 {
   const char *ptr = pattern;
   int escaped = 0;
+  int basic = !(cflags & REG_EXTENDED);
   while (*ptr != '\0')
     {
-      switch (*ptr)
+      /* Parse backreference if in basic mode */
+      if (basic && escaped && isdigit (*ptr))
+	RE_RETCHECK (__re_compile_backref (re, *nsub, *ptr - '0'));
+      else
 	{
-	case '\\':
-	  if (escaped)
-	    RE_RETCHECK (__re_compile_literal (re, *ptr));
-	  else
+	  switch (*ptr)
 	    {
-	      escaped = 1;
-	      ptr++;
-	      continue;
+	    case '\\':
+	      if (escaped)
+		RE_RETCHECK (__re_compile_literal (re, *ptr));
+	      else
+		{
+		  escaped = 1;
+		  ptr++;
+		  continue;
+		}
+	      break;
+	    case '[':
+	      RE_RETCHECK (__re_compile_bracket (re, &ptr));
+	      break;
+	    case '.':
+	      RE_RETCHECK (__re_compile_fixed (re, __RE_ANY));
+	      break;
+	    case '^':
+	      RE_RETCHECK (ptr == pattern ?
+			   __re_compile_fixed (re, __RE_START) :
+			   __re_compile_literal (re, *ptr));
+	      break;
+	    case '$':
+	      RE_RETCHECK (ptr[1] == '\0' ?
+			   __re_compile_fixed (re, __RE_END) :
+			   __re_compile_literal (re, *ptr));
+	      break;
+	    case '*':
+	      if (ptr == pattern || (*pattern == '^' && ptr == pattern + 1))
+		RE_RETCHECK (__re_compile_literal (re, *ptr));
+	      else
+		{
+		  struct __re_node *n = &re->nodes[re->count - 1];
+		  if (!n->can_rep)
+		    return REG_BADRPT;
+		  n->max_rep = (size_t) -1;
+		  n->can_rep = 0;
+		}
+	      break;
+	    case '(':
+	      if (escaped == basic)
+		RE_RETCHECK (__re_compile_subexpr (re, &ptr, cflags, nsub));
+	      else
+		RE_RETCHECK (__re_compile_literal (re, *ptr));
+	      break;
+	    case ')':
+	      if (escaped == basic)
+		{
+		  if (subexpr)
+		    {
+		      *end = ptr;
+		      return 0;
+		    }
+		  else
+		    return REG_EPAREN;
+		}
+	      else
+		RE_RETCHECK (__re_compile_literal (re, *ptr));
+	      break;
+	    case '{':
+	      if (escaped == basic)
+		RE_RETCHECK (__re_compile_range (re, &ptr, basic));
+	      else
+		RE_RETCHECK (__re_compile_literal (re, *ptr));
+	      break;
+	    case '}':
+	      if (escaped == basic)
+		return REG_EBRACE;
+	      else
+		RE_RETCHECK (__re_compile_literal (re, *ptr));
+	      break;
+	    default:
+	      RE_RETCHECK (__re_compile_literal (re, *ptr));
 	    }
-	  break;
-	case '[':
-	  RE_RETCHECK (__re_compile_bracket (re, &ptr));
-	  break;
-	case '.':
-	  RE_RETCHECK (__re_compile_fixed (re, __RE_ANY));
-	  break;
-	case '^':
-	  RE_RETCHECK (ptr == pattern ? __re_compile_fixed (re, __RE_START) :
-		       __re_compile_literal (re, *ptr));
-	  break;
-	case '$':
-	  RE_RETCHECK (ptr[1] == '\0' ? __re_compile_fixed (re, __RE_END) :
-		       __re_compile_literal (re, *ptr));
-	  break;
-	case '*':
-	  if (ptr == pattern || (*pattern == '^' && ptr != pattern + 1))
-	    RE_RETCHECK (__re_compile_literal (re, *ptr));
-	  else
-	    {
-	      struct __re_node *n = &re->nodes[re->count - 1];
-	      if (!n->can_rep)
-		return REG_BADRPT;
-	      n->max_rep = (size_t) -1;
-	      n->can_rep = 0;
-	    }
-	  break;
-	default:
-	  RE_RETCHECK (__re_compile_literal (re, *ptr));
 	}
       ptr++;
       escaped = 0;
     }
+  if (subexpr)
+    return REG_EPAREN;
   if (escaped)
     return REG_EESCAPE;
   return 0;
@@ -320,7 +494,7 @@ regcomp (regex_t *__restrict preg, const char *__restrict pattern, int cflags)
   struct __re_regex *re = &preg->__re_regex;
   int ret;
   memset (preg, 0, sizeof (regex_t));
-  ret = __re_compile_expr (re, pattern);
+  ret = __re_compile_expr (re, pattern, cflags, &preg->re_nsub, 0, NULL);
   if (ret != 0)
     {
       __re_free_regex (re);

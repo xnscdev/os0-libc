@@ -45,15 +45,17 @@ typedef ssize_t regoff_t;
 
 typedef enum
 {
-  __RE_CHARS,
+  __RE_CHARS = 1,
   __RE_ANY,
   __RE_START,
   __RE_END,
-  __RE_SUBEXPR
+  __RE_SUBEXPR,
+  __RE_BACKREF
 } __re_node_type;
 
 struct __re_chars
 {
+  char *collate;
   wctype_t wctype;
   int min;
   int max;
