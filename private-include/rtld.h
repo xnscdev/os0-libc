@@ -108,6 +108,16 @@ struct obj_deps
   unsigned int *deps;
 };
 
+/* Info about a copied global variable */
+
+struct rtld_global
+{
+  char *name;       /* Symbol name */
+  void *start_addr; /* Address in shared library */
+  void *final_addr; /* Address in executable */
+  size_t size;      /* Symbol size */
+};
+
 /* Info about a loaded shared object */
 
 struct rtld_info
@@ -146,8 +156,17 @@ typedef struct __FILE FILE;
 __BEGIN_DECLS
 
 extern struct rtld_info rtld_shlibs[MAX_SHLIBS];
+extern struct rtld_global *rtld_globals;
+extern size_t rtld_global_count;
 extern struct queue_node *rtld_init_func;
 extern struct queue_node *rtld_fini_func;
+
+static inline Elf32_Sym *
+rtld_get_symbol (struct rtld_info *dlinfo, Elf32_Word index)
+{
+  return (Elf32_Sym *) ((uintptr_t) dlinfo->symtab.table +
+			index * dlinfo->symtab.entsize);
+}
 
 void rtld_map_elf (int fd, struct rtld_info *dlinfo);
 void rtld_load_dynamic (int obj, unsigned long priority, int mode);

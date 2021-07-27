@@ -21,12 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static inline Elf32_Sym *
-rtld_get_symbol (struct rtld_info *dlinfo, Elf32_Word index)
-{
-  return (Elf32_Sym *) ((uintptr_t) dlinfo->symtab.table +
-			index * dlinfo->symtab.entsize);
-}
+struct rtld_global *rtld_globals;
+size_t rtld_global_count;
 
 unsigned long
 rtld_symbol_hash (const char *name)
@@ -89,7 +85,9 @@ rtld_perform_rel (Elf32_Rel *entry, int obj, Elf32_Sword addend, int mode)
 #define REL_OFFSET ((Elf32_Addr *) (dlinfo->offset + entry->r_offset))
   struct rtld_info *dlinfo = &rtld_shlibs[obj];
   Elf32_Sym *symbol = NULL;
+  const char *name = NULL;
   void *symaddr;
+  size_t i;
 
   if ((mode & RTLD_LAZY) && ELF32_R_TYPE (entry->r_info) == R_386_JMP_SLOT)
     {
@@ -100,7 +98,6 @@ rtld_perform_rel (Elf32_Rel *entry, int obj, Elf32_Sword addend, int mode)
   /* Lookup the symbol if there is one specified */
   if (ELF32_R_SYM (entry->r_info) != STN_UNDEF)
     {
-      const char *name;
       symbol = rtld_get_symbol (dlinfo, ELF32_R_SYM (entry->r_info));
       name = dlinfo->strtab.table + symbol->st_name;
       symaddr = rtld_lookup_symbol (name, obj, 1);
@@ -116,16 +113,43 @@ rtld_perform_rel (Elf32_Rel *entry, int obj, Elf32_Sword addend, int mode)
 
   switch (ELF32_R_TYPE (entry->r_info))
     {
-    case R_386_COPY:
-    case R_386_GLOB_DAT:
-    case R_386_JMP_SLOT:
-      addend = 0;
     case R_386_32:
       *REL_OFFSET = (uintptr_t) symaddr + addend;
       break;
     case R_386_PC32:
       *REL_OFFSET = (uintptr_t) symaddr - (uintptr_t) dlinfo->offset -
 	entry->r_offset - 4 + addend;
+      break;
+    case R_386_GLOB_DAT:
+      for (i = 0; i < rtld_global_count; i++)
+	{
+	  if (strcmp (rtld_globals[i].name, name) == 0)
+	    {
+	      rtld_globals[i].start_addr = symaddr;
+	      *REL_OFFSET = (uintptr_t) rtld_globals[i].final_addr;
+	      break;
+	    }
+	}
+      if (i == rtld_global_count)
+	{
+	  /* The symbol is not needed by the executable, link directly to
+	     address in shared object */
+	  *REL_OFFSET = (uintptr_t) symaddr;
+	}
+      break;
+    case R_386_JMP_SLOT:
+      *REL_OFFSET = (uintptr_t) symaddr;
+      break;
+    case R_386_COPY:
+      for (i = 0; i < rtld_global_count; i++)
+	{
+	  if (strcmp (rtld_globals[i].name, name) == 0)
+	    {
+	      memcpy (rtld_globals[i].final_addr, rtld_globals[i].start_addr,
+		      rtld_globals[i].size);
+	      break;
+	    }
+	}
       break;
     case R_386_RELATIVE:
       *REL_OFFSET += (uintptr_t) dlinfo->offset + addend;

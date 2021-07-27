@@ -75,7 +75,7 @@ fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
       /* Write all elements at once for speed */
       for (i = 0; i < len; i++)
 	{
-	  if (fputc (buf[i], stream) == EOF)
+	  if (fputc_unlocked (buf[i], stream) == EOF)
 	    {
 	      stream->_flags |= __IO_err;
 	      return i;
@@ -88,7 +88,7 @@ fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
       size_t j;
       for (j = 0; j < size; j++)
 	{
-	  if (fputc (buf[i * size + j], stream) == EOF)
+	  if (fputc_unlocked (buf[i * size + j], stream) == EOF)
 	    {
 	      stream->_flags |= __IO_err;
 	      return i;

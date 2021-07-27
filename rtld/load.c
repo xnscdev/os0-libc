@@ -170,6 +170,82 @@ rtld_load_dynamic (int obj, unsigned long priority, int mode)
       dlinfo->pltgot[2] = (uintptr_t) rtld_lazy_lookup_symbol;
     }
 
+  /* If we are loading the main executable, we need to build a list of
+     R_386_COPY relocations needed which will be used during relocation of
+     shared objects. */
+  if (obj == 0)
+    {
+      size_t size;
+      size_t i = 0;
+      size_t j = 0;
+
+      /* Determine the number of entries */
+      if (dlinfo->rel.table != NULL)
+	{
+	  for (size = 0; size < dlinfo->rel.size; size += dlinfo->rel.entsize)
+	    {
+	      Elf32_Rel *entry =
+		(Elf32_Rel *) ((uintptr_t) dlinfo->rel.table + size);
+	      if (ELF32_R_TYPE (entry->r_info) == R_386_COPY
+		  && ELF32_R_SYM (entry->r_info) != STN_UNDEF)
+		i++;
+	    }
+	}
+      if (dlinfo->rela.table != NULL)
+	{
+	  for (size = 0; size < dlinfo->rela.size; size += dlinfo->rela.entsize)
+	    {
+	      Elf32_Rela *entry =
+		(Elf32_Rela *) ((uintptr_t) dlinfo->rela.table + size);
+	      if (ELF32_R_TYPE (entry->r_info) == R_386_COPY
+		  && ELF32_R_SYM (entry->r_info) != STN_UNDEF)
+		i++;
+	    }
+	}
+      rtld_globals = malloc (sizeof (struct rtld_global) * i);
+      if (unlikely (rtld_globals == NULL))
+	RTLD_NO_MEMORY (dlinfo->name);
+
+      /* Add symbol names to table entries */
+      if (dlinfo->rel.table != NULL)
+	{
+	  for (size = 0; size < dlinfo->rel.size; size += dlinfo->rel.entsize)
+	    {
+	      Elf32_Rel *entry =
+		(Elf32_Rel *) ((uintptr_t) dlinfo->rel.table + size);
+	      if (ELF32_R_TYPE (entry->r_info) == R_386_COPY
+		  && ELF32_R_SYM (entry->r_info) != STN_UNDEF)
+		{
+		  Elf32_Sym *symbol =
+		    rtld_get_symbol (dlinfo, ELF32_R_SYM (entry->r_info));
+		  rtld_globals[j].name = dlinfo->strtab.table + symbol->st_name;
+		  rtld_globals[j].final_addr = (void *) symbol->st_value;
+		  rtld_globals[j].size = symbol->st_size;
+		  j++;
+		}
+	    }
+	}
+      if (dlinfo->rela.table != NULL)
+	{
+	  for (size = 0; size < dlinfo->rela.size; size += dlinfo->rela.entsize)
+	    {
+	      Elf32_Rela *entry =
+		(Elf32_Rela *) ((uintptr_t) dlinfo->rela.table + size);
+	      if (ELF32_R_TYPE (entry->r_info) == R_386_COPY
+		  && ELF32_R_SYM (entry->r_info) != STN_UNDEF)
+		{
+		  Elf32_Sym *symbol =
+		    rtld_get_symbol (dlinfo, ELF32_R_SYM (entry->r_info));
+		  rtld_globals[j].name = dlinfo->strtab.table + symbol->st_name;
+		  rtld_globals[j].final_addr = (void *) symbol->st_value;
+		  rtld_globals[j].size = symbol->st_size;
+		  j++;
+		}
+	    }
+	}
+      rtld_global_count = i;
+    }
+
   /* Load shared libraries */
   for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
     {
