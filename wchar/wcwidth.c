@@ -1,4 +1,4 @@
-/* wchar.h -- This file is part of OS/0 libc.
+/* wcwidth.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,37 +14,12 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _WCHAR_H
-#define _WCHAR_H
+#include <wchar.h>
 
-#include <limits.h>
-#include <stdint.h>
-#include <wctype.h>
-
-#define WEOF ((wint_t) -1)
-
-#ifndef __FILE_defined
-typedef struct __FILE FILE;
-#define __FILE_defined
-#endif
-
-#include <bits/types/mbstate.h>
-
-struct tm;
-
-__BEGIN_DECLS
-
-wint_t btowc (int c);
-int wctob (wint_t wc);
-
-size_t mbrlen (const char *__restrict str, size_t len,
-	       mbstate_t *__restrict ps);
-size_t mbrtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len,
-		mbstate_t *__restrict ps);
-size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);
-
-int wcwidth (wchar_t wc);
-
-__END_DECLS
-
-#endif
+int
+wcwidth (wchar_t wc)
+{
+  if (wc == L'\0')
+    return 0;
+  return 1;
+}

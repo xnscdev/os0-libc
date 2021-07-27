@@ -217,7 +217,8 @@ libc_src = [
   'wchar/mbrtowc.c',
   'wchar/wcrtomb.c',
   'wchar/wctob.c',
-  'wchar/wctype.c'
+  'wchar/wctype.c',
+  'wchar/wcwidth.c'
 ]
 
 if get_option('shared')
