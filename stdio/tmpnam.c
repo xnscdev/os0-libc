@@ -49,3 +49,12 @@ tmpnam_r (char *str)
     }
   return str;
 }
+
+FILE *
+tmpfile (void)
+{
+  int fd = mkstemp (P_tmpdir "/fileXXXXXX");
+  if (fd == -1)
+    return NULL;
+  return fdopen (fd, "w+");
+}

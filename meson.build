@@ -68,6 +68,7 @@ libc_src = [
   'regex/regerror.c',
   'regex/regexec.c',
   'regex/regfree.c',
+  'stdio/asprintf.c',
   'stdio/err.c',
   'stdio/ferror.c',
   'stdio/fflush.c',
