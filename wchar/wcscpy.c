@@ -1,4 +1,4 @@
-/* strcpy.c -- This file is part of OS/0 libc.
+/* wcscpy.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -17,72 +17,72 @@
 #include <branch.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
+#include <wchar.h>
 
-char *
-strdup (const char *s)
+wchar_t *
+wcsdup (const wchar_t *ws)
 {
-  size_t len = strlen (s);
-  char *buffer = malloc (len + 1);
+  size_t len = wcslen (ws);
+  wchar_t *buffer = malloc (sizeof (wchar_t) * (len + 1));
   if (unlikely (buffer == NULL))
     return NULL;
-  strcpy (buffer, s);
+  wcscpy (buffer, ws);
   return buffer;
 }
 
-char *
-stpcpy (char *dest, const char *src)
+wchar_t *
+wcpcpy (wchar_t *dest, const wchar_t *src)
 {
   while (1)
     {
       *dest = *src++;
-      if (*dest == '\0')
+      if (*dest == L'\0')
 	return dest;
       dest++;
     }
 }
 
-char *
-stpncpy (char *dest, const char *src, size_t len)
+wchar_t *
+wcpncpy (wchar_t *dest, const wchar_t *src, size_t len)
 {
   size_t i = 0;
   while (i < len)
     {
       dest[i] = src[i];
-      if (dest[i] == '\0')
-        break;
+      if (dest[i] == L'\0')
+	break;
       i++;
     }
   while (i < len)
-    dest[i++] = '\0';
+    dest[i++] = L'\0';
   return dest + len - 1;
 }
 
-char *
-strcpy (char *dest, const char *src)
+wchar_t *
+wcscpy (wchar_t *dest, const wchar_t *src)
 {
   size_t i = 0;
   while (1)
     {
       dest[i] = src[i];
-      if (dest[i] == '\0')
+      if (dest[i] == L'\0')
 	return dest;
       i++;
     }
 }
 
-char *
-strncpy (char *dest, const char *src, size_t len)
+wchar_t *
+wcsncpy (wchar_t *dest, const wchar_t *src, size_t len)
 {
   size_t i = 0;
   while (i < len)
     {
       dest[i] = src[i];
-      if (dest[i] == '\0')
-        break;
+      if (dest[i] == L'\0')
+	break;
       i++;
     }
   while (i < len)
-    dest[i++] = '\0';
+    dest[i++] = L'\0';
   return dest;
 }

@@ -1,4 +1,4 @@
-/* mbrlen.c -- This file is part of OS/0 libc.
+/* wcsspn.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,26 +14,42 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <libc-locale.h>
-#include <stdlib.h>
-#include <string.h>
 #include <wchar.h>
 
 size_t
-mblen (const char *str, size_t len)
+wcsspn (const wchar_t *str, const wchar_t *accept)
 {
-  int ret = mbtowc (NULL, str, len);
-  if (ret < 0)
+  const wchar_t *ptr = str;
+  while (*str != L'\0')
     {
-      __libc_mbstate._count = 0;
-      return -1;
+      const wchar_t *wc;
+      for (wc = accept; *wc != L'\0'; wc++)
+	{
+	  if (*str == *wc)
+	    break;
+	}
+      if (*wc == L'\0')
+	break;
+      str++;
     }
-  else
-    return ret;
+  return str - ptr;
 }
 
 size_t
-mbrlen (const char *__restrict str, size_t len, mbstate_t *__restrict ps)
+wcscspn (const wchar_t *str, const wchar_t *reject)
 {
-  return mbrtowc (NULL, str, len, ps == NULL ? &__libc_mbstate : ps);
+  const wchar_t *ptr = str;
+  while (*str != L'\0')
+    {
+      const wchar_t *c;
+      for (c = reject; *c != L'\0'; c++)
+	{
+	  if (*str == *c)
+	    break;
+	}
+      if (*c != L'\0')
+	break;
+      str++;
+    }
+  return str - ptr;
 }

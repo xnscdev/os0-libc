@@ -1,4 +1,4 @@
-/* mbrlen.c -- This file is part of OS/0 libc.
+/* wcstok.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,26 +14,43 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <libc-locale.h>
-#include <stdlib.h>
-#include <string.h>
 #include <wchar.h>
 
-size_t
-mblen (const char *str, size_t len)
+wchar_t *
+wcstok (wchar_t *__restrict ws, const wchar_t *__restrict delims,
+	wchar_t **__restrict saveptr)
 {
-  int ret = mbtowc (NULL, str, len);
-  if (ret < 0)
-    {
-      __libc_mbstate._count = 0;
-      return -1;
-    }
-  else
-    return ret;
-}
+  size_t i;
+  wchar_t *ptr = NULL;
+  wchar_t *end;
 
-size_t
-mbrlen (const char *__restrict str, size_t len, mbstate_t *__restrict ps)
-{
-  return mbrtowc (NULL, str, len, ps == NULL ? &__libc_mbstate : ps);
+  /* Set or restore context */
+  if (ws != NULL)
+    *saveptr = ws;
+  else
+    ws = *saveptr + 1;
+
+  for (end = s; *end != L'\0'; end++)
+    {
+      int is_delim = 0;
+      for (i = 0; delims[i] != L'\0'; i++)
+	{
+	  if (*end == delims[i])
+	    {
+	      is_delim = 1;
+	      break;
+	    }
+	}
+
+      if (!is_delim && ptr == NULL)
+	ptr = end;
+      else if (is_delim && ptr != NULL)
+	{
+	  *saveptr = end;
+	  *end = L'\0';
+	  return ptr;
+	}
+    }
+  *saveptr = end;
+  return ptr;
 }

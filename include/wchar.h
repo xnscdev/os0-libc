@@ -45,6 +45,31 @@ size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);
 
 int wcwidth (wchar_t wc);
 
+size_t wcslen (const wchar_t *ws);
+size_t wcsnlen (const wchar_t *ws, size_t len);
+wchar_t *wcsdup (const wchar_t *ws);
+wchar_t *wcpcpy (wchar_t *dest, const wchar_t *src);
+wchar_t *wcpncpy (wchar_t *dest, const wchar_t *src, size_t len);
+wchar_t *wcscpy (wchar_t *dest, const wchar_t *src);
+wchar_t *wcsncpy (wchar_t *dest, const wchar_t *src, size_t len);
+int wcscmp (const wchar_t *a, const wchar_t *b);
+int wcsncmp (const wchar_t *a, const wchar_t *b, size_t len);
+int wcscasecmp (const wchar_t *a, const wchar_t *b);
+int wcsncasecmp (const wchar_t *a, const wchar_t *b, size_t len);
+int wcscoll (const wchar_t *a, const wchar_t *b);
+wchar_t *wcschr (const wchar_t *ws, wchar_t wc);
+wchar_t *wcsrchr (const wchar_t *ws, wchar_t wc);
+wchar_t *wcsstr (const wchar_t *haystack, const wchar_t *needle);
+wchar_t *wcswcs (const wchar_t *haystack, const wchar_t *needle);
+wchar_t *wcscat (wchar_t *__restrict a, const wchar_t *__restrict b);
+wchar_t *wcsncat (wchar_t *__restrict a, const wchar_t *__restrict b,
+		  size_t len);
+size_t wcsspn (const wchar_t *str, const wchar_t *accept);
+size_t wcscspn (const wchar_t *str, const wchar_t *reject);
+wchar_t *wcspbrk (const wchar_t *str, const wchar_t *accept);
+wchar_t *wcstok (wchar_t *__restrict ws, const wchar_t *__restrict delims,
+		 wchar_t **__restrict saveptr);
+
 __END_DECLS
 
 #endif

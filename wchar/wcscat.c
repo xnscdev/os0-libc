@@ -1,4 +1,4 @@
-/* mbrlen.c -- This file is part of OS/0 libc.
+/* wcscat.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,26 +14,21 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <libc-locale.h>
-#include <stdlib.h>
-#include <string.h>
 #include <wchar.h>
 
-size_t
-mblen (const char *str, size_t len)
+wchar_t *
+wcscat (wchar_t *__restrict a, const wchar_t *__restrict b)
 {
-  int ret = mbtowc (NULL, str, len);
-  if (ret < 0)
-    {
-      __libc_mbstate._count = 0;
-      return -1;
-    }
-  else
-    return ret;
+  wchar_t *ptr = wcschr (a, L'\0');
+  wcscpy (ptr, b);
+  return a;
 }
 
-size_t
-mbrlen (const char *__restrict str, size_t len, mbstate_t *__restrict ps)
+wchar_t *
+wcsncat (wchar_t *__restrict a, const wchar_t *__restrict b, size_t len)
 {
-  return mbrtowc (NULL, str, len, ps == NULL ? &__libc_mbstate : ps);
+  wchar_t *ptr = wcschr (a, L'\0');
+  wcsncpy (ptr, b, len);
+  ptr[len] = L'\0';
+  return a;
 }
