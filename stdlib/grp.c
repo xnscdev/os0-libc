@@ -182,3 +182,50 @@ endgrent (void)
       __libc_getgrent_stream = NULL;
     }
 }
+
+int
+getgrouplist (const char *user, gid_t group, gid_t *groups, int *ngroups)
+{
+  FILE *file = fopen (GROUP_FILE, "r");
+  char *buffer = malloc (GROUP_BUFSIZ);
+  struct group g;
+  size_t count = 0;
+  int fail = 0;
+  if (*ngroups > 0)
+    groups[count++] = group;
+  if (file == NULL || buffer == NULL)
+    return *ngroups;
+
+  while (1)
+    {
+      size_t i;
+      if (__getgrent (&g, file, buffer, GROUP_BUFSIZ) == NULL)
+	break;
+      for (i = 0; g.gr_mem[i] != NULL; i++)
+	{
+	  if (strcmp (g.gr_mem[i], user) == 0)
+	    {
+	      if (count >= *ngroups)
+		fail = 1;
+	      if (!fail && g.gr_gid != groups[0])
+		groups[count++] = g.gr_gid;
+	      break;
+	    }
+	}
+    }
+  free (buffer);
+  if (ferror (file))
+    {
+      fclose (file);
+      return *ngroups;
+    }
+  fclose (file);
+
+  if (fail)
+    {
+      errno = ERANGE;
+      *ngroups = count;
+      return -1;
+    }
+  return 0;
+}

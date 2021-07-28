@@ -46,6 +46,7 @@ struct group *getgrent (void);
 void endgrent (void);
 
 int setgroups (size_t, const gid_t *list);
+int getgrouplist (const char *user, gid_t group, gid_t *groups, int *ngroups);
 
 __END_DECLS
 
