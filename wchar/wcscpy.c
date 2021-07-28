@@ -17,7 +17,28 @@
 #include <branch.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <symbol.h>
 #include <wchar.h>
+
+wchar_t *
+wmemmove (wchar_t *dest, const wchar_t *src, size_t len)
+{
+  size_t i;
+  if (dest < src)
+    return wmemcpy (dest, src, len);
+  for (i = len; i > 0; i--)
+    dest[i - 1] = src[i - 1];
+  return dest;
+}
+
+wchar_t *
+wmemset (wchar_t *ptr, wchar_t wc, size_t len)
+{
+  size_t i;
+  for (i = 0; i < len; i++)
+    ptr[i] = wc;
+  return ptr;
+}
 
 wchar_t *
 wcsdup (const wchar_t *ws)
@@ -86,3 +107,6 @@ wcsncpy (wchar_t *dest, const wchar_t *src, size_t len)
     dest[i++] = L'\0';
   return dest;
 }
+
+weak_alias (wcsncpy, wmemcpy);
+weak_alias (wcpncpy, wmempcpy);

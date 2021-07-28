@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <string.h>
+#include <symbol.h>
 
 int
 memcmp (const void *a, const void *b, size_t len)
@@ -56,3 +57,5 @@ memrchr (const void *str, int c, size_t len)
     }
   return NULL;
 }
+
+weak_alias (memcmp, bcmp);

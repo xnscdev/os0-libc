@@ -45,6 +45,16 @@ size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);
 
 int wcwidth (wchar_t wc);
 
+wchar_t *wmemcpy (wchar_t *__restrict dest, const wchar_t *__restrict src,
+		  size_t len);
+wchar_t *wmempcpy (wchar_t *__restrict dest, const wchar_t *__restrict src,
+		   size_t len);
+wchar_t *wmemmove (wchar_t *dest, const wchar_t *src, size_t len);
+wchar_t *wmemset (wchar_t *ptr, wchar_t wc, size_t len);
+int wmemcmp (const wchar_t *a, const wchar_t *b, size_t len);
+wchar_t *wmemchr (const wchar_t *str, wchar_t wc, size_t len);
+wchar_t *wmemrchr (const wchar_t *str, wchar_t wc, size_t len);
+
 size_t wcslen (const wchar_t *ws);
 size_t wcsnlen (const wchar_t *ws, size_t len);
 wchar_t *wcsdup (const wchar_t *ws);

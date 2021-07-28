@@ -29,6 +29,7 @@ int fls (int value);
 int flsl (long value);
 int flsll (long long value);
 
+int bcmp (const void *a, const void *b, size_t len);
 void bcopy (const void *src, void *dest, size_t len);
 void bzero (void *ptr, size_t len);
 

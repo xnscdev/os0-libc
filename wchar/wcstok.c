@@ -30,7 +30,7 @@ wcstok (wchar_t *__restrict ws, const wchar_t *__restrict delims,
   else
     ws = *saveptr + 1;
 
-  for (end = s; *end != L'\0'; end++)
+  for (end = ws; *end != L'\0'; end++)
     {
       int is_delim = 0;
       for (i = 0; delims[i] != L'\0'; i++)

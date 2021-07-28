@@ -14,7 +14,33 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <symbol.h>
 #include <wchar.h>
+
+wchar_t *
+wmemchr (const wchar_t *str, wchar_t c, size_t len)
+{
+  size_t i;
+  for (i = 0; i < len; str++, i++)
+    {
+      if (*str == c)
+	return (wchar_t *) str;
+    }
+  return NULL;
+}
+
+wchar_t *
+wmemrchr (const wchar_t *str, wchar_t c, size_t len)
+{
+  size_t i;
+  const wchar_t *ptr = str + len - 1;
+  for (i = 0; i < len; ptr--, i++)
+    {
+      if (*ptr == c)
+	return (wchar_t *) ptr;
+    }
+  return NULL;
+}
 
 int
 wcscmp (const wchar_t *a, const wchar_t *b)
@@ -119,3 +145,5 @@ wcsrchr (const wchar_t *ws, wchar_t wc)
       ptr++;
     }
 }
+
+weak_alias (wcsncmp, wmemcmp);
