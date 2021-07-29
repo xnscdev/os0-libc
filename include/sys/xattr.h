@@ -20,7 +20,6 @@
 #include <bits/xattr.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <stddef.h>
 
 __BEGIN_DECLS
 

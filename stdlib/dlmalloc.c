@@ -377,7 +377,6 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 */
 
 #include <sys/types.h>
-#include <stddef.h>
 
 #define MAX_SIZE_T           (~(size_t)0)
 #ifndef ONLY_MSPACES

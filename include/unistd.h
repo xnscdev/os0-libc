@@ -21,7 +21,6 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/unistd.h>
-#include <stddef.h>
 
 __BEGIN_DECLS
 
@@ -123,6 +122,8 @@ int truncate (const char *path, off_t len);
 int ftruncate (int fd, off_t len);
 int truncate64 (const char *path, off64_t len);
 int ftruncate64 (int fd, off64_t len);
+
+int getentropy (void *buffer, size_t len);
 
 int nice (int inc);
 

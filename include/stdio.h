@@ -21,7 +21,6 @@
 #include <sys/types.h>
 #include <sys/unistd.h>
 #include <stdarg.h>
-#include <stddef.h>
 
 #define EOF (-1)
 

@@ -1,4 +1,4 @@
-/* dirent.h -- This file is part of OS/0 libc.
+/* random.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,34 +14,16 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _DIRENT_H
-#define _DIRENT_H
+#ifndef _SYS_RANDOM_H
+#define _SYS_RANDOM_H
 
-#include <bits/dirent.h>
+#include <bits/random.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-typedef struct
-{
-  int _fd;
-  int _close;
-} DIR;
-
 __BEGIN_DECLS
 
-int closedir (DIR *dir);
-DIR *opendir (const char *path);
-DIR *fdopendir (int fd);
-struct dirent *readdir (DIR *dir);
-int readdir_r (DIR *__restrict dir, struct dirent *__restrict entry,
-	       struct dirent **__restrict saveptr);
-void rewinddir (DIR *dir);
-void seekdir (DIR *dir, long pos);
-long telldir (DIR *dir);
-int dirfd (DIR *dir);
-
-int IFTODT (mode_t mode);
-mode_t DTTOIF (int type);
+ssize_t getrandom (void *buffer, size_t len, unsigned int flags);
 
 __END_DECLS
 

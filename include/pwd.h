@@ -19,7 +19,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <stddef.h>
 
 struct passwd
 {

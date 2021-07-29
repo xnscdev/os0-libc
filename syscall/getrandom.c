@@ -1,4 +1,4 @@
-/* dirent.h -- This file is part of OS/0 libc.
+/* getrandom.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,35 +14,24 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _DIRENT_H
-#define _DIRENT_H
+#include <sys/random.h>
+#include <sys/syscall.h>
+#include <errno.h>
+#include <unistd.h>
 
-#include <bits/dirent.h>
-#include <sys/cdefs.h>
-#include <sys/types.h>
-
-typedef struct
+ssize_t
+getrandom (void *buffer, size_t len, unsigned int flags)
 {
-  int _fd;
-  int _close;
-} DIR;
+  return syscall (SYS_getrandom, buffer, len, flags);
+}
 
-__BEGIN_DECLS
-
-int closedir (DIR *dir);
-DIR *opendir (const char *path);
-DIR *fdopendir (int fd);
-struct dirent *readdir (DIR *dir);
-int readdir_r (DIR *__restrict dir, struct dirent *__restrict entry,
-	       struct dirent **__restrict saveptr);
-void rewinddir (DIR *dir);
-void seekdir (DIR *dir, long pos);
-long telldir (DIR *dir);
-int dirfd (DIR *dir);
-
-int IFTODT (mode_t mode);
-mode_t DTTOIF (int type);
-
-__END_DECLS
-
-#endif
+int
+getentropy (void *buffer, size_t len)
+{
+  if (len > 256)
+    {
+      errno = EIO;
+      return -1;
+    }
+  return getrandom (buffer, len, 0) == len ? 0 : -1;
+}

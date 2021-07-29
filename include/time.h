@@ -19,7 +19,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/time.h>
-#include <stddef.h>
 
 __BEGIN_DECLS
 

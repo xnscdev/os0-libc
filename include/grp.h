@@ -19,7 +19,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <stddef.h>
 
 #define __gr_mem_limit 16
 
