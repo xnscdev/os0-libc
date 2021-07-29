@@ -49,12 +49,46 @@ struct __locale_ctype_data
 		     mbstate_t *__restrict);
   size_t (*wcrtomb) (char *__restrict, wchar_t, mbstate_t *__restrict);
   int has_shift_states;
+  char *codeset;
+};
+
+struct __locale_messages_data
+{
+  char *yesexpr;
+  char *noexpr;
+};
+
+struct __locale_monetary_data
+{
+  char *currsym;
+};
+
+struct __locale_time_data
+{
+  char *dt_fmt;
+  char *d_fmt;
+  char *t_fmt;
+  char *t_fmt_ampm;
+  char *am;
+  char *pm;
+  char *days[7];
+  char *abdays[7];
+  char *months[12];
+  char *abmonths[12];
+  char *era;
+  char *era_d_fmt;
+  char *era_dt_fmt;
+  char *era_t_fmt;
+  char *altdigits;
 };
 
 struct __locale
 {
   struct lconv __lconv;
   struct __locale_ctype_data __LC_CTYPE;
+  struct __locale_messages_data __LC_MESSAGES;
+  struct __locale_monetary_data __LC_MONETARY;
+  struct __locale_time_data __LC_TIME;
   const char *__names[__LC_LAST];
 };
 

@@ -47,6 +47,72 @@ const struct __locale __libc_posix_locale = {
     __libc_posix_wcrtomb,
     0 /* Don't support multibyte characters for POSIX locale */
   },
+  .__LC_MESSAGES = {
+    "^[yY]",
+    "^[nN]"
+  },
+  .__LC_MONETARY = {
+    "-"
+  },
+  .__LC_TIME = {
+    "%a %b %e %H:%M:%S %Y",
+    "%m/%d/%y",
+    "%H:%M:%S",
+    "%I:%M:%S %p",
+    "AM",
+    "PM",
+    {
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    },
+    {
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    },
+    {
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    },
+    {
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    },
+    "",
+    "",
+    "",
+    "",
+    ""
+  },
   .__names = {"C", "C", "C", "C", "C", "C"}
 };
 
