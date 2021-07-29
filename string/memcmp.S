@@ -1,4 +1,4 @@
-/* memset.c -- This file is part of OS/0 libc.
+/* memcmp.S -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,13 +14,32 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <string.h>
+	.section .text
+	.global memcmp
+	.weak memcmp
+	.type memcmp, @function
+	.global __memcmp
+	.type __memcmp, @function
+memcmp:
+__memcmp:
+	push	%esi
+	mov	%edi, %edx
+	mov	8(%esp), %esi
+	mov	12(%esp), %edi
+	mov	16(%esp), %ecx
+	cld
+	xor	%eax, %eax
+	repe
+	cmpsb
+	jz	1f
 
-void *
-memset (void *ptr, int c, size_t len)
-{
-  size_t i;
-  for (i = 0; i < len; i++)
-    ((unsigned char *) ptr)[i] = c;
-  return ptr;
-}
+	sbb	%eax, %eax
+	or	$1, %al
+
+1:
+	pop	%esi
+	mov	%edx, %edi
+	ret
+
+	.size memcmp, . - memcmp
+	.size __memcmp, . - __memcmp
