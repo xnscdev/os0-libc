@@ -1,5 +1,7 @@
 install_headers('ioctl.h',
 		'mman.h',
+		'mount.h',
+		'queue.h',
 		'resource.h',
 		'socket.h',
 		'stat.h',

@@ -15,6 +15,7 @@
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <sys/mman.h>
+#include <sys/resource.h>
 #include <sys/syscall.h>
 #include <errno.h>
 #include <signal.h>
@@ -35,8 +36,8 @@ __syscall_handle_err (long num, long ret)
       return (long) SIG_ERR;
     case SYS_nice:
     case SYS_getpriority:
-      if (ret < 20)
-	errno = -ret - 20;
+      if (ret < PRIO_MIN)
+	errno = -ret + PRIO_MIN;
       else
 	return ret;
       break;

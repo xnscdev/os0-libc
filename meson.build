@@ -182,6 +182,7 @@ libc_src = [
   'syscall/mkdir.c',
   'syscall/mknod.c',
   'syscall/mman.c',
+  'syscall/mount.c',
   'syscall/nanosleep.c',
   'syscall/open.S',
   'syscall/pgid.c',
