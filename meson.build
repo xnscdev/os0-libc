@@ -59,7 +59,33 @@ subdir('include')
 
 libc_inc = include_directories('.', 'include', 'private-include')
 
+cc_cmd = meson.get_compiler('c').cmd_array()
+if get_option('debug')
+  cc_cmd += ['-g']
+endif
+
+if host_machine.cpu_family() == 'x86'
+  arch_subdir = 'arch/i386'
+  arch_src = [
+    arch_subdir / 'brk.S',
+    arch_subdir / 'fcntl.S',
+    arch_subdir / 'ioctl.S',
+    arch_subdir / 'longjmp.S',
+    arch_subdir / 'memchr.S',
+    arch_subdir / 'memcmp.S',
+    arch_subdir / 'memcpy.S',
+    arch_subdir / 'memmove.S',
+    arch_subdir / 'memset.S',
+    arch_subdir / 'open.S',
+    arch_subdir / 'sigsetjmp.S',
+    arch_subdir / 'syscall.S'
+  ]
+else
+  error('Unsupported host CPU type')
+endif
+
 libc_src = [
+  arch_src,
   'locale/langinfo.c',
   'locale/localeconv.c',
   'locale/posix.c',
@@ -114,7 +140,6 @@ libc_src = [
   'stdlib/killpg.c',
   'stdlib/locks.c',
   'stdlib/login.c',
-  'stdlib/longjmp.S',
   'stdlib/lsearch.c',
   'stdlib/malloc.c',
   'stdlib/mktemp.c',
@@ -127,7 +152,6 @@ libc_src = [
   'stdlib/sigjmp.c',
   'stdlib/signal.c',
   'stdlib/sigset.c',
-  'stdlib/sigsetjmp.S',
   'stdlib/sleep.c',
   'stdlib/statvfs.c',
   'stdlib/stdmath.c',
@@ -137,11 +161,6 @@ libc_src = [
   'string/atol.c',
   'string/bset.c',
   'string/fstrtol_l.c',
-  'string/memchr.S',
-  'string/memcmp.S',
-  'string/memcpy.S',
-  'string/memmove.S',
-  'string/memset.S',
   'string/strcasestr.c',
   'string/strcat.c',
   'string/strcmp.c',
@@ -161,7 +180,6 @@ libc_src = [
   'string/strtol.c',
   'string/strtol_l.c',
   'syscall/access.c',
-  'syscall/brk.S',
   'syscall/chdir.c',
   'syscall/chmod.c',
   'syscall/chown.c',
@@ -171,7 +189,6 @@ libc_src = [
   'syscall/dup.c',
   'syscall/execve.c',
   'syscall/exit.c',
-  'syscall/fcntl.S',
   'syscall/fork.c',
   'syscall/getcwd.c',
   'syscall/getrandom.c',
@@ -179,7 +196,6 @@ libc_src = [
   'syscall/gettimeofday.c',
   'syscall/groups.c',
   'syscall/io.c',
-  'syscall/ioctl.S',
   'syscall/itimer.c',
   'syscall/kill.c',
   'syscall/link.c',
@@ -189,7 +205,6 @@ libc_src = [
   'syscall/mman.c',
   'syscall/mount.c',
   'syscall/nanosleep.c',
-  'syscall/open.S',
   'syscall/pgid.c',
   'syscall/pipe.c',
   'syscall/priority.c',
@@ -202,7 +217,6 @@ libc_src = [
   'syscall/statfs.c',
   'syscall/symlink.c',
   'syscall/sync.c',
-  'syscall/syscall.S',
   'syscall/syscall-err.c',
   'syscall/time.c',
   'syscall/truncate.c',
@@ -253,18 +267,5 @@ libc_dep = declare_dependency(include_directories: libc_inc, link_with: libc)
 # Build libm
 subdir('math')
 
-cc_cmd = meson.get_compiler('c').cmd_array()
-if get_option('debug')
-  cc_cmd += ['-g']
-endif
-
-# Build crt0.o
-custom_target('crt0.o', input: 'stdlib/crt0.S', output: 'crt0.o',
-	      command: [cc_cmd, '-c', '-o', '@OUTPUT@', '@INPUT@'],
-	      build_by_default: true, install: true,
-	      install_dir: get_option('libdir'))
-
-# Build dynamic linker if shared libc enabled
-if get_option('shared')
-  subdir('rtld')
-endif
+# Build architecture-specific components
+subdir(arch_subdir)
