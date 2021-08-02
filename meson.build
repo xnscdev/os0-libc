@@ -5,18 +5,19 @@ add_project_arguments('-fno-common', '-U_FILE_OFFSET_BITS', language: 'c')
 libc_config = configuration_data()
 libc_config.set_quoted('LIBC_VERSION', meson.project_version())
 
-cc = meson.get_compiler('c')
-hostcpu = host_machine.cpu_family()
+cc_cmd = meson.get_compiler('c').cmd_array()
+if get_option('debug')
+  cc_cmd += ['-g']
+endif
 
-if hostcpu == 'x86'
-  bits = 32
-  libc_config.set10('ARCH_I386', true)
-elif hostcpu == 'x86_64'
-  bits = 64
-  libc_config.set10('ARCH_X86_64', true)
-else
+hostcpu = host_machine.cpu_family()
+mach = run_command('machine.sh', hostcpu)
+if mach.returncode() != 0
   error('Unsupported CPU type: ' + hostcpu)
 endif
+mach_output = mach.stdout().strip().split()
+machine_arch = mach_output[0]
+bits = mach_output[1].to_int()
 
 if bits == 32
   # stdint.h macros
@@ -52,40 +53,17 @@ else
   libc_config.set('__FMT64', 'l')
 endif
 
+libc_config.set10('ARCH_' + machine_arch.to_upper(), true)
+
 configure_file(input: 'config.h.in', output: 'config.h',
 	       configuration: libc_config)
 
-subdir('include')
-
 libc_inc = include_directories('.', 'include', 'private-include')
 
-cc_cmd = meson.get_compiler('c').cmd_array()
-if get_option('debug')
-  cc_cmd += ['-g']
-endif
-
-if host_machine.cpu_family() == 'x86'
-  arch_subdir = 'arch/i386'
-  arch_src = [
-    arch_subdir / 'brk.S',
-    arch_subdir / 'fcntl.S',
-    arch_subdir / 'ioctl.S',
-    arch_subdir / 'longjmp.S',
-    arch_subdir / 'memchr.S',
-    arch_subdir / 'memcmp.S',
-    arch_subdir / 'memcpy.S',
-    arch_subdir / 'memmove.S',
-    arch_subdir / 'memset.S',
-    arch_subdir / 'open.S',
-    arch_subdir / 'sigsetjmp.S',
-    arch_subdir / 'syscall.S'
-  ]
-else
-  error('Unsupported host CPU type')
-endif
+subdir('include')
+subdir('arch' / machine_arch)
 
 libc_src = [
-  arch_src,
   'locale/langinfo.c',
   'locale/localeconv.c',
   'locale/posix.c',
@@ -251,6 +229,11 @@ libc_src = [
   'wchar/wcwidth.c'
 ]
 
+# Add architecture-specific sources
+foreach f : arch_src
+  libc_src += 'arch' / machine_arch / f
+endforeach
+
 if get_option('shared')
   lib_targ = 'both_libraries'
 else
@@ -267,5 +250,7 @@ libc_dep = declare_dependency(include_directories: libc_inc, link_with: libc)
 # Build libm
 subdir('math')
 
-# Build architecture-specific components
-subdir(arch_subdir)
+# Build dynamic linker if shared libc enabled
+if get_option('shared')
+  subdir('arch' / machine_arch / 'rtld')
+endif
