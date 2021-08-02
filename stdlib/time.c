@@ -182,6 +182,30 @@ localtime_r (const time_t *__restrict time, struct tm *__restrict tp)
   return gmtime_r (time, tp);
 }
 
+time_t
+timegm (struct tm *tp)
+{
+  int i;
+  time_t time = 0;
+  tp->tm_isdst = 0;
+  if (tp->tm_year < 70)
+    {
+      errno = ERANGE;
+      return 0;
+    }
+  for (i = 70; i < tp->tm_year; i++)
+    time += __month_doys[LEAPYEAR (i + 1900)][12];
+  time += __month_doys[LEAPYEAR (tp->tm_year + 1900)][tp->tm_mon % 12];
+  return time + tp->tm_mday * SECSPERDAY + tp->tm_hour * SECSPERHOUR +
+    tp->tm_min * 60 + tp->tm_sec;
+}
+
+time_t
+timelocal (struct tm *tp)
+{
+  return timegm (tp);
+}
+
 void
 tzset (void)
 {

@@ -150,6 +150,7 @@ libc_src = [
   'string/strftime.c',
   'string/strlen.c',
   'string/strpbrk.c',
+  'string/strptime.c',
   'string/strsep.c',
   'string/strsignal.c',
   'string/strspn.c',
