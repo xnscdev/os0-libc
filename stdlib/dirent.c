@@ -72,7 +72,7 @@ readdir (DIR *dir)
 {
   if (readdir_r (dir, &__libc_readdir_entry, &__libc_readdir_saveptr) == -1)
     return NULL;
-  return &__libc_readdir_entry;
+  return __libc_readdir_saveptr;
 }
 
 int
@@ -80,10 +80,10 @@ readdir_r (DIR *__restrict dir, struct dirent *__restrict entry,
 	   struct dirent **__restrict saveptr)
 {
   int ret = syscall (SYS_getdents, dir->_fd, entry, 1);
-  if (ret == -1)
+  if (ret <= 0)
     {
       *saveptr = NULL;
-      return -1;
+      return ret;
     }
   *saveptr = entry;
   return 0;
