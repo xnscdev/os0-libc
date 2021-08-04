@@ -25,10 +25,14 @@ if bits == 32
   libc_config.set('__UINT32_T', 'unsigned long')
   libc_config.set('__INT32_SUFFIX', 'L')
   libc_config.set('__UINT32_SUFFIX', 'UL')
+  libc_config.set('__INT32_SUFFIX_PASTE', ' ## L')
+  libc_config.set('__UINT32_SUFFIX_PASTE', ' ## UL')
   libc_config.set('__INT64_T', 'long long')
   libc_config.set('__UINT64_T', 'unsigned long long')
   libc_config.set('__INT64_SUFFIX', 'LL')
   libc_config.set('__UINT64_SUFFIX', 'ULL')
+  libc_config.set('__INT64_SUFFIX_PASTE', ' ## LL')
+  libc_config.set('__UINT64_SUFFIX_PASTE', ' ## ULL')
   libc_config.set('__INTPTR_T', 'int32_t')
   libc_config.set('__UINTPTR_T', 'uint32_t')
 
@@ -41,10 +45,14 @@ else
   libc_config.set('__UINT32_T', 'unsigned int')
   libc_config.set('__INT32_SUFFIX', '')
   libc_config.set('__UINT32_SUFFIX', 'U')
+  libc_config.set('__INT32_SUFFIX_PASTE', '')
+  libc_config.set('__UINT32_SUFFIX_PASTE', ' ## U')
   libc_config.set('__INT64_T', 'long')
   libc_config.set('__UINT64_T', 'unsigned long')
   libc_config.set('__INT64_SUFFIX', 'L')
   libc_config.set('__UINT64_SUFFIX', 'UL')
+  libc_config.set('__INT64_SUFFIX_PASTE', ' ## L')
+  libc_config.set('__UINT64_SUFFIX_PASTE', ' ## UL')
   libc_config.set('__INTPTR_T', 'int64_t')
   libc_config.set('__UINTPTR_T', 'uint64_t')
 
@@ -215,12 +223,14 @@ libc_src = [
   'wchar/ctype.c',
   'wchar/mbrlen.c',
   'wchar/mbrtowc.c',
+  'wchar/mbsrtowcs.c',
   'wchar/wcrtomb.c',
   'wchar/wcscat.c',
   'wchar/wcscmp.c',
   'wchar/wcscpy.c',
   'wchar/wcslen.c',
   'wchar/wcspbrk.c',
+  'wchar/wcsrtombs.c',
   'wchar/wcsspn.c',
   'wchar/wcsstr.c',
   'wchar/wcstok.c',

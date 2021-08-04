@@ -80,13 +80,13 @@ typedef uint64_t uintmax_t;
 
 #define INT8_C(x)  (x)
 #define INT16_C(x) (x)
-#define INT32_C(x) (x@__INT32_SUFFIX@)
-#define INT64_C(x) (x@__INT64_SUFFIX@)
+#define INT32_C(x) (x@__INT32_SUFFIX_PASTE@)
+#define INT64_C(x) (x@__INT64_SUFFIX_PASTE@)
 
 #define UINT8_C(x)  (x)
 #define UINT16_C(x) (x)
-#define UINT32_C(x) (x@__UINT32_SUFFIX@)
-#define UINT64_C(x) (x@__UINT64_SUFFIX@)
+#define UINT32_C(x) (x@__UINT32_SUFFIX_PASTE@)
+#define UINT64_C(x) (x@__UINT64_SUFFIX_PASTE@)
 
 #define INTMAX_C(x)  INT64_C (x)
 #define UINTMAX_C(x) UINT64_C (x)
@@ -95,8 +95,8 @@ typedef uint64_t uintmax_t;
 
 #define INT8_MAX  127
 #define INT16_MAX 32767
-#define INT32_MAX ((int32_t) 2147483647L)
-#define INT64_MAX ((int64_t) 9223372036854775807LL)
+#define INT32_MAX 2147483647@__INT32_SUFFIX@
+#define INT64_MAX 9223372036854775807@__INT64_SUFFIX@
 
 #define INT8_MIN  -128
 #define INT16_MIN -32768
@@ -105,8 +105,8 @@ typedef uint64_t uintmax_t;
 
 #define UINT8_MAX  255
 #define UINT16_MAX 65535
-#define UINT32_MAX ((uint32_t) 4294967295UL)
-#define UINT64_MAX ((uint64_t) 18446744073709551615ULL)
+#define UINT32_MAX 4294967295@__UINT32_SUFFIX@
+#define UINT64_MAX 18446744073709551615@__UINT64_SUFFIX@
 
 /* Minimum-width integer limit macros */
 

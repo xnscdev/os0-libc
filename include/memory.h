@@ -1,4 +1,4 @@
-/* wcwidth.c -- This file is part of OS/0 libc.
+/* memory.h -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,14 +14,4 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <stdlib.h>
-#include <wchar.h>
-
-int
-wcwidth (wchar_t wc)
-{
-  char str[MB_LEN_MAX];
-  if (wc == L'\0')
-    return 0;
-  return wctomb (str, wc);
-}
+#include <string.h>

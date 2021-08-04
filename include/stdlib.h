@@ -93,6 +93,10 @@ long double strtold_l (const char *__restrict str, char **__restrict end,
 size_t mblen (const char *str, size_t len);
 int mbtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len);
 int wctomb (char *str, wchar_t wc);
+size_t mbstowcs (wchar_t *__restrict pwc, const char *__restrict str,
+		 size_t len);
+size_t wcstombs (char *__restrict str, const wchar_t *__restrict pwc,
+		 size_t len);
 
 void *bsearch (const void *key, const void *base, size_t len, size_t size,
 	       int (*cmp) (const void *, const void *));

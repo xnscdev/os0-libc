@@ -42,7 +42,14 @@ size_t mbrlen (const char *__restrict str, size_t len,
 size_t mbrtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len,
 		mbstate_t *__restrict ps);
 size_t wcrtomb (char *__restrict str, wchar_t wc, mbstate_t *__restrict ps);
-
+size_t mbsrtowcs (wchar_t *__restrict dest, const char **__restrict src,
+		  size_t len, mbstate_t *__restrict ps);
+size_t mbsnrtowcs (wchar_t *__restrict dest, const char **__restrict src,
+		   size_t nms, size_t len, mbstate_t *__restrict ps);
+size_t wcsrtombs (char *__restrict dest, const wchar_t **__restrict src,
+		  size_t len, mbstate_t *__restrict ps);
+size_t wcsnrtombs (char *__restrict dest, const wchar_t **__restrict src,
+		   size_t nwc, size_t len, mbstate_t *__restrict ps);
 int wcwidth (wchar_t wc);
 
 wchar_t *wmemcpy (wchar_t *__restrict dest, const wchar_t *__restrict src,
