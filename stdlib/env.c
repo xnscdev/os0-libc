@@ -64,7 +64,7 @@ int
 setenv (const char *name, const char *value, int overwrite)
 {
   char **temp;
-  size_t i;
+  size_t i = 0;
   if (name == NULL || *name == '=' || strchr (name, '=') != NULL)
     {
       errno = EINVAL;
@@ -75,7 +75,7 @@ setenv (const char *name, const char *value, int overwrite)
   __libc_lock (&__libc_env_lock);
   if (environ != NULL)
     {
-      for (i = 0; environ[i] != NULL; i++)
+      for (; environ[i] != NULL; i++)
 	{
 	  char *eq = strchr (environ[i], '=');
 	  if (eq == NULL)

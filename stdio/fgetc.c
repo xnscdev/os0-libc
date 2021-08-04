@@ -64,10 +64,18 @@ fgetc_unlocked (FILE *stream)
   if (stream->_read_ptr_len > 0)
     return stream->_read_buf[--stream->_read_ptr_len];
   ret = read (stream->_fd, &c, 1);
-  if (ret != 1)
-    return EOF;
   stream->_flags |= __IO_orient;
   stream->_flags &= ~__IO_wide;
+  if (ret == -1)
+    {
+      stream->_flags |= __IO_err;
+      return EOF;
+    }
+  else if (ret == 0)
+    {
+      stream->_flags |= __IO_eof;
+      return EOF;
+    }
   return c;
 }
 

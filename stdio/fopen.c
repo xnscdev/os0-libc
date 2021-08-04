@@ -94,20 +94,31 @@ fopen (const char *__restrict path, const char *__restrict mode)
       close (fd);
       return NULL;
     }
-  stream->_flags = _IOFBF | __IO_wbuf_alloc | __IO_stt_alloc;
+  flags &= O_ACCMODE;
+  stream->_flags = __IO_stt_alloc | flags;
   stream->_fd = fd;
   stream->_lock = 0;
   stream->_read_buf = NULL;
   stream->_read_buf_len = 0;
   stream->_read_ptr_len = 0;
-  stream->_write_buf = malloc (BUFSIZ);
-  if (stream->_write_buf == NULL)
+  if (flags != O_RDONLY)
     {
-      close (fd);
-      free (stream);
-      return NULL;
+      stream->_write_buf = malloc (BUFSIZ);
+      if (stream->_write_buf == NULL)
+	{
+	  close (fd);
+	  free (stream);
+	  return NULL;
+	}
+      stream->_write_buf_len = BUFSIZ;
+      stream->_flags |= __IO_wbuf_alloc | _IOFBF;
     }
-  stream->_write_buf_len = BUFSIZ;
+  else
+    {
+      stream->_write_buf = NULL;
+      stream->_write_buf_len = 0;
+      stream->_flags |= _IONBF;
+    }
   stream->_write_ptr_len = 0;
   return stream;
 }
@@ -168,20 +179,31 @@ fdopen (int fd, const char *mode)
   stream = malloc (sizeof (FILE));
   if (stream == NULL)
     return NULL;
-  stream->_flags = _IOFBF | __IO_wbuf_alloc | __IO_stt_alloc;
+  flags &= O_ACCMODE;
+  stream->_flags = __IO_stt_alloc | flags;
   stream->_fd = fd;
   stream->_lock = 0;
   stream->_read_buf = NULL;
   stream->_read_buf_len = 0;
   stream->_read_ptr_len = 0;
-  stream->_write_buf = malloc (BUFSIZ);
-  if (stream->_write_buf == NULL)
+  if (flags != O_RDONLY)
     {
-      free (stream);
-      errno = ENOMEM;
-      return NULL;
+      stream->_write_buf = malloc (BUFSIZ);
+      if (stream->_write_buf == NULL)
+	{
+	  free (stream);
+	  errno = ENOMEM;
+	  return NULL;
+	}
+      stream->_write_buf_len = BUFSIZ;
+      stream->_flags |= __IO_wbuf_alloc | _IOFBF;
     }
-  stream->_write_buf_len = BUFSIZ;
+  else
+    {
+      stream->_write_buf = NULL;
+      stream->_write_buf_len = 0;
+      stream->_flags |= _IONBF;
+    }
   stream->_write_ptr_len = 0;
   return stream;
 }

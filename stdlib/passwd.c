@@ -85,11 +85,11 @@ __getpwent (struct passwd *__restrict result, FILE *__restrict stream,
 struct passwd *
 getpwnam (const char *name)
 {
-  struct passwd *ignore;
-  if (getpwnam_r (name, &__libc_passwd, __libc_pwbuf, PASSWD_BUFSIZ, &ignore)
+  struct passwd *pwd;
+  if (getpwnam_r (name, &__libc_passwd, __libc_pwbuf, PASSWD_BUFSIZ, &pwd)
       == -1)
     return NULL;
-  return &__libc_passwd;
+  return pwd;
 }
 
 struct passwd *
@@ -116,19 +116,17 @@ getpwnam_r (const char *__restrict name, struct passwd *__restrict pwd,
     }
   while (1)
     {
-      if (__getpwent (*result, file, buffer, len) == NULL)
+      if (__getpwent (pwd, file, buffer, len) == NULL)
+	{
+	  fclose (file);
+	  *result = NULL;
+	  return -1;
+	}
+      if (strcmp (pwd->pw_name, name) == 0)
 	break;
-      if (strcmp ((*result)->pw_name, name) == 0)
-	break;
-    }
-  if (ferror (file))
-    {
-      fclose (file);
-      *result = NULL;
-      return -1;
     }
   fclose (file);
-  memcpy (pwd, *result, sizeof (struct passwd));
+  *result = pwd;
   return 0;
 }
 
@@ -146,15 +144,13 @@ getpwuid_r (uid_t uid, struct passwd *__restrict pwd, char *__restrict buffer,
   while (1)
     {
       if (__getpwent (*result, file, buffer, len) == NULL)
-	break;
+	{
+	  fclose (file);
+	  *result = NULL;
+	  return -1;
+	}
       if ((*result)->pw_uid == uid)
 	break;
-    }
-  if (ferror (file))
-    {
-      fclose (file);
-      *result = NULL;
-      return -1;
     }
   fclose (file);
   memcpy (pwd, *result, sizeof (struct passwd));

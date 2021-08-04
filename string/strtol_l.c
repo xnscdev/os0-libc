@@ -27,6 +27,8 @@
 static const char *
 __get_base (const char *str, int *sign, int *base, locale_t loc)
 {
+  if (*base != 0)
+    return str;
   while (isspace_l (*str, loc))
     str++;
   if (*str == '-')
@@ -194,7 +196,8 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
     }
 
  finish:
-  *end = (char *) str;
+  if (end != NULL)
+    *end = (char *) str;
   if (currlen == grouplen)
     {
       /* Append any remaining satisfied group of digits to the final result */
@@ -209,7 +212,8 @@ __strtox_l (const char *__restrict str, char **__restrict end, int base,
   return sign ? -value : value;
 
  overflow:
-  *end = (char *) str;
+  if (end != NULL)
+    *end = (char *) str;
   errno = ERANGE;
   return sign ? min : max;
 }
@@ -298,7 +302,8 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
     }
 
  finish:
-  *end = (char *) str;
+  if (end != NULL)
+    *end = (char *) str;
   if (currlen == grouplen)
     {
       /* Append any remaining satisfied group of digits to the final result */
@@ -313,7 +318,8 @@ __strtoux_l (const char *__restrict str, char **__restrict end, int base,
   return sign ? -value : value;
 
  overflow:
-  *end = (char *) str;
+  if (end != NULL)
+    *end = (char *) str;
   errno = ERANGE;
   return sign ? 0 : max;
 }

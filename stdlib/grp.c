@@ -104,19 +104,17 @@ getgrgid_r (gid_t gid, struct group *__restrict grp, char *__restrict buffer,
     }
   while (1)
     {
-      if (__getgrent (*result, file, buffer, len) == NULL)
+      if (__getgrent (grp, file, buffer, len) == NULL)
+	{
+	  fclose (file);
+	  *result = NULL;
+	  return -1;
+	}
+      if (grp->gr_gid == gid)
 	break;
-      if ((*result)->gr_gid == gid)
-	break;
-    }
-  if (ferror (file))
-    {
-      fclose (file);
-      *result = NULL;
-      return -1;
     }
   fclose (file);
-  memcpy (grp, *result, sizeof (struct group));
+  *result = grp;
   return 0;
 }
 
@@ -134,19 +132,17 @@ getgrnam_r (const char *__restrict name, struct group *__restrict grp,
     }
   while (1)
     {
-      if (__getgrent (*result, file, buffer, len) == NULL)
+      if (__getgrent (grp, file, buffer, len) == NULL)
+	{
+	  fclose (file);
+	  *result = NULL;
+	  return -1;
+	}
+      if (strcmp (grp->gr_name, name) == 0)
 	break;
-      if (strcmp ((*result)->gr_name, name) == 0)
-	break;
-    }
-  if (ferror (file))
-    {
-      fclose (file);
-      *result = NULL;
-      return -1;
     }
   fclose (file);
-  memcpy (grp, *result, sizeof (struct group));
+  *result = grp;
   return 0;
 }
 

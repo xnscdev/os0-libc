@@ -34,8 +34,14 @@ fgets_unlocked (char *__restrict str, int size, FILE *__restrict stream)
   for (i = 0; i < size - 1; i++)
     {
       char c = fgetc_unlocked (stream);
-      if (feof (stream) || ferror (stream))
-	break;
+      if (ferror (stream))
+	return NULL;
+      if (feof (stream))
+	{
+	  if (i == 0)
+	    return NULL;
+	  break;
+	}
       str[i] = c;
       if (c == '\n')
 	{
@@ -54,7 +60,15 @@ gets (char *str)
   for (i = 0; ; i++)
     {
       char c = getchar ();
-      if (feof (stdin) || ferror (stdin) || c == '\n')
+      if (ferror (stdin))
+	return NULL;
+      if (feof (stdin))
+	{
+	  if (i == 0)
+	    return NULL;
+	  break;
+	}
+      if (c == '\n')
 	break;
       str[i] = c;
     }
