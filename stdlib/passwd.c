@@ -95,11 +95,11 @@ getpwnam (const char *name)
 struct passwd *
 getpwuid (uid_t uid)
 {
-  struct passwd *ignore;
-  if (getpwuid_r (uid, &__libc_passwd, __libc_pwbuf, PASSWD_BUFSIZ, &ignore)
+  struct passwd *pwd;
+  if (getpwuid_r (uid, &__libc_passwd, __libc_pwbuf, PASSWD_BUFSIZ, &pwd)
       == -1)
     return NULL;
-  return &__libc_passwd;
+  return pwd;
 }
 
 int
@@ -143,17 +143,17 @@ getpwuid_r (uid_t uid, struct passwd *__restrict pwd, char *__restrict buffer,
     }
   while (1)
     {
-      if (__getpwent (*result, file, buffer, len) == NULL)
+      if (__getpwent (pwd, file, buffer, len) == NULL)
 	{
 	  fclose (file);
 	  *result = NULL;
 	  return -1;
 	}
-      if ((*result)->pw_uid == uid)
+      if (pwd->pw_uid == uid)
 	break;
     }
   fclose (file);
-  memcpy (pwd, *result, sizeof (struct passwd));
+  *result = pwd;
   return 0;
 }
 

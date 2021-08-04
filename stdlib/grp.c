@@ -74,21 +74,21 @@ __getgrent (struct group *__restrict result, FILE *__restrict stream,
 struct group *
 getgrgid (gid_t gid)
 {
-  struct group *ignore;
-  if (getgrgid_r (gid, &__libc_group, __libc_grpbuf, GROUP_BUFSIZ, &ignore)
+  struct group *grp;
+  if (getgrgid_r (gid, &__libc_group, __libc_grpbuf, GROUP_BUFSIZ, &grp)
       == -1)
     return NULL;
-  return &__libc_group;
+  return grp;
 }
 
 struct group *
 getgrnam (const char *name)
 {
-  struct group *ignore;
-  if (getgrnam_r (name, &__libc_group, __libc_grpbuf, GROUP_BUFSIZ, &ignore)
+  struct group *grp;
+  if (getgrnam_r (name, &__libc_group, __libc_grpbuf, GROUP_BUFSIZ, &grp)
       == -1)
     return NULL;
-  return &__libc_group;
+  return grp;
 }
 
 int
