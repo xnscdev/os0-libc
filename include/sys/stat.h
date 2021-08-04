@@ -51,9 +51,10 @@ int futimens (int fd, const struct timespec times[2]);
 
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
 #define stat stat64
-#define lstat(path, st) lstat64 (path, st)
-#define fstat(fd, st) fstat64 (fd, st)
-#define fstatat(fd, path, st, flags) fstatat64 (fd, path, st, flags)
+#define lstat(path, st) lstat64 (path, (struct stat64 *) (st))
+#define fstat(fd, st) fstat64 (fd, (struct stat64 *) (st))
+#define fstatat(fd, path, st, flags)			\
+  fstatat64 (fd, path, (struct stat64 *) (st), flags)
 #endif
 
 __END_DECLS

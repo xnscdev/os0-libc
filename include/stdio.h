@@ -40,6 +40,8 @@
 #include <bits/errlist.h>
 
 #ifndef __FILE_defined
+#include <bits/types/file.h>
+
 typedef struct __FILE FILE;
 #define __FILE_defined
 #endif
@@ -202,6 +204,8 @@ ssize_t getline (char **__restrict line, size_t *__restrict len,
 char *tmpnam (char *str);
 char *tmpnam_r (char *str);
 FILE *tmpfile (void);
+
+int remove (const char *path);
 
 __END_DECLS
 

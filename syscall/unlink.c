@@ -14,7 +14,9 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/stat.h>
 #include <sys/syscall.h>
+#include <stdio.h>
 #include <unistd.h>
 
 int
@@ -27,4 +29,16 @@ int
 unlinkat (int fd, const char *path, int flags)
 {
   return syscall (SYS_unlinkat, fd, path, flags);
+}
+
+int
+remove (const char *path)
+{
+  struct stat st;
+  if (stat (path, &st) == -1)
+    return -1;
+  if (S_ISDIR (st.st_mode))
+    return rmdir (path);
+  else
+    return unlink (path);
 }
