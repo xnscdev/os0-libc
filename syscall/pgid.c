@@ -35,6 +35,12 @@ getpgrp (void)
   return syscall (SYS_getpgrp);
 }
 
+pid_t
+setsid (void)
+{
+  return syscall (SYS_setsid);
+}
+
 int
 setpgrp (void)
 {

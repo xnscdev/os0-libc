@@ -47,6 +47,7 @@ int getresgid (gid_t *rgid, gid_t *egid, gid_t *sgid);
 int setpgid (pid_t pid, pid_t pgid);
 pid_t getpgid (pid_t pid);
 pid_t getpgrp (void);
+pid_t setsid (void);
 int setpgrp (void);
 
 char *getcwd (char *buffer, size_t len);
