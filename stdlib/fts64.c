@@ -18,5 +18,6 @@
 
 #undef  _FILE_OFFSET_BITS
 #define _FILE_OFFSET_BITS 64
+#define STAT stat64
 
 #include "fts.c"

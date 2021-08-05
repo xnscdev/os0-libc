@@ -68,6 +68,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifndef STAT
+#define STAT stat
+#endif
+
 #ifndef ALIGNBYTES
 #define ALIGNBYTES (__alignof__ (long double) - 1)
 #endif
@@ -165,7 +169,7 @@ __fts_alloc (FTS *ftsp, const char *name, size_t namelen)
   memmove (ptr->fts_name, name, namelen);
   ptr->fts_name[namelen] = '\0';
   if (!(ftsp->fts_options & FTS_NOSTAT))
-    ptr->fts_statp = (struct stat *) ALIGN (ptr->fts_name + namelen + 2);
+    ptr->fts_statp = (struct STAT *) ALIGN (ptr->fts_name + namelen + 2);
   ptr->fts_namelen = namelen;
   ptr->fts_path = ftsp->fts_path;
   ptr->fts_errno = 0;
@@ -194,8 +198,8 @@ __fts_stat (FTS *ftsp, FTSENT *ptr, int follow)
   FTSENT *t;
   dev_t dev;
   ino_t ino;
-  struct stat sb;
-  struct stat *sbp = ftsp->fts_options & FTS_NOSTAT ? &sb : ptr->fts_statp;
+  struct STAT sb;
+  struct STAT *sbp = ftsp->fts_options & FTS_NOSTAT ? &sb : ptr->fts_statp;
   int saved_errno;
 
   if ((ftsp->fts_options & FTS_LOGICAL) || follow)
@@ -280,7 +284,7 @@ __fts_chdir (FTS *ftsp, FTSENT *ptr, int fd, const char *path)
 {
   int old_errno;
   int newfd = fd;
-  struct stat64 st;
+  struct __STAT st;
   int ret;
   if (ftsp->fts_options & FTS_NOCHDIR)
     return 0;
