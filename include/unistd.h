@@ -83,11 +83,7 @@ ssize_t write (int fd, const void *buffer, size_t len);
 off_t lseek (int fd, off_t offset, int whence);
 off64_t lseek64 (int fd, off64_t offset, int whence);
 
-int open (const char *path, int flags, ...);
-int openat (int fd, const char *path, int flags, ...);
-int creat (const char *path, mode_t mode);
 int close (int fd);
-
 int pipe (int fd[2]);
 
 int dup (int fd);

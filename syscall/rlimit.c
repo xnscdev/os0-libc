@@ -1,4 +1,4 @@
-/* fcntl.h -- This file is part of OS/0 libc.
+/* rlimit.c -- This file is part of OS/0 libc.
    Copyright (C) 2021 XNSC
 
    OS/0 libc is free software: you can redistribute it and/or modify
@@ -14,21 +14,18 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
-#ifndef _FCNTL_H
-#define _FCNTL_H
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
-#include <sys/cdefs.h>
-#include <sys/fcntl.h>
-#include <sys/types.h>
+int
+setrlimit (int resource, const struct rlimit *rlim)
+{
+  return syscall (SYS_setrlimit, resource, rlim);
+}
 
-__BEGIN_DECLS
-
-int open (const char *path, int flags, ...);
-int openat (int fd, const char *path, int flags, ...);
-int creat (const char *path, mode_t mode);
-
-int fcntl (int fd, int cmd, ...);
-
-__END_DECLS
-
-#endif
+int
+getrlimit (int resource, struct rlimit *rlim)
+{
+  return syscall (SYS_getrlimit, resource, rlim);
+}

@@ -21,6 +21,8 @@
 
 __BEGIN_DECLS
 
+int setrlimit (int resource, const struct rlimit *rlim);
+int getrlimit (int resource, struct rlimit *rlim);
 int getrusage (int who, struct rusage *usage);
 
 int getpriority (int which, id_t who);

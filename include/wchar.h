@@ -37,6 +37,7 @@ __BEGIN_DECLS
 wint_t btowc (int c);
 int wctob (wint_t wc);
 
+int mbsinit (const mbstate_t *ps);
 size_t mbrlen (const char *__restrict str, size_t len,
 	       mbstate_t *__restrict ps);
 size_t mbrtowc (wchar_t *__restrict pwc, const char *__restrict str, size_t len,
