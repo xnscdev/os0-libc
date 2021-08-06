@@ -27,8 +27,8 @@ off64_t
 lseek64 (int fd, off64_t offset, int whence)
 {
   off64_t result;
-  if (syscall (SYS__llseek, fd, (offset >> 32) & 0xffffffff,
-	       offset & 0xffffffff, &result, whence) == -1)
+  if (syscall (SYS__llseek, fd, (unsigned long) (offset >> 32) & 0xffffffff,
+	       (unsigned long) offset & 0xffffffff, &result, whence) == -1)
     return -1;
   return result;
 }

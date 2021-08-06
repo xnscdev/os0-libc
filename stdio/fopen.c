@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -36,7 +37,7 @@ fopen (const char *__restrict path, const char *__restrict mode)
       flags = O_RDONLY;
       break;
     case 'w':
-      flags = O_WRONLY;
+      flags = O_WRONLY | O_CREAT;
       break;
     case 'a':
       flags = O_RDONLY | O_APPEND;
@@ -76,7 +77,8 @@ fopen (const char *__restrict path, const char *__restrict mode)
     }
 
  start:
-  fd = open (path, flags);
+  fd = open (path, flags,
+	     S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
   if (fd == -1)
     return NULL;
   if (cloexec)
@@ -95,7 +97,7 @@ fopen (const char *__restrict path, const char *__restrict mode)
       return NULL;
     }
   flags &= O_ACCMODE;
-  stream->_flags = __IO_stt_alloc | flags;
+  stream->_flags = __IO_stt_alloc | (flags & O_ACCMODE);
   stream->_fd = fd;
   stream->_lock = 0;
   stream->_read_buf = NULL;
@@ -226,6 +228,8 @@ fmemopen (void *__restrict *buffer, size_t size, const char *__restrict mode)
 int
 fclose (FILE *stream)
 {
+  if (fflush (stream) == -1)
+    return -1;
   if (close (stream->_fd) == -1)
     return EOF;
   if (stream->_flags & __IO_rbuf_alloc)

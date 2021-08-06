@@ -45,7 +45,8 @@ const struct __locale __libc_posix_locale = {
     {tolower, toupper},
     __libc_posix_mbrtowc,
     __libc_posix_wcrtomb,
-    0 /* Don't support multibyte characters for POSIX locale */
+    0, /* Don't support multibyte characters for POSIX locale */
+    "ASCII"
   },
   .__LC_MESSAGES = {
     "^[yY]",

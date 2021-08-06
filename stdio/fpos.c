@@ -49,12 +49,7 @@ ftell (FILE *stream)
 int
 fseeko (FILE *stream, off_t offset, int whence)
 {
-  off_t ret = lseek (stream->_fd, offset, whence);
-  if (ret == -1)
-    return -1;
-  stream->_flags &= ~__IO_eof;
-  stream->_read_buf_len = 0;
-  return 0;
+  return fseeko64 (stream, offset, whence);
 }
 
 off_t
@@ -72,11 +67,14 @@ rewind (FILE *stream)
 int
 fseeko64 (FILE *stream, off64_t offset, int whence)
 {
-  off_t ret = lseek64 (stream->_fd, offset, whence);
+  off_t ret;
+  if (fflush (stream) == -1)
+    return -1;
+  stream->_read_ptr_len = 0;
+  ret = lseek64 (stream->_fd, offset, whence);
   if (ret == -1)
     return -1;
   stream->_flags &= ~__IO_eof;
-  stream->_read_buf_len = 0;
   return 0;
 }
 
