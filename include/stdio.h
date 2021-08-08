@@ -84,14 +84,14 @@ void perror (const char *str);
 
 int fputc (int c, FILE *stream);
 int fputc_unlocked (int c, FILE *stream);
-#define putc(c, stream) fputc (c, stream)
-#define putc_unlocked(c, stream) fputc_unlocked (c, stream)
+int putc (int c, FILE *stream);
+int putc_unlocked (int c, FILE *stream);
 int putchar (int c);
 int putchar_unlocked (int c);
 
 wint_t fputwc (wchar_t wc, FILE *stream);
 wint_t fputwc_unlocked (wchar_t wc, FILE *stream);
-#define putwc(wc, stream) fputwc (c, stream);
+wint_t putwc (wchar_t wc, FILE *stream);
 wint_t putwchar (wchar_t wc);
 wint_t putwchar_unlocked (wchar_t wc);
 
@@ -113,16 +113,16 @@ int vsscanf (const char *__restrict str, const char *__restrict fmt,
 
 int fgetc (FILE *stream);
 int fgetc_unlocked (FILE *stream);
-#define getc(stream) fgetc (stream)
-#define getc_unlocked(stream) fgetc_unlocked (stream)
+int getc (FILE *stream);
+int getc_unlocked (FILE *stream);
 int getchar (void);
 int getchar_unlocked (void);
 int ungetc (int c, FILE *stream);
 
 wint_t fgetwc (FILE *stream);
 wint_t fgetwc_unlocked (FILE *stream);
-#define getwc(stream) fgetwc (stream)
-#define getwc_unlocked(stream) fgetwc_unlocked (stream)
+wint_t getc (FILE *stream);
+wint_t getc_unlocked (FILE *stream);
 wint_t getwchar (void);
 wint_t getwchar_unlocked (void);
 wint_t ungetwc (wint_t wc, FILE *stream);
@@ -155,11 +155,11 @@ size_t fwrite_unlocked (const void *__restrict buffer, size_t size, size_t len,
 void clearerr (FILE *stream);
 void clearerr_unlocked (FILE *stream);
 int feof (FILE *stream);
-#define feof_unlocked(stream) feof (stream)
+int feof_unlocked (FILE *stream);
 int ferror (FILE *stream);
-#define ferror_unlocked(stream) ferror (stream)
+int ferror_unlocked (FILE *stream);
 int fileno (FILE *stream);
-#define fileno_unlocked(stream) fileno (stream)
+int fileno_unlocked (FILE *stream);
 
 int fgetpos (FILE *__restrict stream, fpos_t *__restrict pos);
 int fsetpos (FILE *__restrict stream, const fpos_t *__restrict pos);
@@ -174,8 +174,8 @@ int fseeko64 (FILE *stream, off64_t offset, int whence);
 off64_t ftello64 (FILE *stream);
 
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
-#define fseeko(stream, offset, whence) fseeko64 (stream, offset, whence)
-#define ftello(stream) ftello64 (stream)
+#define fseeko fseeko64
+#define ftello ftello64
 #endif
 
 int fflush (FILE *stream);
@@ -205,6 +205,8 @@ char *tmpnam (char *str);
 char *tmpnam_r (char *str);
 FILE *tmpfile (void);
 
+int rename (const char *old, const char *new);
+int renameat (int oldfd, const char *old, int newfd, const char *new);
 int remove (const char *path);
 
 __END_DECLS

@@ -19,5 +19,7 @@
 
 #define weak_alias(old, new)						\
   extern __typeof__ (old) new __attribute__ ((weak, alias (#old)))
+#define strong_alias(old, new)					\
+  extern __typeof__ (old) new __attribute__ ((alias (#old)))
 
 #endif

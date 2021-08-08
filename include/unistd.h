@@ -104,9 +104,6 @@ int fchown (int fd, uid_t uid, gid_t gid);
 int lchown (const char *path, uid_t uid, gid_t gid);
 int fchownat (int fd, const char *path, uid_t uid, gid_t gid, int flags);
 
-int rename (const char *old, const char *new);
-int renameat (int oldfd, const char *old, int newfd, const char *new);
-
 int symlink (const char *old, const char *new);
 int symlinkat (const char *old, int fd, const char *new);
 

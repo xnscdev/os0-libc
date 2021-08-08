@@ -75,6 +75,8 @@ int wcsncmp (const wchar_t *a, const wchar_t *b, size_t len);
 int wcscasecmp (const wchar_t *a, const wchar_t *b);
 int wcsncasecmp (const wchar_t *a, const wchar_t *b, size_t len);
 int wcscoll (const wchar_t *a, const wchar_t *b);
+size_t wcsxfrm (wchar_t *__restrict dest, const wchar_t *__restrict src,
+		size_t len);
 wchar_t *wcschr (const wchar_t *ws, wchar_t wc);
 wchar_t *wcsrchr (const wchar_t *ws, wchar_t wc);
 wchar_t *wcsstr (const wchar_t *haystack, const wchar_t *needle);

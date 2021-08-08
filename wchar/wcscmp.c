@@ -113,6 +113,16 @@ wcscoll (const wchar_t *a, const wchar_t *b)
   return wcscmp (a, b);
 }
 
+size_t
+wcsxfrm (wchar_t *__restrict dest, const wchar_t *__restrict src, size_t len)
+{
+  size_t i;
+  for (i = 0; i < len - 1 && src[i] != '\0'; i++)
+    dest[i] = src[i];
+  dest[i] = L'\0';
+  return i;
+}
+
 wchar_t *
 wcschr (const wchar_t *ws, wchar_t wc)
 {

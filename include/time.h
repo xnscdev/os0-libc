@@ -38,7 +38,7 @@ struct tm *localtime_r (const time_t *__restrict time,
 			struct tm *__restrict tp);
 time_t timegm (struct tm *tp);
 time_t timelocal (struct tm *tp);
-#define mktime(tp) timelocal (tp)
+time_t mktime (struct tm *tp);
 
 void tzset (void);
 
@@ -52,6 +52,7 @@ size_t strftime (char *__restrict str, size_t len, const char *__restrict fmt,
 char *strptime (const char *__restrict buffer, const char *__restrict fmt,
 		struct tm *__restrict tp);
 
+clock_t clock (void);
 int clock_getres (clockid_t id, struct timespec *tp);
 int clock_gettime (clockid_t id, struct timespec *tp);
 

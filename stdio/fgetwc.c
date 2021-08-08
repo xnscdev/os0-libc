@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stream.h>
 #include <string.h>
+#include <symbol.h>
 #include <unistd.h>
 #include <wchar.h>
 
@@ -119,3 +120,6 @@ ungetwc (wint_t wc, FILE *stream)
   funlockfile (stream);
   return ret;
 }
+
+strong_alias (fgetwc, getwc);
+strong_alias (fgetwc_unlocked, getwc_unlocked);

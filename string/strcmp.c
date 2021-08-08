@@ -96,6 +96,16 @@ strcoll (const char *a, const char *b)
   return strcmp (a, b); /* Works for POSIX locale */
 }
 
+size_t
+strxfrm (char *__restrict dest, const char *__restrict src, size_t len)
+{
+  size_t i;
+  for (i = 0; i < len - 1 && src[i] != '\0'; i++)
+    dest[i] = src[i];
+  dest[i] = '\0';
+  return i;
+}
+
 char *
 strchr (const char *s, int c)
 {

@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stream.h>
+#include <symbol.h>
 #include <unistd.h>
 
 int
@@ -100,3 +101,6 @@ ungetc (int c, FILE *stream)
   funlockfile (stream);
   return ret;
 }
+
+strong_alias (fgetc, getc);
+strong_alias (fgetc_unlocked, getc_unlocked);

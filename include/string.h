@@ -42,6 +42,7 @@ int strncmp (const char *a, const char *b, size_t len);
 int strcasecmp (const char *a, const char *b);
 int strncasecmp (const char *a, const char *b, size_t len);
 int strcoll (const char *a, const char *b);
+size_t strxfrm (char *__restrict dest, const char *__restrict src, size_t len);
 char *strchr (const char *s, int c);
 char *strrchr (const char *s, int c);
 char *strstr (const char *haystack, const char *needle);

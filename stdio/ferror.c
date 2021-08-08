@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <stream.h>
+#include <symbol.h>
 
 void
 clearerr (FILE *stream)
@@ -48,3 +49,7 @@ fileno (FILE *stream)
 {
   return stream->_fd;
 }
+
+strong_alias (feof, feof_unlocked);
+strong_alias (ferror, ferror_unlocked);
+strong_alias (fileno, fileno_unlocked);

@@ -14,6 +14,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OS/0 libc. If not, see <https://www.gnu.org/licenses/>. */
 
+#include <sys/resource.h>
 #include <errno.h>
 #include <stdio.h>
 #include <time.h>
@@ -206,6 +207,12 @@ timelocal (struct tm *tp)
   return timegm (tp);
 }
 
+time_t
+mktime (struct tm *tp)
+{
+  return timelocal (tp);
+}
+
 void
 tzset (void)
 {
@@ -213,4 +220,16 @@ tzset (void)
   tzname[1] = "GMT";
   timezone = 0;
   daylight = 0;
+}
+
+clock_t
+clock (void)
+{
+  struct rusage usage;
+  if (getrusage (RUSAGE_SELF, &usage) == -1)
+    return -1;
+  return usage.ru_utime.tv_sec * CLOCKS_PER_SEC +
+    usage.ru_utime.tv_usec * CLOCKS_PER_SEC / 1000000 +
+    usage.ru_stime.tv_sec * CLOCKS_PER_SEC +
+    usage.ru_stime.tv_usec * CLOCKS_PER_SEC / 1000000;
 }

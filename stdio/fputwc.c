@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stream.h>
 #include <string.h>
+#include <symbol.h>
 #include <unistd.h>
 #include <wchar.h>
 
@@ -76,3 +77,5 @@ putwchar_unlocked (wchar_t wc)
 {
   return fputwc_unlocked (wc, stdout);
 }
+
+strong_alias (fputwc, putwc);

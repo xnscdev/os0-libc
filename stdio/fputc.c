@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <stream.h>
+#include <symbol.h>
 #include <unistd.h>
 
 int
@@ -68,3 +69,6 @@ putchar_unlocked (int c)
 {
   return fputc_unlocked (c, stdout);
 }
+
+strong_alias (fputc, putc);
+strong_alias (fputc_unlocked, putc_unlocked);
