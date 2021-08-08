@@ -113,9 +113,9 @@ int rand (void);
 int rand_r (unsigned int *seed);
 void srand (unsigned int seed);
 
-char *mktemp (char *template);
-int mkstemp (char *template);
-char *mkdtemp (char *template);
+char *mktemp (char *tmpl);
+int mkstemp (char *tmpl);
+char *mkdtemp (char *tmpl);
 
 __END_DECLS
 

@@ -36,7 +36,7 @@
 #define __LC_wctrans_max 8
 
 #ifndef __wint_defined
-typedef int wint_t;
+typedef unsigned int wint_t;
 #define __wint_defined
 #endif
 

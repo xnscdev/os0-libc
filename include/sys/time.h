@@ -25,8 +25,8 @@ __BEGIN_DECLS
 int gettimeofday (struct timeval *__restrict tv,
 		  struct timezone *__restrict tz);
 
-int setitimer (int which, const struct itimerval *__restrict new,
-	       struct itimerval *__restrict old);
+int setitimer (int which, const struct itimerval *__restrict newval,
+	       struct itimerval *__restrict oldval);
 int getitimer (int which, struct itimerval *curr);
 
 int utimes (const char *path, const struct timeval times[2]);

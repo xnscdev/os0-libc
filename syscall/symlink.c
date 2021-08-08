@@ -18,13 +18,13 @@
 #include <unistd.h>
 
 int
-symlink (const char *old, const char *new)
+symlink (const char *oldpath, const char *newpath)
 {
-  return syscall (SYS_symlink, old, new);
+  return syscall (SYS_symlink, oldpath, newpath);
 }
 
 int
-symlinkat (const char *old, int fd, const char *new)
+symlinkat (const char *oldpath, int fd, const char *newpath)
 {
-  return syscall (SYS_symlinkat, old, fd, new);
+  return syscall (SYS_symlinkat, oldpath, fd, newpath);
 }

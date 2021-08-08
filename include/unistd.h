@@ -92,8 +92,9 @@ int dup2 (int fd1, int fd2);
 int access (const char *path, int mode);
 int faccessat (int fd, const char *path, int mode, int flags);
 
-int link (const char *old, const char *new);
-int linkat (int oldfd, const char *old, int newfd, const char *new, int flags);
+int link (const char *oldpath, const char *newpath);
+int linkat (int oldfd, const char *oldpath, int newfd, const char *newpath,
+	    int flags);
 
 int unlink (const char *path);
 int unlinkat (int fd, const char *path, int flags);
@@ -104,8 +105,8 @@ int fchown (int fd, uid_t uid, gid_t gid);
 int lchown (const char *path, uid_t uid, gid_t gid);
 int fchownat (int fd, const char *path, uid_t uid, gid_t gid, int flags);
 
-int symlink (const char *old, const char *new);
-int symlinkat (const char *old, int fd, const char *new);
+int symlink (const char *oldpath, const char *newpath);
+int symlinkat (const char *oldpath, int fd, const char *newpath);
 
 ssize_t readlink (const char *__restrict path, char *__restrict buffer,
 		  size_t len);

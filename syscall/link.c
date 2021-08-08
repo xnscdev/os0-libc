@@ -18,13 +18,14 @@
 #include <unistd.h>
 
 int
-link (const char *old, const char *new)
+link (const char *oldpath, const char *newpath)
 {
-  return syscall (SYS_link, old, new);
+  return syscall (SYS_link, oldpath, newpath);
 }
 
 int
-linkat (int oldfd, const char *old, int newfd, const char *new, int flags)
+linkat (int oldfd, const char *oldpath, int newfd, const char *newpath,
+	int flags)
 {
-  return syscall (SYS_linkat, oldfd, old, newfd, new, flags);
+  return syscall (SYS_linkat, oldfd, oldpath, newfd, newpath, flags);
 }

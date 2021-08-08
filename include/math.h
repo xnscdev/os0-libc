@@ -178,7 +178,7 @@ double hypot (double x, double y);
 float hypotf (float x, float y);
 long double hypotl (long double x, long double y);
 
-double finite (double x);
+int finite (double x);
 
 #define fpclassify(x) __builtin_fpclassify (FP_NAN, FP_INFINITE, FP_NORMAL, \
 					    FP_SUBNORMAL, FP_ZERO, (x))

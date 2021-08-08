@@ -19,10 +19,10 @@
 #include <unistd.h>
 
 int
-setitimer (int which, const struct itimerval *__restrict new,
-	   struct itimerval *__restrict old)
+setitimer (int which, const struct itimerval *__restrict newval,
+	   struct itimerval *__restrict oldval)
 {
-  return syscall (SYS_setitimer, which, new, old);
+  return syscall (SYS_setitimer, which, newval, oldval);
 }
 
 int

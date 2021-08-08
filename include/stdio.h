@@ -47,7 +47,7 @@ typedef struct __FILE FILE;
 #endif
 
 #ifndef __wint_defined
-typedef int wint_t;
+typedef unsigned int wint_t;
 #define __wint_defined
 #endif
 
@@ -121,8 +121,8 @@ int ungetc (int c, FILE *stream);
 
 wint_t fgetwc (FILE *stream);
 wint_t fgetwc_unlocked (FILE *stream);
-wint_t getc (FILE *stream);
-wint_t getc_unlocked (FILE *stream);
+wint_t getwc (FILE *stream);
+wint_t getwc_unlocked (FILE *stream);
 wint_t getwchar (void);
 wint_t getwchar_unlocked (void);
 wint_t ungetwc (wint_t wc, FILE *stream);
@@ -205,8 +205,8 @@ char *tmpnam (char *str);
 char *tmpnam_r (char *str);
 FILE *tmpfile (void);
 
-int rename (const char *old, const char *new);
-int renameat (int oldfd, const char *old, int newfd, const char *new);
+int rename (const char *oldpath, const char *newpath);
+int renameat (int oldfd, const char *oldpath, int newfd, const char *newpath);
 int remove (const char *path);
 
 __END_DECLS

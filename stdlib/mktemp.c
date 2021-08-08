@@ -23,24 +23,24 @@
 #include <unistd.h>
 
 char *
-mktemp (char *template)
+mktemp (char *tmpl)
 {
-  size_t len = strlen (template);
+  size_t len = strlen (tmpl);
   char *ptr;
   unsigned int seed;
   int i;
-  if (len < 6 || (ptr = template + len - 7, strcmp (ptr, "XXXXXX") != 0))
+  if (len < 6 || (ptr = tmpl + len - 7, strcmp (ptr, "XXXXXX") != 0))
     {
       errno = EINVAL;
-      *template = '\0';
-      return template;
+      *tmpl = '\0';
+      return tmpl;
     }
 
   /* Make sure we can actually access the supplied path */
-  if (access (template, F_OK) == -1 && errno != ENOENT)
+  if (access (tmpl, F_OK) == -1 && errno != ENOENT)
     {
-      *template = '\0';
-      return template;
+      *tmpl = '\0';
+      return tmpl;
     }
 
   /* Generate random filenames until one is found */
@@ -49,27 +49,27 @@ mktemp (char *template)
     {
       for (i = 0; i < 6; i++)
         ptr[i] = 'A' + rand_r (&seed) % 26;
-      if (access (template, F_OK) == -1 && errno == ENOENT)
+      if (access (tmpl, F_OK) == -1 && errno == ENOENT)
 	break;
     }
-  return template;
+  return tmpl;
 }
 
 int
-mkstemp (char *template)
+mkstemp (char *tmpl)
 {
-  size_t len = strlen (template);
+  size_t len = strlen (tmpl);
   char *ptr;
   unsigned int seed;
   int i;
-  if (len < 6 || (ptr = template + len - 7, strcmp (ptr, "XXXXXX") != 0))
+  if (len < 6 || (ptr = tmpl + len - 7, strcmp (ptr, "XXXXXX") != 0))
     {
       errno = EINVAL;
       return -1;
     }
 
   /* Make sure we can actually access the supplied path */
-  if (access (template, F_OK) == -1 && errno != ENOENT)
+  if (access (tmpl, F_OK) == -1 && errno != ENOENT)
     return -1;
 
   /* Generate random filenames until one can be opened */
@@ -79,19 +79,19 @@ mkstemp (char *template)
       int fd;
       for (i = 0; i < 6; i++)
         ptr[i] = 'A' + rand_r (&seed) % 26;
-      fd = open (template, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+      fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
       if (fd != -1)
 	return fd;
     }
 }
 
 char *
-mkdtemp (char *template)
+mkdtemp (char *tmpl)
 {
-  mktemp (template);
-  if (*template == '\0')
+  mktemp (tmpl);
+  if (*tmpl == '\0')
     return NULL;
-  if (mkdir (template, S_IRWXU) == -1)
+  if (mkdir (tmpl, S_IRWXU) == -1)
     return NULL;
-  return template;
+  return tmpl;
 }

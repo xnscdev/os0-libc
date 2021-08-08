@@ -18,13 +18,13 @@
 #include <unistd.h>
 
 int
-rename (const char *old, const char *new)
+rename (const char *oldpath, const char *newpath)
 {
-  return syscall (SYS_rename, old, new);
+  return syscall (SYS_rename, oldpath, newpath);
 }
 
 int
-renameat (int oldfd, const char *old, int newfd, const char *new)
+renameat (int oldfd, const char *oldpath, int newfd, const char *newpath)
 {
-  return syscall (SYS_renameat, oldfd, old, newfd, new);
+  return syscall (SYS_renameat, oldfd, oldpath, newfd, newpath);
 }
