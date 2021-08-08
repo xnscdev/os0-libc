@@ -28,37 +28,12 @@ char *
 strtok_r (char *__restrict s, const char *__restrict delims,
 	  char **__restrict saveptr)
 {
-  size_t i;
-  char *ptr = NULL;
-  char *end;
-
-  /* Set or restore context */
-  if (s != NULL)
-    *saveptr = s;
-  else
-    s = *saveptr + 1;
-
-  for (end = s; *end != '\0'; end++)
-    {
-      int is_delim = 0;
-      for (i = 0; delims[i] != '\0'; i++)
-	{
-	  if (*end == delims[i])
-	    {
-	      is_delim = 1;
-	      break;
-	    }
-	}
-
-      if (!is_delim && ptr == NULL)
-	ptr = end;
-      else if (is_delim && ptr != NULL)
-	{
-	  *saveptr = end;
-	  *end = '\0';
-	  return ptr;
-	}
-    }
-  *saveptr = end;
+  char *ptr;
+  if (s == NULL)
+    s = *saveptr;
+  if (s == NULL || *s == '\0')
+    return NULL;
+  ptr = s + strspn (s, delims);
+  *saveptr = strpbrk (ptr, delims);
   return ptr;
 }
