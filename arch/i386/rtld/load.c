@@ -76,6 +76,10 @@ rtld_load_dynamic (int obj, unsigned long priority, int mode)
 {
   Elf32_Dyn *entry;
   struct rtld_info *dlinfo = &rtld_shlibs[obj];
+  uintptr_t *init_array = NULL;
+  uintptr_t *fini_array = NULL;
+  size_t init_arraysz = 0;
+  size_t fini_arraysz = 0;
   for (entry = dlinfo->dynamic; entry->d_tag != DT_NULL; entry++)
     {
       switch (entry->d_tag)
@@ -112,11 +116,23 @@ rtld_load_dynamic (int obj, unsigned long priority, int mode)
 	  break;
 	case DT_INIT:
 	  rtld_queue_add (&rtld_init_func,
-			  dlinfo->offset + entry->d_un.d_ptr, priority);
+			  dlinfo->offset + entry->d_un.d_ptr, priority * 2);
+	  break;
+	case DT_INIT_ARRAY:
+	  init_array = dlinfo->offset + entry->d_un.d_ptr;
+	  break;
+	case DT_INIT_ARRAYSZ:
+	  init_arraysz = entry->d_un.d_val / sizeof (uintptr_t);
 	  break;
 	case DT_FINI:
 	  rtld_queue_add (&rtld_fini_func,
-			  dlinfo->offset + entry->d_un.d_ptr, priority);
+			  dlinfo->offset + entry->d_un.d_ptr, priority * 2);
+	  break;
+	case DT_FINI_ARRAY:
+	  fini_array = dlinfo->offset + entry->d_un.d_ptr;
+	  break;
+	case DT_FINI_ARRAYSZ:
+	  fini_arraysz = entry->d_un.d_val / sizeof (uintptr_t);
 	  break;
 	case DT_REL:
 	  dlinfo->rel.table = dlinfo->offset + entry->d_un.d_ptr;
@@ -164,6 +180,29 @@ rtld_load_dynamic (int obj, unsigned long priority, int mode)
       abort ();
     }
 
+  /* Add array of init/fini functions, if present */
+  if (init_array != NULL)
+    {
+      size_t i;
+      for (i = 0; i < init_arraysz; i++)
+	{
+	  if (init_array[i] != 0)
+	    rtld_queue_add (&rtld_init_func, dlinfo->offset + init_array[i],
+			    priority * 2 + 1);
+	}
+    }
+  if (fini_array != NULL)
+    {
+      size_t i;
+      for (i = 0; i < fini_arraysz; i++)
+	{
+	  if (fini_array[i] != 0)
+	    rtld_queue_add (&rtld_fini_func, dlinfo->offset + fini_array[i],
+			    priority * 2 + 1);
+	}
+    }
+
+  /* Setup PLT/GOT for lazy dynamic linking */
   if (likely (dlinfo->pltgot != NULL))
     {
       dlinfo->pltgot[1] = obj;
