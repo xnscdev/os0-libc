@@ -136,11 +136,11 @@ long syscall (long num, ...);
 long sysconf (int name);
 
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
-#define pread(fd, buffer, len, offset) pread64 (fd, buffer, len, offset)
-#define pwrite(fd, buffer, len, offset) pwrite64 (fd, buffer, len, offset)
-#define lseek(fd, offset, whence) lseek64 (fd, offset, whence)
-#define truncate(path, len) truncate64 (path, len)
-#define ftruncate(fd, len) ftruncate64 (fd, len)
+#define pread     pread64
+#define pwrite    pwrite64
+#define lseek     lseek64
+#define truncate  truncate64
+#define ftruncate ftruncate64
 #endif
 
 __END_DECLS

@@ -109,6 +109,7 @@ libc_src = [
   'stdio/vscanf.c',
   'stdlib/abort.c',
   'stdlib/assert.c',
+  'stdlib/cxxabi.c',
   'stdlib/bitsearch.c',
   'stdlib/bsearch.c',
   'stdlib/dirent.c',

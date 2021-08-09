@@ -44,8 +44,7 @@ atexit (void (*func) (void))
 void
 exit (int code)
 {
-  int i;
-  for (i = 0; i < __atexit_ptr; i++)
-    __atexit_funcs[i] ();
+  while (__atexit_ptr-- > 0)
+    __atexit_funcs[__atexit_ptr] ();
   _exit (code);
 }
